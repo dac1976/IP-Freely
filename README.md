@@ -19,8 +19,6 @@ Copyright (C) 2018 Duncan Crutchley.
 * Scheduled recording can be setup and enabled on a per camera basis.
 * User can view larger expanded view from any of the 4 streams.
 
-## To-do List ##
-
 ## Requirements ##
 This application has been developed in Qt Creator and tested for use in Windows 10 and Linux (Ubuntu 17.10). In Windows it is recommended to use the MSVC2015 64bit tool chain from within Qt Creator to build and test the code. In Linux the code has been tested with GCC 7.2.0 but other C++11 compilers should be fine, such as Clang.
 
