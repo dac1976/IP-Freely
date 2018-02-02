@@ -22,6 +22,12 @@
     <height>480</height>
    </size>
   </property>
+  <property name="font">
+   <font>
+    <family>Segoe UI</family>
+    <pointsize>9</pointsize>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>IP Freely Camera Storage Browser</string>
   </property>
