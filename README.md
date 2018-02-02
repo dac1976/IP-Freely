@@ -2,7 +2,7 @@
 ## Introduction ##
 This project implements a hopefully useful cross-platform application to view and record from up to 4 IP camera live RTSP streams. The application also allows you to view a camera's on-board storage (e.g. SD card) and download video content from the camera's on-board storage to your PC (or anywhere else your PC can browse to on your network, e.g. a NAS).
 
-It is licensed under the GNU Lesser General Public License and the relevant documentation for this can be found at the top of each source file and in the files COPYING and COPYING.LESSER.
+It is licensed under the GNU Lesser General Public License and the relevant documentation for this can be found at the top of each source file and the LICENSE text file.
 
 The code is the work of Duncan Crutchley (<dac1976github@outlook.com>).
 
