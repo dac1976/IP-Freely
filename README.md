@@ -22,8 +22,34 @@ I started this project shortly after buying and installing some RSTP compatible 
 * Scheduled recording can be setup and enabled on a per camera basis.
 * User can view larger expanded view from any of the 4 streams.
 
-## Screen-shots ##
-Coming soon...
+## Screenshots ##
+### Preferences ###
+ 
+![alt text][pic04]
+
+![alt text][pic05]
+
+### Camera Setup ###
+ 
+![alt text][pic03]
+
+### Main Screen ###
+ 
+![alt text][pic01]
+
+![alt text][pic02]
+
+![alt text][pic06]
+
+![alt text][pic07]
+
+[pic01]: https://github.com/dac1976/IP-Freely/blob/master/Images/pic01.png "Main screen displaying one camera."
+[pic02]: https://github.com/dac1976/IP-Freely/blob/master/Images/pic02.png "Expanded view of camera 1's feed."
+[pic03]: https://github.com/dac1976/IP-Freely/blob/master/Images/pic03.png "Camera setup dialog."
+[pic04]: https://github.com/dac1976/IP-Freely/blob/master/Images/pic04.png "General preferences."
+[pic05]: https://github.com/dac1976/IP-Freely/blob/master/Images/pic05.png "Recording schedule preferences."
+[pic06]: https://github.com/dac1976/IP-Freely/blob/master/Images/pic06.png "Camera storage browser."
+[pic07]: https://github.com/dac1976/IP-Freely/blob/master/Images/pic07.png "Camera stream recording."
 
 ## Build Requirements ##
 This application has been developed in Qt Creator and tested for use in Windows 10 and Linux (Ubuntu 17.10). In Windows it is recommended to use the MSVC2015 64bit tool chain from within Qt Creator to build and test the code. In Linux the code has been tested with GCC 7.2.0 but other C++11 compilers should be fine, such as Clang.
