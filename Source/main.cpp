@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
 
         logInitialised = true;
 
-        IpFreelyMainWindow w;
+        IpFreelyMainWindow w(appVersion);
         DEBUG_MESSAGE_EX_INFO("Showing main form.");
         w.show();
 

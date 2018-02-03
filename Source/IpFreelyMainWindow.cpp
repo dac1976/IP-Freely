@@ -34,6 +34,7 @@
 #include <QPainter>
 #include <QPen>
 #include <QBrush>
+#include <QScreen>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -54,7 +55,9 @@ namespace bfs = boost::filesystem;
 namespace
 {
 
-static constexpr int DEFAULT_UPDATE_PERIOD_MS = 25;
+static constexpr int    DEFAULT_UPDATE_PERIOD_MS = 25;
+static constexpr double DEFAULT_BUTTON_ICON_SIZE = 32.0;
+static constexpr double DEFAULT_SCREEN_SIZE      = 1080.0;
 
 void ClearLayout(QLayout* layout, bool deleteWidgets)
 {
@@ -88,9 +91,10 @@ void ClearLayout(QLayout* layout, bool deleteWidgets)
 
 } // unnamed namesapce
 
-IpFreelyMainWindow::IpFreelyMainWindow(QWidget* parent)
+IpFreelyMainWindow::IpFreelyMainWindow(QString const& appVersion, QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::IpFreelyMainWindow)
+    , m_appVersion(appVersion)
     , m_updateFeedsTimer(new QTimer(this))
     , m_numConnections(0)
     , m_videoForm(std::make_unique<IpFreelyVideoForm>())
@@ -98,6 +102,8 @@ IpFreelyMainWindow::IpFreelyMainWindow(QWidget* parent)
     ui->setupUi(this);
 
     connect(m_updateFeedsTimer, &QTimer::timeout, this, &IpFreelyMainWindow::on_updateFeedsTimer);
+
+    SetButtonSizes();
 
     ConnectButtons();
 
@@ -182,6 +188,8 @@ void IpFreelyMainWindow::on_actionAbout_triggered()
 {
     IpFreelyAbout aboutDlg;
     aboutDlg.setModal(true);
+    QString title = tr("IP Freely (RTSP Stream Viewer and Recorder) ") + m_appVersion;
+    aboutDlg.SetTitle(title);
     aboutDlg.exec();
 }
 
@@ -503,6 +511,80 @@ void IpFreelyMainWindow::resizeEvent(QResizeEvent* /*event*/)
     }
 }
 
+void IpFreelyMainWindow::SetButtonSizes()
+{
+    auto   g           = ui->cam1SettingsToolButton->geometry();
+    auto   screenPos   = ui->cam1SettingsToolButton->mapToGlobal(QPoint(g.left(), g.top()));
+    auto   screen      = qApp->screenAt(screenPos);
+    double scaleFactor = screen->size().height() / DEFAULT_SCREEN_SIZE;
+    int    buttonSize  = static_cast<int>(DEFAULT_BUTTON_ICON_SIZE * scaleFactor);
+
+    if (buttonSize < 24)
+    {
+        buttonSize = 24;
+    }
+    else if (buttonSize > 48)
+    {
+        buttonSize = 48;
+    }
+
+    ui->cam1SettingsToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam1ConnectToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam1ImageToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam1RecordToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam1ExpandToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam1StorageToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+
+    ui->cam4SettingsToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam4ConnectToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam4ImageToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam4RecordToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam4ExpandToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam4StorageToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+
+    ui->cam2SettingsToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam2ConnectToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam2ImageToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam2RecordToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam2ExpandToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam2StorageToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+
+    ui->cam3SettingsToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam3ConnectToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam3ImageToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam3RecordToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam3ExpandToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam3StorageToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+
+    ui->cam1SettingsToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam1ConnectToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam1ImageToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam1RecordToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam1ExpandToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam1StorageToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+
+    ui->cam4SettingsToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam4ConnectToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam4ImageToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam4RecordToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam4ExpandToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam4StorageToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+
+    ui->cam2SettingsToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam2ConnectToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam2ImageToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam2RecordToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam2ExpandToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam2StorageToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+
+    ui->cam3SettingsToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam3ConnectToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam3ImageToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam3RecordToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam3ExpandToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam3StorageToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+}
+
 void IpFreelyMainWindow::ConnectButtons()
 {
     connect(ui->cam1SettingsToolButton,
@@ -736,11 +818,11 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
             break;
         }
 
-        connectBtn->setIcon(QIcon(":/icons/icons/WallCam_Connect_20.png"));
+        connectBtn->setIcon(QIcon(":/icons/icons/WallCam_Connect_48.png"));
         connectBtn->setToolTip("Connect to camera stream.");
 
         recordBtn->setEnabled(false);
-        recordBtn->setIcon(QIcon(":/icons/icons/Record_20.png"));
+        recordBtn->setIcon(QIcon(":/icons/icons/Record-48.png"));
         recordBtn->setToolTip("Record from camera stream.");
 
         snapshotBtn->setEnabled(false);
@@ -797,8 +879,8 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
         }
         catch (std::exception& e)
         {
-            DEBUG_MESSAGE_EX_ERROR(
-                "Stream Error, camera: " << camName << ", error message: " << e.what());
+            DEBUG_MESSAGE_EX_ERROR("Stream Error, camera: " << camName
+                                                            << ", error message: " << e.what());
             QMessageBox::critical(this,
                                   "Stream Error",
                                   QString::fromLocal8Bit(e.what()),
@@ -836,14 +918,14 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
         m_camFeeds[camera.camId] = feed;
 
         recordBtn->setEnabled(!camera.enableScheduledRecording);
-        recordBtn->setIcon(QIcon(":/icons/icons/Record_20.png"));
+        recordBtn->setIcon(QIcon(":/icons/icons/Record-48.png"));
         recordBtn->setToolTip("Record from camera stream.");
 
         snapshotBtn->setEnabled(true);
         expandBtn->setEnabled(true);
         storageBtn->setEnabled(true);
 
-        connectBtn->setIcon(QIcon(":/icons/icons/WallCam_Disconnect_20.png"));
+        connectBtn->setIcon(QIcon(":/icons/icons/WallCam_Disconnect_48.png"));
         connectBtn->setToolTip("Disconnect from camera stream.");
 
         m_streamProcessors[camera.camId]->Start();
@@ -866,14 +948,14 @@ void IpFreelyMainWindow::RecordActionHandler(ipfreely::eCamId const camId, QTool
     {
         streamProcIter->second->StopVideoWriting();
 
-        recordBtn->setIcon(QIcon(":/icons/icons/Record_20.png"));
+        recordBtn->setIcon(QIcon(":/icons/icons/Record-48.png"));
         recordBtn->setToolTip("Record from camera stream.");
     }
     else
     {
         streamProcIter->second->StartVideoWriting();
 
-        recordBtn->setIcon(QIcon(":/icons/icons/Stop_20.png"));
+        recordBtn->setIcon(QIcon(":/icons/icons/Stop-48.png"));
         recordBtn->setToolTip("Stop recording from camera stream.");
     }
 }

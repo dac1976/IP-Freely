@@ -77,7 +77,7 @@
     <widget class="QLabel" name="srcUrl">
      <property name="maximumSize">
       <size>
-       <width>350</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>

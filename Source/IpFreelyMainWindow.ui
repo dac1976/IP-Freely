@@ -12,8 +12,8 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>1024</width>
-    <height>768</height>
+    <width>800</width>
+    <height>600</height>
    </size>
   </property>
   <property name="font">
@@ -69,14 +69,14 @@
             <widget class="QToolButton" name="cam1SettingsToolButton">
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -87,12 +87,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/Settings_20.png</normaloff>:/icons/icons/Settings_20.png</iconset>
+               <normaloff>:/icons/icons/Settings-48.png</normaloff>:/icons/icons/Settings-48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -107,14 +107,14 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -125,12 +125,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/WallCam_Connect_20.png</normaloff>:/icons/icons/WallCam_Connect_20.png</iconset>
+               <normaloff>:/icons/icons/WallCam_Connect_48.png</normaloff>:/icons/icons/WallCam_Connect_48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -145,14 +145,14 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -163,12 +163,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/ScreenShot_20.png</normaloff>:/icons/icons/ScreenShot_20.png</iconset>
+               <normaloff>:/icons/icons/Screenshot-48.png</normaloff>:/icons/icons/Screenshot-48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -183,14 +183,14 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -201,12 +201,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/Record_20.png</normaloff>:/icons/icons/Record_20.png</iconset>
+               <normaloff>:/icons/icons/Record-48.png</normaloff>:/icons/icons/Record-48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -221,14 +221,14 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -239,12 +239,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/Expand-20.png</normaloff>:/icons/icons/Expand-20.png</iconset>
+               <normaloff>:/icons/icons/Expand-48.png</normaloff>:/icons/icons/Expand-48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -265,14 +265,14 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -283,12 +283,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/Storage-20.png</normaloff>:/icons/icons/Storage-20.png</iconset>
+               <normaloff>:/icons/icons/Storage-48.png</normaloff>:/icons/icons/Storage-48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -365,14 +365,14 @@
             <widget class="QToolButton" name="cam4SettingsToolButton">
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -383,12 +383,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/Settings_20.png</normaloff>:/icons/icons/Settings_20.png</iconset>
+               <normaloff>:/icons/icons/Settings-48.png</normaloff>:/icons/icons/Settings-48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -403,14 +403,14 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -421,12 +421,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/WallCam_Connect_20.png</normaloff>:/icons/icons/WallCam_Connect_20.png</iconset>
+               <normaloff>:/icons/icons/WallCam_Connect_48.png</normaloff>:/icons/icons/WallCam_Connect_48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -441,14 +441,14 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -459,12 +459,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/ScreenShot_20.png</normaloff>:/icons/icons/ScreenShot_20.png</iconset>
+               <normaloff>:/icons/icons/Screenshot-48.png</normaloff>:/icons/icons/Screenshot-48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -479,14 +479,14 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -497,12 +497,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/Record_20.png</normaloff>:/icons/icons/Record_20.png</iconset>
+               <normaloff>:/icons/icons/Record-48.png</normaloff>:/icons/icons/Record-48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -517,14 +517,14 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -535,12 +535,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/Expand-20.png</normaloff>:/icons/icons/Expand-20.png</iconset>
+               <normaloff>:/icons/icons/Expand-48.png</normaloff>:/icons/icons/Expand-48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -555,14 +555,14 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>243</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -573,12 +573,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/Storage-20.png</normaloff>:/icons/icons/Storage-20.png</iconset>
+               <normaloff>:/icons/icons/Storage-48.png</normaloff>:/icons/icons/Storage-48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -655,14 +655,14 @@
             <widget class="QToolButton" name="cam2SettingsToolButton">
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -673,12 +673,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/Settings_20.png</normaloff>:/icons/icons/Settings_20.png</iconset>
+               <normaloff>:/icons/icons/Settings-48.png</normaloff>:/icons/icons/Settings-48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -693,14 +693,14 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -711,12 +711,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/WallCam_Connect_20.png</normaloff>:/icons/icons/WallCam_Connect_20.png</iconset>
+               <normaloff>:/icons/icons/WallCam_Connect_48.png</normaloff>:/icons/icons/WallCam_Connect_48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -731,14 +731,14 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -749,12 +749,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/ScreenShot_20.png</normaloff>:/icons/icons/ScreenShot_20.png</iconset>
+               <normaloff>:/icons/icons/Screenshot-48.png</normaloff>:/icons/icons/Screenshot-48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -769,14 +769,14 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -787,12 +787,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/Record_20.png</normaloff>:/icons/icons/Record_20.png</iconset>
+               <normaloff>:/icons/icons/Record-48.png</normaloff>:/icons/icons/Record-48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -807,14 +807,14 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -825,12 +825,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/Expand-20.png</normaloff>:/icons/icons/Expand-20.png</iconset>
+               <normaloff>:/icons/icons/Expand-48.png</normaloff>:/icons/icons/Expand-48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -845,14 +845,14 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -863,12 +863,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/Storage-20.png</normaloff>:/icons/icons/Storage-20.png</iconset>
+               <normaloff>:/icons/icons/Storage-48.png</normaloff>:/icons/icons/Storage-48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -945,14 +945,14 @@
             <widget class="QToolButton" name="cam3SettingsToolButton">
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -963,12 +963,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/Settings_20.png</normaloff>:/icons/icons/Settings_20.png</iconset>
+               <normaloff>:/icons/icons/Settings-48.png</normaloff>:/icons/icons/Settings-48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -983,14 +983,14 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -1001,12 +1001,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/WallCam_Connect_20.png</normaloff>:/icons/icons/WallCam_Connect_20.png</iconset>
+               <normaloff>:/icons/icons/WallCam_Connect_48.png</normaloff>:/icons/icons/WallCam_Connect_48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -1021,14 +1021,14 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -1039,12 +1039,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/ScreenShot_20.png</normaloff>:/icons/icons/ScreenShot_20.png</iconset>
+               <normaloff>:/icons/icons/Screenshot-48.png</normaloff>:/icons/icons/Screenshot-48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -1059,14 +1059,14 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -1077,12 +1077,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/Record_20.png</normaloff>:/icons/icons/Record_20.png</iconset>
+               <normaloff>:/icons/icons/Record-48.png</normaloff>:/icons/icons/Record-48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -1097,14 +1097,14 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -1115,12 +1115,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/Expand-20.png</normaloff>:/icons/icons/Expand-20.png</iconset>
+               <normaloff>:/icons/icons/Expand-48.png</normaloff>:/icons/icons/Expand-48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -1135,14 +1135,14 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="toolTip">
@@ -1153,12 +1153,12 @@
              </property>
              <property name="icon">
               <iconset resource="ipfreely.qrc">
-               <normaloff>:/icons/icons/Storage-20.png</normaloff>:/icons/icons/Storage-20.png</iconset>
+               <normaloff>:/icons/icons/Storage-48.png</normaloff>:/icons/icons/Storage-48.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>48</width>
+               <height>48</height>
               </size>
              </property>
              <property name="autoRaise">
@@ -1212,7 +1212,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuEdit">

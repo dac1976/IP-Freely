@@ -1,13 +1,13 @@
 <RCC>
     <qresource prefix="/icons">
         <file>IpFreely.ico</file>
-        <file>icons/Record_20.png</file>
-        <file>icons/ScreenShot_20.png</file>
-        <file>icons/Stop_20.png</file>
-        <file>icons/Settings_20.png</file>
-        <file>icons/Expand-20.png</file>
-        <file>icons/WallCam_Connect_20.png</file>
-        <file>icons/WallCam_Disconnect_20.png</file>
-        <file>icons/Storage-20.png</file>
+        <file>icons/Expand-48.png</file>
+        <file>icons/Record-48.png</file>
+        <file>icons/Screenshot-48.png</file>
+        <file>icons/Settings-48.png</file>
+        <file>icons/Stop-48.png</file>
+        <file>icons/Storage-48.png</file>
+        <file>icons/WallCam_Connect_48.png</file>
+        <file>icons/WallCam_Disconnect_48.png</file>
     </qresource>
 </RCC>

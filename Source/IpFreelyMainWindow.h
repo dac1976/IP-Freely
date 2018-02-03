@@ -62,7 +62,7 @@ public:
      * \brief IpFreelyMainWindow constructor.
      * \param[in] parent - (Optional) Pointer to parent widget.
      */
-    explicit IpFreelyMainWindow(QWidget* parent = nullptr);
+    explicit IpFreelyMainWindow(QString const& appVersion, QWidget* parent = nullptr);
 
     /*! \brief IpFreelyVideoForm destructor. */
     ~IpFreelyMainWindow();
@@ -101,31 +101,33 @@ protected:
     virtual void resizeEvent(QResizeEvent* event);
 
 private:
-    void ConnectButtons();
-    void CheckStartupConnections();
-    void SetupCameraInDb(ipfreely::eCamId const camId, QToolButton* connectBtn);
-    void ConnectionHandler(ipfreely::IpCamera const& camera, QToolButton* connectBtn,
-                           QToolButton* recordBtn, QToolButton* snapshotBtn, QToolButton* expandBtn,
-                           QToolButton* storageBtn);
-    void RecordActionHandler(ipfreely::eCamId const camId, QToolButton* recordBtn);
+    void     SetButtonSizes();
+    void     ConnectButtons();
+    void     CheckStartupConnections();
+    void     SetupCameraInDb(ipfreely::eCamId const camId, QToolButton* connectBtn);
+    void     ConnectionHandler(ipfreely::IpCamera const& camera, QToolButton* connectBtn,
+                               QToolButton* recordBtn, QToolButton* snapshotBtn, QToolButton* expandBtn,
+                               QToolButton* storageBtn);
+    void     RecordActionHandler(ipfreely::eCamId const camId, QToolButton* recordBtn);
     QWidget* GetParentFrame(ipfreely::eCamId const camId) const;
-    void UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage const& videoFrame,
-                            bool const streamProcIsWriting);
-    void SaveImageSnapshot(ipfreely::eCamId const camId);
-    void SetFpsInTitle(ipfreely::eCamId const camId, double const fps);
-    void ShowExpandedVideoForm(ipfreely::eCamId const camId);
-    void ViewStorage(ipfreely::IpCamera const& camera);
+    void     UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage const& videoFrame,
+                                bool const streamProcIsWriting);
+    void     SaveImageSnapshot(ipfreely::eCamId const camId);
+    void     SetFpsInTitle(ipfreely::eCamId const camId, double const fps);
+    void     ShowExpandedVideoForm(ipfreely::eCamId const camId);
+    void     ViewStorage(ipfreely::IpCamera const& camera);
 
 private:
-    Ui::IpFreelyMainWindow*          ui;
-    ipfreely::IpFreelyPreferences    m_prefs;
-    ipfreely::IpFreelyCameraDatabase m_camDb;
-    QTimer*                          m_updateFeedsTimer;
+    Ui::IpFreelyMainWindow*                   ui;
+    QString                                   m_appVersion;
+    ipfreely::IpFreelyPreferences             m_prefs;
+    ipfreely::IpFreelyCameraDatabase          m_camDb;
+    QTimer*                                   m_updateFeedsTimer;
     std::map<ipfreely::eCamId, QLabel*>       m_camFeeds;
     std::map<ipfreely::eCamId, stream_proc_t> m_streamProcessors;
-    int                                m_numConnections;
-    std::unique_ptr<IpFreelyVideoForm> m_videoForm;
-    ipfreely::eCamId                   m_videoFormId;
+    int                                       m_numConnections;
+    std::unique_ptr<IpFreelyVideoForm>        m_videoForm;
+    ipfreely::eCamId                          m_videoFormId;
 };
 
 #endif // IPFREELYMAINWINDOW_H
