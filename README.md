@@ -9,7 +9,7 @@ The code is the work of Duncan Crutchley (<dac1976github@outlook.com>).
 Copyright (C) 2018 Duncan Crutchley.
 
 ## Background ##
-I started this project shortly after buying and installing some RSTP compatible IP security cameras at my house. The software that came with the cameras was adequate but not great; relying on ActiveX and Internet Explorer. Instead this project provides a native application to view and record up to cameras' streams. Currently, this application does not give you any control over the IP cameras' on-board settings.
+I started this project shortly after buying and installing some RTSP compatible IP security cameras at my house. The software that came with the cameras was adequate but not great; relying on ActiveX and Internet Explorer. Instead this project provides a native application to view and record up to cameras' streams. Currently, this application does not give you any control over the IP cameras' on-board settings.
 
 ## Key Features ##
 * Multi-threaded.
