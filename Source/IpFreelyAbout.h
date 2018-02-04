@@ -53,6 +53,9 @@ public:
     void SetTitle(const QString& title);
 
 private:
+    void SetDisplaySize();
+
+private:
     Ui::IpFreelyAbout* ui;
 };
 

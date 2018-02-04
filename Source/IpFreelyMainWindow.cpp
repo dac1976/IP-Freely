@@ -55,9 +55,7 @@ namespace bfs = boost::filesystem;
 namespace
 {
 
-static constexpr int    DEFAULT_UPDATE_PERIOD_MS = 25;
-static constexpr double DEFAULT_BUTTON_ICON_SIZE = 32.0;
-static constexpr double DEFAULT_SCREEN_SIZE      = 1080.0;
+static constexpr int DEFAULT_UPDATE_PERIOD_MS = 25;
 
 void ClearLayout(QLayout* layout, bool deleteWidgets)
 {
@@ -103,7 +101,7 @@ IpFreelyMainWindow::IpFreelyMainWindow(QString const& appVersion, QWidget* paren
 
     connect(m_updateFeedsTimer, &QTimer::timeout, this, &IpFreelyMainWindow::on_updateFeedsTimer);
 
-    SetButtonSizes();
+    SetDisplaySize();
 
     ConnectButtons();
 
@@ -511,21 +509,67 @@ void IpFreelyMainWindow::resizeEvent(QResizeEvent* /*event*/)
     }
 }
 
-void IpFreelyMainWindow::SetButtonSizes()
+void IpFreelyMainWindow::SetDisplaySize()
 {
-    auto   g           = ui->cam1SettingsToolButton->geometry();
-    auto   screenPos   = ui->cam1SettingsToolButton->mapToGlobal(QPoint(g.left(), g.top()));
-    auto   screen      = qApp->screenAt(screenPos);
-    double scaleFactor = screen->size().height() / DEFAULT_SCREEN_SIZE;
-    int    buttonSize  = static_cast<int>(DEFAULT_BUTTON_ICON_SIZE * scaleFactor);
+    static constexpr double DEFAULT_SCREEN_SIZE = 1080.0;
+    static constexpr int    MIN_BUTTON_SIZE     = 24;
+    static constexpr int    MAX_BUTTON_SIZE     = 48;
+    static constexpr int    MIN_DISPLAY_WIDTH   = 800;
+    static constexpr int    MIN_DISPLAY_HEIGHT  = 600;
 
-    if (buttonSize < 24)
+    auto      displayGeometry = geometry();
+    auto      screenPos       = mapToGlobal(QPoint(displayGeometry.left(), displayGeometry.top()));
+    auto      screen          = qApp->screenAt(screenPos);
+    double    scaleFactor     = static_cast<double>(screen->size().height()) / DEFAULT_SCREEN_SIZE;
+    int const maxDisplayWidth = static_cast<int>(static_cast<double>(screen->size().width()) * 0.9);
+    int const maxDisplayHeight =
+        static_cast<int>(static_cast<double>(screen->size().height()) * 0.9);
+
+    int displayWidth = static_cast<int>(static_cast<double>(displayGeometry.width()) * scaleFactor);
+
+    if (displayWidth < MIN_DISPLAY_WIDTH)
     {
-        buttonSize = 24;
+        displayWidth = MIN_DISPLAY_WIDTH;
     }
-    else if (buttonSize > 48)
+    else if (displayWidth > maxDisplayWidth)
     {
-        buttonSize = 48;
+        displayWidth = maxDisplayWidth;
+    }
+
+    int displayHeight =
+        static_cast<int>(static_cast<double>(displayGeometry.height()) * scaleFactor);
+
+    if (displayHeight < MIN_DISPLAY_HEIGHT)
+    {
+        displayHeight = MIN_DISPLAY_HEIGHT;
+    }
+    else if (displayHeight > maxDisplayHeight)
+    {
+        displayHeight = maxDisplayHeight;
+    }
+
+    int displayLeft =
+        static_cast<int>(static_cast<double>(screen->size().width() - displayWidth) / 2.0);
+
+    int displayTop =
+        static_cast<int>(static_cast<double>(screen->size().height() - displayHeight) / 2.0);
+
+    displayGeometry.setWidth(displayWidth);
+    displayGeometry.setHeight(displayHeight);
+    displayGeometry.setTop(displayTop);
+    displayGeometry.setLeft(displayLeft);
+    setGeometry(displayGeometry);
+
+    auto buttonGeometry = ui->cam1SettingsToolButton->geometry();
+    int  buttonSize = static_cast<int>(static_cast<double>(buttonGeometry.height()) * scaleFactor);
+
+    if (buttonSize < MIN_BUTTON_SIZE)
+    {
+        buttonSize = MIN_BUTTON_SIZE;
+    }
+    else if (buttonSize > MAX_BUTTON_SIZE)
+    {
+        buttonSize = MAX_BUTTON_SIZE;
     }
 
     ui->cam1SettingsToolButton->setMinimumSize(QSize(buttonSize, buttonSize));

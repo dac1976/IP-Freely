@@ -63,6 +63,7 @@ private slots:
     void on_revertSchedulePushButton_clicked();
 
 private:
+    void SetDisplaySize();
     void InitialisSchedule();
 
 private:

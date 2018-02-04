@@ -101,7 +101,7 @@ protected:
     virtual void resizeEvent(QResizeEvent* event);
 
 private:
-    void     SetButtonSizes();
+    void     SetDisplaySize();
     void     ConnectButtons();
     void     CheckStartupConnections();
     void     SetupCameraInDb(ipfreely::eCamId const camId, QToolButton* connectBtn);

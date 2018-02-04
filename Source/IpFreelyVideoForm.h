@@ -69,6 +69,9 @@ protected:
     virtual void showEvent(QShowEvent* event);
 
 private:
+    void SetDisplaySize();
+
+private:
     Ui::IpFreelyVideoForm* ui;
     bool                   m_resetSize;
     QLabel*                m_videoFrame;

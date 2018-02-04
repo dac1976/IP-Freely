@@ -24,6 +24,7 @@
  */
 #include "IpFreelyAbout.h"
 #include "ui_IpFreelyAbout.h"
+#include <QScreen>
 
 IpFreelyAbout::IpFreelyAbout(QWidget* parent)
     : QDialog(parent)
@@ -36,6 +37,8 @@ IpFreelyAbout::IpFreelyAbout(QWidget* parent)
     this->setWindowFlags(flags);
 
     ui->tabWidget->setCurrentIndex(0);
+
+    SetDisplaySize();
 }
 
 IpFreelyAbout::~IpFreelyAbout()
@@ -46,4 +49,55 @@ IpFreelyAbout::~IpFreelyAbout()
 void IpFreelyAbout::SetTitle(const QString& title)
 {
     ui->titleLabel->setText(title);
+}
+
+void IpFreelyAbout::SetDisplaySize()
+{
+    static constexpr double DEFAULT_SCREEN_SIZE = 1080.0;
+    static constexpr int    MIN_DISPLAY_WIDTH   = 640;
+    static constexpr int    MIN_DISPLAY_HEIGHT  = 480;
+
+    auto      displayGeometry = geometry();
+    auto      screenPos       = mapToGlobal(QPoint(displayGeometry.left(), displayGeometry.top()));
+    auto      screen          = qApp->screenAt(screenPos);
+    double    scaleFactor     = static_cast<double>(screen->size().height()) / DEFAULT_SCREEN_SIZE;
+    int const maxDisplayWidth =
+        static_cast<int>(static_cast<double>(screen->size().width()) * 0.75);
+    int const maxDisplayHeight =
+        static_cast<int>(static_cast<double>(screen->size().height()) * 0.75);
+
+    int displayWidth = static_cast<int>(static_cast<double>(displayGeometry.width()) * scaleFactor);
+
+    if (displayWidth < MIN_DISPLAY_WIDTH)
+    {
+        displayWidth = MIN_DISPLAY_WIDTH;
+    }
+    else if (displayWidth > maxDisplayWidth)
+    {
+        displayWidth = maxDisplayWidth;
+    }
+
+    int displayHeight =
+        static_cast<int>(static_cast<double>(displayGeometry.height()) * scaleFactor);
+
+    if (displayHeight < MIN_DISPLAY_HEIGHT)
+    {
+        displayHeight = MIN_DISPLAY_HEIGHT;
+    }
+    else if (displayHeight > maxDisplayHeight)
+    {
+        displayHeight = maxDisplayHeight;
+    }
+
+    int displayLeft =
+        static_cast<int>(static_cast<double>(screen->size().width() - displayWidth) / 2.0);
+
+    int displayTop =
+        static_cast<int>(static_cast<double>(screen->size().height() - displayHeight) / 2.0);
+
+    displayGeometry.setWidth(displayWidth);
+    displayGeometry.setHeight(displayHeight);
+    displayGeometry.setTop(displayTop);
+    displayGeometry.setLeft(displayLeft);
+    setGeometry(displayGeometry);
 }

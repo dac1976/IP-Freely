@@ -61,9 +61,10 @@ public:
 
 private slots:
     void removeClicked(IpFreelyDownloadWidget* downloadWidget);
+    void downloadRequested(QWebEngineDownloadItem* webItem);
 
 private:
-    void downloadRequested(QWebEngineDownloadItem* webItem);
+    void SetDisplaySize();
 
 private:
     Ui::IpFreelySdCardViewerDialog* ui;

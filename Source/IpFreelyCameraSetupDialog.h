@@ -63,6 +63,7 @@ private slots:
     void on_revertChangesPushButton_clicked();
 
 private:
+    void SetDisplaySize();
     void InitialiseCameraSettings(ipfreely::IpCamera const& camera);
 
 private:
