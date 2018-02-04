@@ -454,7 +454,8 @@ void IpFreelyMainWindow::on_updateFeedsTimer()
         if (streamProcessor.second->VideoFrameUpdated())
         {
             auto currentVideoFrame = streamProcessor.second->CurrentVideoFrame();
-            auto fps               = streamProcessor.second->CurrentFps();
+
+            auto fps = streamProcessor.second->CurrentFps();
 
             UpdateCamFeedFrame(streamProcessor.first,
                                currentVideoFrame,

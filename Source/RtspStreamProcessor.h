@@ -94,7 +94,17 @@ public:
     bool VideoFrameUpdated() const noexcept;
 
     /*!
+     * \brief GetAspectRatioAndSize return s the aspect ratio.
+     * \param[out] width - Width of video stream's frames.
+     * \param[out] height - Height of video stream's frames.
+     * \return A double contiaing the aspect ratio e.g. 1.333333 == 4:3.
+     */
+    double GetAspectRatioAndSize(int& width, int& height) const;
+
+    /*!
      * \brief CurrentVideoFrame gives acces to current video frame.
+     * \param[in] width - (Optional) Required output width for QImage
+     * \param[in] height - (Optional) Required output height for QImage
      * \return A QImage of the current video frame at full stream resolution.
      */
     QImage CurrentVideoFrame() const;
@@ -108,13 +118,13 @@ public:
 private:
     virtual void ThreadIteration() noexcept;
     virtual void ProcessTerminationConditions() noexcept;
-    void SetEnableVideoWriting(bool enable) noexcept;
-    void CheckRecordingSchedule();
-    void CreateCaptureObjects();
-    void GrabVideoFrame();
-    void WriteVideoFrame();
-    void CheckFps();
-    void SetFps(double const fps) noexcept;
+    void         SetEnableVideoWriting(bool enable) noexcept;
+    void         CheckRecordingSchedule();
+    void         CreateCaptureObjects();
+    void         GrabVideoFrame();
+    void         WriteVideoFrame();
+    void         CheckFps();
+    void         SetFps(double const fps) noexcept;
 
 private:
     mutable std::mutex             m_writingMutex{};
@@ -130,6 +140,8 @@ private:
     bool                           m_useRecordingSchedule{false};
     core_lib::threads::SyncEvent   m_updateEvent{};
     bool                           m_enableVideoWriting{false};
+    int                            m_videoWidth{0};
+    int                            m_videoHeight{0};
     cv::Ptr<cv::VideoCapture>      m_videoCapture{};
     cv::Ptr<cv::Mat>               m_videoFrame{};
     cv::Ptr<cv::VideoWriter>       m_videoWriter{};

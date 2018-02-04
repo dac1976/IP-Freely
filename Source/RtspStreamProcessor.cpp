@@ -163,7 +163,11 @@ RtspStreamProcessor::RtspStreamProcessor(std::string const& name,
         BOOST_THROW_EXCEPTION(std::runtime_error("Failed to open VideoCapture object."));
     }
 
-    m_fps                   = m_videoCapture->get(CV_CAP_PROP_FPS);
+    cv::Size videoSize = cv::Size(static_cast<int>(m_videoCapture->get(CV_CAP_PROP_FRAME_WIDTH)),
+                                  static_cast<int>(m_videoCapture->get(CV_CAP_PROP_FRAME_HEIGHT)));
+    m_videoWidth       = videoSize.width;
+    m_videoHeight      = videoSize.height;
+    m_fps              = m_videoCapture->get(CV_CAP_PROP_FPS);
     m_updatePeriodMillisecs = static_cast<unsigned int>(1000.0 / m_fps);
 
     DEBUG_MESSAGE_EX_INFO("Stream at: " << m_completeRtspUrl << " running with FPS of: " << m_fps
@@ -210,6 +214,13 @@ bool RtspStreamProcessor::VideoFrameUpdated() const noexcept
 {
     std::lock_guard<std::mutex> lock(m_frameMutex);
     return m_videoFrameUpdated;
+}
+
+double RtspStreamProcessor::GetAspectRatioAndSize(int& width, int& height) const
+{
+    width  = m_videoWidth;
+    height = m_videoHeight;
+    return static_cast<double>(m_videoWidth) / static_cast<double>(m_videoHeight);
 }
 
 QImage RtspStreamProcessor::CurrentVideoFrame() const
@@ -303,10 +314,6 @@ void RtspStreamProcessor::CreateCaptureObjects()
             m_videoWriter.release();
         }
 
-        cv::Size videoSize =
-            cv::Size(static_cast<int>(m_videoCapture->get(CV_CAP_PROP_FRAME_WIDTH)),
-                     static_cast<int>(m_videoCapture->get(CV_CAP_PROP_FRAME_HEIGHT)));
-
         std::ostringstream oss;
         oss << m_name << "_" << m_currentTime << ".mp4";
         bfs::path p(m_saveFolderPath);
@@ -315,8 +322,10 @@ void RtspStreamProcessor::CreateCaptureObjects()
 
         DEBUG_MESSAGE_EX_INFO("Creating new output video file: " << p.string());
 
-        m_videoWriter = cv::makePtr<cv::VideoWriter>(
-            p.string().c_str(), cv::VideoWriter::fourcc('D', 'I', 'V', 'X'), m_fps, videoSize);
+        m_videoWriter = cv::makePtr<cv::VideoWriter>(p.string().c_str(),
+                                                     cv::VideoWriter::fourcc('D', 'I', 'V', 'X'),
+                                                     m_fps,
+                                                     cv::Size(m_videoWidth, m_videoHeight));
 
         if (!m_videoWriter->isOpened())
         {
@@ -362,10 +371,9 @@ void RtspStreamProcessor::CheckFps()
         SetFps(fps);
         m_updatePeriodMillisecs = updatePeriodMillisecs;
 
-        DEBUG_MESSAGE_EX_INFO("Stream at: " << m_completeRtspUrl << " now running with FPS of: "
-                                            << fps
-                                            << ", thread update period (ms): "
-                                            << m_updatePeriodMillisecs);
+        DEBUG_MESSAGE_EX_INFO("Stream at: "
+                              << m_completeRtspUrl << " now running with FPS of: " << fps
+                              << ", thread update period (ms): " << m_updatePeriodMillisecs);
     }
 }
 
