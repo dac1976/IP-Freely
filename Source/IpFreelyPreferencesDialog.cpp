@@ -47,7 +47,7 @@ IpFreelyPreferencesDialog::IpFreelyPreferencesDialog(ipfreely::IpFreelyPreferenc
 
     SetDisplaySize();
 
-    InitialisSchedule();
+    InitialisSchedules();
 }
 
 IpFreelyPreferencesDialog::~IpFreelyPreferencesDialog()
@@ -73,6 +73,19 @@ void IpFreelyPreferencesDialog::on_buttonBox_accepted()
     }
 
     m_prefs.SetRecordingSchedule(schedule);
+
+    schedule = m_prefs.MotionTrackingSchedule();
+
+    for (int row = 0; row < ui->motionTrackingTableWidget->rowCount(); ++row)
+    {
+        for (int col = 0; col < ui->motionTrackingTableWidget->columnCount(); ++col)
+        {
+            schedule[static_cast<size_t>(row)][static_cast<size_t>(col)] =
+                ui->motionTrackingTableWidget->item(row, col)->checkState() == Qt::Checked;
+        }
+    }
+
+    m_prefs.SetMotionTrackingSchedule(schedule);
 
     m_prefs.Save();
     accept();
@@ -118,7 +131,21 @@ void IpFreelyPreferencesDialog::on_selectAllPushButton_clicked()
 
 void IpFreelyPreferencesDialog::on_revertSchedulePushButton_clicked()
 {
-    InitialisSchedule();
+    auto schedule = m_prefs.RecordingSchedule();
+    int  row      = 0;
+
+    for (auto const& day : schedule)
+    {
+        int col = 0;
+
+        for (auto hour : day)
+        {
+            ui->scheduleTableWidget->item(row, col++)
+                ->setCheckState(hour ? Qt::Checked : Qt::Unchecked);
+        }
+
+        ++row;
+    }
 }
 
 void IpFreelyPreferencesDialog::SetDisplaySize()
@@ -172,7 +199,7 @@ void IpFreelyPreferencesDialog::SetDisplaySize()
     setGeometry(displayGeometry);
 }
 
-void IpFreelyPreferencesDialog::InitialisSchedule()
+void IpFreelyPreferencesDialog::InitialisSchedules()
 {
     auto schedule = m_prefs.RecordingSchedule();
     int  row      = 0;
@@ -184,6 +211,63 @@ void IpFreelyPreferencesDialog::InitialisSchedule()
         for (auto hour : day)
         {
             ui->scheduleTableWidget->item(row, col++)
+                ->setCheckState(hour ? Qt::Checked : Qt::Unchecked);
+        }
+
+        ++row;
+    }
+
+    schedule = m_prefs.MotionTrackingSchedule();
+    row      = 0;
+
+    for (auto const& day : schedule)
+    {
+        int col = 0;
+
+        for (auto hour : day)
+        {
+            ui->motionTrackingTableWidget->item(row, col++)
+                ->setCheckState(hour ? Qt::Checked : Qt::Unchecked);
+        }
+
+        ++row;
+    }
+}
+
+void IpFreelyPreferencesDialog::on_selectNoneMtPushButton_clicked()
+{
+    for (int row = 0; row < ui->motionTrackingTableWidget->rowCount(); ++row)
+    {
+        for (int col = 0; col < ui->motionTrackingTableWidget->columnCount(); ++col)
+        {
+            ui->motionTrackingTableWidget->item(row, col)->setCheckState(Qt::Unchecked);
+        }
+    }
+}
+
+void IpFreelyPreferencesDialog::on_selectAllMtPushButton_clicked()
+{
+    for (int row = 0; row < ui->motionTrackingTableWidget->rowCount(); ++row)
+    {
+        for (int col = 0; col < ui->motionTrackingTableWidget->columnCount(); ++col)
+        {
+            ui->motionTrackingTableWidget->item(row, col)->setCheckState(Qt::Checked);
+        }
+    }
+}
+
+void IpFreelyPreferencesDialog::on_revertScheduleMtPushButton_clicked()
+{
+    auto schedule = m_prefs.MotionTrackingSchedule();
+    int  row      = 0;
+
+    for (auto const& day : schedule)
+    {
+        int col = 0;
+
+        for (auto hour : day)
+        {
+            ui->motionTrackingTableWidget->item(row, col++)
                 ->setCheckState(hour ? Qt::Checked : Qt::Unchecked);
         }
 

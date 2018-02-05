@@ -127,6 +127,26 @@ void IpFreelyPreferences::SetRecordingSchedule(std::vector<std::vector<bool>> co
     m_schedule = schedule;
 }
 
+std::vector<std::vector<bool>> IpFreelyPreferences::MotionTrackingSchedule() const noexcept
+{
+    return m_mtSchedule;
+}
+
+void IpFreelyPreferences::SetMotionTrackingSchedule(std::vector<std::vector<bool>> const& schedule)
+{
+    if (schedule.size() != 7)
+    {
+        BOOST_THROW_EXCEPTION(std::invalid_argument("Incorrect number of days in schedule."));
+    }
+
+    if (schedule.front().size() != 24)
+    {
+        BOOST_THROW_EXCEPTION(std::invalid_argument("Incorrect number of hours in schedule."));
+    }
+
+    m_mtSchedule = schedule;
+}
+
 void IpFreelyPreferences::Save() const
 {
     if (bfs::exists(m_cfgPath))

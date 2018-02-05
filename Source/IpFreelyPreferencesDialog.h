@@ -61,10 +61,13 @@ private slots:
     void on_selectNonePushButton_clicked();
     void on_selectAllPushButton_clicked();
     void on_revertSchedulePushButton_clicked();
+    void on_selectNoneMtPushButton_clicked();
+    void on_selectAllMtPushButton_clicked();
+    void on_revertScheduleMtPushButton_clicked();
 
 private:
     void SetDisplaySize();
-    void InitialisSchedule();
+    void InitialisSchedules();
 
 private:
     Ui::IpFreelyPreferencesDialog* ui;

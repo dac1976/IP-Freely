@@ -27,7 +27,6 @@
 #include <chrono>
 #include <boost/throw_exception.hpp>
 #include <boost/filesystem.hpp>
-#include <opencv/cv.hpp>
 #include "StringUtils/StringUtils.h"
 #include "DebugLog/DebugLogging.h"
 
@@ -112,21 +111,22 @@ inline QImage CvMatToQImage(cv::Mat const& inMat)
 
 } // namespace utils
 
-RtspStreamProcessor::RtspStreamProcessor(std::string const& name,
-                                         std::string const& completeRtspUrl,
-                                         std::string const& saveFolderPath,
-                                         double const       requiredFileDurationSecs,
-                                         std::vector<std::vector<bool>> const& recordingSchedule)
+RtspStreamProcessor::RtspStreamProcessor(
+    std::string const& name, std::string const& completeRtspUrl, std::string const& saveFolderPath,
+    double const requiredFileDurationSecs, std::vector<std::vector<bool>> const& recordingSchedule,
+    std::vector<std::vector<bool>> const& motionSchedule, double const motionSensitivity,
+    double const motionTrackInterval)
     : ThreadBase()
     , m_name(core_lib::string_utils::RemoveIllegalChars(name))
     , m_completeRtspUrl(completeRtspUrl)
     , m_saveFolderPath(saveFolderPath)
     , m_requiredFileDurationSecs(requiredFileDurationSecs)
     , m_recordingSchedule(recordingSchedule)
+    , m_motionSchedule(motionSchedule)
+    , m_motionSensitivity(motionSensitivity)
     , m_videoCapture(cv::makePtr<cv::VideoCapture>(completeRtspUrl.c_str()))
     , m_videoFrame(cv::makePtr<cv::Mat>())
 {
-
     if (!m_recordingSchedule.empty())
     {
         if (m_recordingSchedule.size() != 7)
@@ -140,6 +140,30 @@ RtspStreamProcessor::RtspStreamProcessor(std::string const& name,
         }
 
         m_useRecordingSchedule = true;
+        DEBUG_MESSAGE_EX_INFO("Recording schedule enabled.");
+    }
+
+    if (!m_motionSchedule.empty())
+    {
+        if (m_motionSchedule.size() != 7)
+        {
+            BOOST_THROW_EXCEPTION(std::invalid_argument("Incorrect number of days in schedule."));
+        }
+
+        if (m_motionSchedule.front().size() != 24)
+        {
+            BOOST_THROW_EXCEPTION(std::invalid_argument("Incorrect number of hours in schedule."));
+        }
+
+        if ((m_motionSensitivity > 0.0) && (m_motionSensitivity <= 1.0))
+        {
+            m_useMotionSchedule = true;
+            DEBUG_MESSAGE_EX_INFO("Motion tracking schedule enabled.");
+        }
+        else
+        {
+            DEBUG_MESSAGE_EX_INFO("Motion tracking sensitivity invalid, tracking disabled.");
+        }
     }
 
     bfs::path p(m_saveFolderPath);
@@ -163,12 +187,25 @@ RtspStreamProcessor::RtspStreamProcessor(std::string const& name,
         BOOST_THROW_EXCEPTION(std::runtime_error("Failed to open VideoCapture object."));
     }
 
+    auto     frameType = static_cast<int>(m_videoCapture->get(cv::CAP_PROP_FORMAT));
     cv::Size videoSize = cv::Size(static_cast<int>(m_videoCapture->get(CV_CAP_PROP_FRAME_WIDTH)),
                                   static_cast<int>(m_videoCapture->get(CV_CAP_PROP_FRAME_HEIGHT)));
     m_videoWidth       = videoSize.width;
     m_videoHeight      = videoSize.height;
     m_fps              = m_videoCapture->get(CV_CAP_PROP_FPS);
     m_updatePeriodMillisecs = static_cast<unsigned int>(1000.0 / m_fps);
+
+    if (m_useMotionSchedule)
+    {
+        m_greyFrame =
+            cv::makePtr<cv::Mat>(cv::Size(static_cast<int>(m_videoWidth * motionSensitivity),
+                                          static_cast<int>(m_videoHeight * motionSensitivity)),
+                                 frameType);
+
+        m_lastFrame           = cv::makePtr<cv::Mat>();
+        m_deltaFrame          = cv::makePtr<cv::Mat>();
+        m_numFramesInInterval = static_cast<int>(motionTrackInterval * m_fps);
+    }
 
     DEBUG_MESSAGE_EX_INFO("Stream at: " << m_completeRtspUrl << " running with FPS of: " << m_fps
                                         << ", thread update period (ms): "
@@ -223,10 +260,18 @@ double RtspStreamProcessor::GetAspectRatioAndSize(int& width, int& height) const
     return static_cast<double>(m_videoWidth) / static_cast<double>(m_videoHeight);
 }
 
-QImage RtspStreamProcessor::CurrentVideoFrame() const
+QImage RtspStreamProcessor::CurrentVideoFrame(bool const getMotionFrame) const
 {
     std::lock_guard<std::mutex> lock(m_frameMutex);
-    return utils::CvMatToQImage(*m_videoFrame);
+
+    if (getMotionFrame && m_motionVideoFrame)
+    {
+        return utils::CvMatToQImage(*m_motionVideoFrame);
+    }
+    else
+    {
+        return utils::CvMatToQImage(*m_videoFrame);
+    }
 }
 
 double RtspStreamProcessor::CurrentFps() const noexcept
@@ -251,7 +296,7 @@ void RtspStreamProcessor::ThreadIteration() noexcept
         CreateCaptureObjects();
         GrabVideoFrame();
         WriteVideoFrame();
-        CheckFps();
+        CheckMotionTracking();
     }
     catch (...)
     {
@@ -278,7 +323,8 @@ void RtspStreamProcessor::CheckRecordingSchedule()
         return;
     }
 
-    auto localTime    = std::localtime(&m_currentTime);
+    auto localTime = std::localtime(&m_currentTime);
+
     bool needToRecord = (m_recordingSchedule[static_cast<size_t>(
         localTime->tm_wday)])[static_cast<size_t>(localTime->tm_hour)];
 
@@ -361,26 +407,116 @@ void RtspStreamProcessor::WriteVideoFrame()
     }
 }
 
-void RtspStreamProcessor::CheckFps()
+bool RtspStreamProcessor::CheckMotionSchedule() const
 {
-    auto fps                   = m_videoCapture->get(CV_CAP_PROP_FPS);
-    auto updatePeriodMillisecs = static_cast<unsigned int>(1000.0 / fps);
-
-    if (updatePeriodMillisecs != m_updatePeriodMillisecs)
+    if (!m_useMotionSchedule || m_motionSchedule.empty())
     {
-        SetFps(fps);
-        m_updatePeriodMillisecs = updatePeriodMillisecs;
+        return false;
+    }
 
-        DEBUG_MESSAGE_EX_INFO("Stream at: "
-                              << m_completeRtspUrl << " now running with FPS of: " << fps
-                              << ", thread update period (ms): " << m_updatePeriodMillisecs);
+    auto localTime = std::localtime(&m_currentTime);
+
+    return (m_motionSchedule[static_cast<size_t>(localTime->tm_wday)])[static_cast<size_t>(
+        localTime->tm_hour)];
+}
+
+void RtspStreamProcessor::TrackMotion()
+{
+    // Scale down image according to sensitivty setting.
+    cv::resize(*m_videoFrame, *m_greyFrame, m_greyFrame->size(), 0.0, 0.0, cv::INTER_AREA);
+
+    // Convert to greyscale.
+    cv::cvtColor(*m_greyFrame, *m_greyFrame, CV_BGR2GRAY);
+
+    // Add Gaussian blur.
+    cv::GaussianBlur(*m_greyFrame, *m_greyFrame, cv::Size(21, 21), 0);
+
+    if (m_trackedFrameCount == 0)
+    {
+        ++m_trackedFrameCount;
+
+        // initialize the last reference frame
+        *m_lastFrame = *m_greyFrame;
+
+        return;
+    }
+    else if (m_trackedFrameCount == m_numFramesInInterval)
+    {
+        m_trackedFrameCount = 0;
+    }
+
+    ++m_trackedFrameCount;
+
+    // Create difference frame.
+    cv::absdiff(*m_lastFrame, *m_greyFrame, *m_deltaFrame);
+    cv::threshold(*m_deltaFrame, *m_deltaFrame, 50, 255, cv::THRESH_BINARY);
+
+    // Dilate to fill-in holes and find contours.
+    int iterations = 2;
+    cv::dilate(*m_deltaFrame, *m_deltaFrame, cv::Mat(), cv::Point(-1, -1), iterations);
+
+    // Approximate contours to polygons
+    cv::findContours(*m_deltaFrame,
+                     m_contours,
+                     m_hierarchy,
+                     CV_RETR_TREE,
+                     CV_CHAIN_APPROX_SIMPLE,
+                     cv::Point(0, 0));
+
+    // Resize polygons to original frame's scale.
+    for (auto& c : m_contours)
+    {
+        for (auto& p : c)
+        {
+            p.x = static_cast<int>(static_cast<double>(p.x) / m_motionSensitivity);
+            p.y = static_cast<int>(static_cast<double>(p.y) / m_motionSensitivity);
+        }
+    }
+
+    m_contoursPoly.resize(m_contours.size());
+
+    for (size_t i = 0; i < m_contours.size(); i++)
+    {
+        cv::approxPolyDP(cv::Mat(m_contours[i]), m_contoursPoly[i], 3, true);
+    }
+
+    // Create result frame if needed.
+    std::lock_guard<std::mutex> lock(m_frameMutex);
+
+    if (!m_motionVideoFrame)
+    {
+        m_motionVideoFrame = cv::makePtr<cv::Mat>(*m_videoFrame);
+    }
+
+    // Draw polygonal contour on result frame.
+    cv::Scalar brightGreenColour = cv::Scalar(0, 255, 0);
+
+    for (size_t i = 0; i < m_contours.size(); i++)
+    {
+        cv::drawContours(*m_motionVideoFrame,
+                         m_contoursPoly,
+                         static_cast<int>(i),
+                         brightGreenColour,
+                         2,
+                         8,
+                         {},
+                         0,
+                         {});
     }
 }
 
-void RtspStreamProcessor::SetFps(double const fps) noexcept
+void RtspStreamProcessor::CheckMotionTracking()
 {
-    std::lock_guard<std::mutex> lock(m_fpsMutex);
-    m_fps = fps;
+    if (!CheckMotionSchedule())
+    {
+        m_trackedFrameCount = 0;
+        return;
+    }
+
+    TrackMotion();
+
+    // TODO: if motion detected then trigger screen capture/writing of video
+    // around motion, plus email alert.
 }
 
 } // namespace ipfreely

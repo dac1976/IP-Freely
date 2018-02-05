@@ -113,6 +113,18 @@ public:
     void SetRecordingSchedule(std::vector<std::vector<bool>> const& schedule);
 
     /*!
+     * \brief MotionTrackingSchedule sets the current motion tracking schedule.
+     * \return A matrix of flags denoting for which hours of which days we should be recording.
+     */
+    std::vector<std::vector<bool>> MotionTrackingSchedule() const noexcept;
+    /*!
+     * \brief SetMotionTrackingSchedule retrieves the current motion tracking schedule.
+     * \param[in] schedule - A matrix of flags denoting for which hours of which days we should be
+     * recording.
+     */
+    void SetMotionTrackingSchedule(std::vector<std::vector<bool>> const& schedule);
+
+    /*!
      * \brief Save the preferences to disk from memory.
      */
     void Save() const;
@@ -136,7 +148,7 @@ private:
         ar(CEREAL_NVP(temp));
         m_connectToCamerasOnStartup = temp == 1;
 
-        ar(CEREAL_NVP(m_schedule));
+        ar(CEREAL_NVP(m_schedule), CEREAL_NVP(m_mtSchedule));
     }
 
 private:
@@ -147,6 +159,9 @@ private:
     std::vector<std::vector<bool>> m_schedule{7, {true, true, true, true, true, true, true, true,
                                                   true, true, true, true, true, true, true, true,
                                                   true, true, true, true, true, true, true, true}};
+    std::vector<std::vector<bool>> m_mtSchedule{
+        7, {true, true, true, true, true, true, true, true, true, true, true, true,
+            true, true, true, true, true, true, true, true, true, true, true, true}};
 };
 
 } // namespace ipfreely

@@ -30,7 +30,7 @@
 #include <cstdint>
 #include <vector>
 #include <ctime>
-#include <opencv2/core/cvstd.hpp>
+#include <opencv/cv.hpp>
 #include "Threads/ThreadBase.h"
 #include "Threads/SyncEvent.h"
 
@@ -56,7 +56,12 @@ public:
      * \param[in] completeRtspUrl - The complete URL to the RSTP stream (inc username and password).
      * \param[in] saveFolderPath - A local folder to save captured videos to.
      * \param[in] requiredFileDurationSecs - Duration to use for captured video files.
-     * \param[in] recordingSchedule - (Optional) The daily/hourly recording schedule..
+     * \param[in] recordingSchedule - (Optional) The daily/hourly recording schedule.
+     * \param[in] motionSchedule - (Optional) The daily/hourly motion tracking schedule.
+     * \param[in] motionSensitivity - (Optional) The sensitivity of the motion tracking in
+     * [0.0, 1.0].
+     * \param[in] motionTrackInterval - (Optional) Mtion tracker will test grab a new reference
+     * frame.
      *
      * The stream processor can be used to receive and thus display RTSP video streams but can also
      * record the stream in DivX format mp4 files to disk. Files are recorded with the given
@@ -64,7 +69,10 @@ public:
      */
     RtspStreamProcessor(std::string const& name, std::string const& completeRtspUrl,
                         std::string const& saveFolderPath, double const requiredFileDurationSecs,
-                        std::vector<std::vector<bool>> const& recordingSchedule = {});
+                        std::vector<std::vector<bool>> const& recordingSchedule   = {},
+                        std::vector<std::vector<bool>> const& motionSchedule      = {},
+                        double const                          motionSensitivity   = 0.5,
+                        double const                          motionTrackInterval = 1.0);
 
     /*! \brief RtspStreamProcessor destructor. */
     virtual ~RtspStreamProcessor();
@@ -103,11 +111,10 @@ public:
 
     /*!
      * \brief CurrentVideoFrame gives acces to current video frame.
-     * \param[in] width - (Optional) Required output width for QImage
-     * \param[in] height - (Optional) Required output height for QImage
+     * \param[in] getMotionFrame - (Optional) Get motion tracking frame if available.
      * \return A QImage of the current video frame at full stream resolution.
      */
-    QImage CurrentVideoFrame() const;
+    QImage CurrentVideoFrame(bool const getMotionFrame = false) const;
 
     /*!
      * \brief CurrentFps gives acces to current stream FPS.
@@ -123,31 +130,44 @@ private:
     void         CreateCaptureObjects();
     void         GrabVideoFrame();
     void         WriteVideoFrame();
-    void         CheckFps();
-    void         SetFps(double const fps) noexcept;
+    bool         CheckMotionSchedule() const;
+    void         TrackMotion();
+    void         CheckMotionTracking();
 
 private:
-    mutable std::mutex             m_writingMutex{};
-    mutable std::mutex             m_frameMutex{};
-    mutable std::mutex             m_fpsMutex{};
-    unsigned int                   m_updatePeriodMillisecs{40};
-    double                         m_fps{25.0};
-    std::string                    m_name{"cam"};
-    std::string                    m_completeRtspUrl{};
-    std::string                    m_saveFolderPath{};
-    double                         m_requiredFileDurationSecs{0.0};
-    std::vector<std::vector<bool>> m_recordingSchedule{};
-    bool                           m_useRecordingSchedule{false};
-    core_lib::threads::SyncEvent   m_updateEvent{};
-    bool                           m_enableVideoWriting{false};
-    int                            m_videoWidth{0};
-    int                            m_videoHeight{0};
-    cv::Ptr<cv::VideoCapture>      m_videoCapture{};
-    cv::Ptr<cv::Mat>               m_videoFrame{};
-    cv::Ptr<cv::VideoWriter>       m_videoWriter{};
-    double                         m_fileDurationSecs{0.0};
-    bool                           m_videoFrameUpdated{false};
-    time_t                         m_currentTime{};
+    mutable std::mutex                  m_writingMutex{};
+    mutable std::mutex                  m_frameMutex{};
+    mutable std::mutex                  m_fpsMutex{};
+    unsigned int                        m_updatePeriodMillisecs{40};
+    double                              m_fps{25.0};
+    std::string                         m_name{"cam"};
+    std::string                         m_completeRtspUrl{};
+    std::string                         m_saveFolderPath{};
+    double                              m_requiredFileDurationSecs{0.0};
+    std::vector<std::vector<bool>>      m_recordingSchedule{};
+    bool                                m_useRecordingSchedule{false};
+    std::vector<std::vector<bool>>      m_motionSchedule{};
+    bool                                m_useMotionSchedule{false};
+    double                              m_motionSensitivity{0.5};
+    core_lib::threads::SyncEvent        m_updateEvent{};
+    bool                                m_enableVideoWriting{false};
+    int                                 m_videoWidth{0};
+    int                                 m_videoHeight{0};
+    cv::Ptr<cv::VideoCapture>           m_videoCapture{};
+    cv::Ptr<cv::Mat>                    m_videoFrame{};
+    cv::Ptr<cv::Mat>                    m_lastFrame{};
+    cv::Ptr<cv::Mat>                    m_greyFrame{};
+    cv::Ptr<cv::Mat>                    m_deltaFrame{};
+    cv::Ptr<cv::Mat>                    m_motionVideoFrame{};
+    cv::Ptr<cv::VideoWriter>            m_videoWriter{};
+    std::vector<std::vector<cv::Point>> m_contours;
+    std::vector<cv::Vec4i>              m_hierarchy;
+    std::vector<std::vector<cv::Point>> m_contoursPoly;
+    int                                 m_numFramesInInterval{0};
+    int                                 m_trackedFrameCount{0};
+    double                              m_fileDurationSecs{0.0};
+    bool                                m_videoFrameUpdated{false};
+    time_t                              m_currentTime{};
 };
 
 } // namespace ipfreely

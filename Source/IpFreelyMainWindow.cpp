@@ -453,7 +453,7 @@ void IpFreelyMainWindow::on_updateFeedsTimer()
     {
         if (streamProcessor.second->VideoFrameUpdated())
         {
-            auto currentVideoFrame = streamProcessor.second->CurrentVideoFrame();
+            auto currentVideoFrame = streamProcessor.second->CurrentVideoFrame(true);
 
             auto fps = streamProcessor.second->CurrentFps();
 
@@ -915,12 +915,18 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
                 schedule.clear();
             }
 
+            auto motionSchedule = m_prefs.MotionTrackingSchedule();
+
+            // TODO: get motion trackenabled state, motion sensitivity
+            // and motion trakc intervak from camera settings.
+
             m_streamProcessors[camera.camId] =
                 std::make_shared<ipfreely::RtspStreamProcessor>(camName,
                                                                 camera.CompleteRtspUrl(),
                                                                 p.string(),
                                                                 m_prefs.FileDurationInSecs(),
-                                                                schedule);
+                                                                schedule,
+                                                                motionSchedule);
         }
         catch (std::exception& e)
         {
