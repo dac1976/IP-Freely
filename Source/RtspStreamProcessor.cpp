@@ -87,19 +87,18 @@ inline QImage CvMatToQImage(cv::Mat const& inMat)
 
 } // namespace utils
 
-static constexpr int    NUM_DILATION_ITERATIONS           = 2;
-static constexpr int    GAUSSIAN_BLUR_SIZE                = 21;
-static constexpr double DIFF_THRESHOLD                    = 50.0;
-static constexpr double DIFF_MAX_VALUE                    = 255.0;
-static constexpr double MIN_BOUNDING_RECT_AREA_PERCENTAGE = 0.05;
-static constexpr double CONTOUR_POLYGON_EPSILON           = 3.0;
-static constexpr int    CONTOUR_LINE_THICKNESS            = 2;
+static constexpr int    NUM_DILATION_ITERATIONS = 2;
+static constexpr int    GAUSSIAN_BLUR_SIZE      = 21;
+static constexpr double DIFF_THRESHOLD          = 50.0;
+static constexpr double DIFF_MAX_VALUE          = 255.0;
+static constexpr double CONTOUR_POLYGON_EPSILON = 3.0;
+static constexpr int    CONTOUR_LINE_THICKNESS  = 2;
 
 RtspStreamProcessor::RtspStreamProcessor(
     std::string const& name, std::string const& completeRtspUrl, std::string const& saveFolderPath,
     double const requiredFileDurationSecs, std::vector<std::vector<bool>> const& recordingSchedule,
-    std::vector<std::vector<bool>> const& motionSchedule, double const motionSensitivity,
-    double const motionDetectorInterval)
+    std::vector<std::vector<bool>> const& motionSchedule,
+    eMotionDetectorMode const motionSensitivity, double const motionDetectorInterval)
     : ThreadBase()
     , m_name(core_lib::string_utils::RemoveIllegalChars(name))
     , m_completeRtspUrl(completeRtspUrl)
@@ -107,7 +106,6 @@ RtspStreamProcessor::RtspStreamProcessor(
     , m_requiredFileDurationSecs(requiredFileDurationSecs)
     , m_recordingSchedule(recordingSchedule)
     , m_motionSchedule(motionSchedule)
-    , m_motionSensitivity(motionSensitivity)
     , m_videoCapture(cv::makePtr<cv::VideoCapture>(completeRtspUrl.c_str()))
     , m_videoFrame(cv::makePtr<cv::Mat>())
     , m_contourColor(cv::Scalar(0 /*Blue*/, 255 /*Green*/, 0 /*Red*/))
@@ -128,7 +126,7 @@ RtspStreamProcessor::RtspStreamProcessor(
         DEBUG_MESSAGE_EX_INFO("Recording schedule enabled.");
     }
 
-    if (!m_motionSchedule.empty())
+    if (!m_motionSchedule.empty() && (motionSensitivity != eMotionDetectorMode::off))
     {
         if (m_motionSchedule.size() != 7)
         {
@@ -140,15 +138,7 @@ RtspStreamProcessor::RtspStreamProcessor(
             BOOST_THROW_EXCEPTION(std::invalid_argument("Incorrect number of hours in schedule."));
         }
 
-        if ((m_motionSensitivity > 0.0) && (m_motionSensitivity <= 1.0))
-        {
-            m_useMotionSchedule = true;
-            DEBUG_MESSAGE_EX_INFO("Motion tracking schedule enabled.");
-        }
-        else
-        {
-            DEBUG_MESSAGE_EX_INFO("Motion tracking sensitivity invalid, tracking disabled.");
-        }
+        m_useMotionSchedule = true;
     }
 
     bfs::path p(m_saveFolderPath);
@@ -183,6 +173,42 @@ RtspStreamProcessor::RtspStreamProcessor(
 
     if (m_useMotionSchedule)
     {
+        double minBoundingRectAreaPercent = 0.0;
+
+        switch (motionSensitivity)
+        {
+        case eMotionDetectorMode::off:
+            // Do nothing.
+            break;
+        case eMotionDetectorMode::lowSensitivity:
+            minBoundingRectAreaPercent = 0.15;
+            m_motionFrameScalar        = 0.333;
+            DEBUG_MESSAGE_EX_INFO("Motion tracking (low sensitivity) enabled for camera: "
+                                  << name
+                                  << ", ref frame interval: "
+                                  << motionDetectorInterval
+                                  << "s");
+            break;
+        case eMotionDetectorMode::mediumSensitivity:
+            minBoundingRectAreaPercent = 0.1;
+            m_motionFrameScalar        = 0.5;
+            DEBUG_MESSAGE_EX_INFO("Motion tracking (medium sensitivity) enabled for camera: "
+                                  << name
+                                  << ", ref frame interval: "
+                                  << motionDetectorInterval
+                                  << "s");
+            break;
+        case eMotionDetectorMode::highSensitivity:
+            minBoundingRectAreaPercent = 0.05;
+            m_motionFrameScalar        = 0.667;
+            DEBUG_MESSAGE_EX_INFO("Motion tracking (high sensitivity) enabled for camera: "
+                                  << name
+                                  << ", ref frame interval: "
+                                  << motionDetectorInterval
+                                  << "s");
+            break;
+        }
+
         // Initialse our reference tracking frame.
         m_refDetectorFrame = cv::makePtr<cv::Mat>();
 
@@ -196,8 +222,11 @@ RtspStreamProcessor::RtspStreamProcessor(
         // Minimum bounding rectangle area for detected motion regions. We discard small
         // areas of motion and regard them as insignificant.
         m_minBoundingRectArea = static_cast<double>(m_videoWidth * m_videoHeight) *
-                                MIN_BOUNDING_RECT_AREA_PERCENTAGE *
-                                MIN_BOUNDING_RECT_AREA_PERCENTAGE;
+                                minBoundingRectAreaPercent * minBoundingRectAreaPercent;
+    }
+    else
+    {
+        DEBUG_MESSAGE_EX_INFO("Motion tracking disabled for camera: " << name);
     }
 
     DEBUG_MESSAGE_EX_INFO("Stream at: " << m_completeRtspUrl << " running with FPS of: " << m_fps
@@ -423,7 +452,7 @@ bool RtspStreamProcessor::DetectMotion()
     // Shrink image according to sensitivty setting.
     cv::Mat greyFrame;
     cv::resize(
-        *m_videoFrame, greyFrame, {}, m_motionSensitivity, m_motionSensitivity, cv::INTER_AREA);
+        *m_videoFrame, greyFrame, {}, m_motionFrameScalar, m_motionFrameScalar, cv::INTER_AREA);
 
     // Convert to resized frame to greyscale.
     cv::cvtColor(greyFrame, greyFrame, CV_BGR2GRAY);
@@ -464,8 +493,8 @@ bool RtspStreamProcessor::DetectMotion()
     {
         for (auto& p : c)
         {
-            p.x = static_cast<int>(static_cast<double>(p.x) / m_motionSensitivity);
-            p.y = static_cast<int>(static_cast<double>(p.y) / m_motionSensitivity);
+            p.x = static_cast<int>(static_cast<double>(p.x) / m_motionFrameScalar);
+            p.y = static_cast<int>(static_cast<double>(p.y) / m_motionFrameScalar);
         }
     }
 

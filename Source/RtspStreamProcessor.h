@@ -46,6 +46,14 @@ class VideoWriter;
 namespace ipfreely
 {
 
+enum class eMotionDetectorMode
+{
+    off,
+    lowSensitivity,
+    mediumSensitivity,
+    highSensitivity
+};
+
 /*! \brief Class defining a RTSP stream processor thread. */
 class RtspStreamProcessor final : public core_lib::threads::ThreadBase
 {
@@ -69,10 +77,10 @@ public:
      */
     RtspStreamProcessor(std::string const& name, std::string const& completeRtspUrl,
                         std::string const& saveFolderPath, double const requiredFileDurationSecs,
-                        std::vector<std::vector<bool>> const& recordingSchedule      = {},
-                        std::vector<std::vector<bool>> const& motionSchedule         = {},
-                        double const                          motionSensitivity      = 0.5,
-                        double const                          motionDetectorInterval = 1.0);
+                        std::vector<std::vector<bool>> const& recordingSchedule = {},
+                        std::vector<std::vector<bool>> const& motionSchedule    = {},
+                        eMotionDetectorMode const motionSensitivity      = eMotionDetectorMode::off,
+                        double const              motionDetectorInterval = 1.0);
 
     /*! \brief RtspStreamProcessor destructor. */
     virtual ~RtspStreamProcessor();
@@ -148,7 +156,7 @@ private:
     bool                                m_useRecordingSchedule{false};
     std::vector<std::vector<bool>>      m_motionSchedule{};
     bool                                m_useMotionSchedule{false};
-    double                              m_motionSensitivity{0.5};
+    double                              m_motionFrameScalar{0.0};
     core_lib::threads::SyncEvent        m_updateEvent{};
     bool                                m_enableVideoWriting{false};
     int                                 m_videoWidth{0};
