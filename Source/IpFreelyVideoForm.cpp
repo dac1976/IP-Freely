@@ -65,7 +65,7 @@ void IpFreelyVideoForm::SetVideoFrame(QImage const& videoFrame, double const fps
         auto w                 = 0.9 * static_cast<double>(availableGeometry.width() -
                                            (layout()->contentsMargins().left() +
                                             layout()->contentsMargins().right() + 2));
-        auto h                 = 0.9 * static_cast<double>(availableGeometry.height() -
+        auto h = 0.9 * static_cast<double>(availableGeometry.height() -
                                            (layout()->contentsMargins().top() +
                                             layout()->contentsMargins().bottom() + 2));
 
@@ -96,7 +96,9 @@ void IpFreelyVideoForm::SetTitle(QString const& title)
     setWindowTitle(m_title);
 }
 
-void IpFreelyVideoForm::showEvent(QShowEvent* /*event*/)
+void IpFreelyVideoForm::showEvent(QShowEvent* event)
 {
     m_resetSize = true;
+
+    QWidget::showEvent(event);
 }

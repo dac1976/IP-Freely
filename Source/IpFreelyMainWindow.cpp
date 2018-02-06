@@ -28,6 +28,7 @@
 #include <QLabel>
 #include <QToolButton>
 #include <QResizeEvent>
+#include <QCloseEvent>
 #include <QMessageBox>
 #include <QLayout>
 #include <QLayoutItem>
@@ -42,6 +43,7 @@
 #include <ctime>
 #include <set>
 #include <boost/filesystem.hpp>
+#include "IpFreelyVideoForm.h"
 #include "IpFreelyPreferencesDialog.h"
 #include "IpFreelyAbout.h"
 #include "IpFreelyCameraSetupDialog.h"
@@ -95,7 +97,7 @@ IpFreelyMainWindow::IpFreelyMainWindow(QString const& appVersion, QWidget* paren
     , m_appVersion(appVersion)
     , m_updateFeedsTimer(new QTimer(this))
     , m_numConnections(0)
-    , m_videoForm(std::make_unique<IpFreelyVideoForm>())
+    , m_videoForm(std::make_shared<IpFreelyVideoForm>())
 {
     ui->setupUi(this);
 
@@ -471,7 +473,17 @@ void IpFreelyMainWindow::on_updateFeedsTimer()
     }
 }
 
-void IpFreelyMainWindow::resizeEvent(QResizeEvent* /*event*/)
+void IpFreelyMainWindow::closeEvent(QCloseEvent* event)
+{
+    if (m_videoForm->isVisible())
+    {
+        m_videoForm->close();
+    }
+
+    QMainWindow::closeEvent(event);
+}
+
+void IpFreelyMainWindow::resizeEvent(QResizeEvent* event)
 {
     if (m_camFeeds.count(ipfreely::eCamId::cam1) > 0)
     {
@@ -508,6 +520,8 @@ void IpFreelyMainWindow::resizeEvent(QResizeEvent* /*event*/)
         ui->cam4Widget->layout()->addWidget(feed);
         m_camFeeds[ipfreely::eCamId::cam4] = feed;
     }
+
+    QMainWindow::resizeEvent(event);
 }
 
 void IpFreelyMainWindow::SetDisplaySize()
@@ -829,7 +843,7 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
     {
         if (m_videoForm->isVisible() && (m_videoFormId == camera.camId))
         {
-            m_videoForm->hide();
+            m_videoForm->close();
             m_videoFormId = ipfreely::eCamId::noCam;
         }
 
@@ -930,8 +944,8 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
         }
         catch (std::exception& e)
         {
-            DEBUG_MESSAGE_EX_ERROR("Stream Error, camera: " << camName
-                                                            << ", error message: " << e.what());
+            DEBUG_MESSAGE_EX_ERROR(
+                "Stream Error, camera: " << camName << ", error message: " << e.what());
             QMessageBox::critical(this,
                                   "Stream Error",
                                   QString::fromLocal8Bit(e.what()),
@@ -1185,7 +1199,7 @@ void IpFreelyMainWindow::ShowExpandedVideoForm(ipfreely::eCamId const camId)
 {
     if (m_videoForm->isVisible())
     {
-        m_videoForm->hide();
+        m_videoForm->close();
     }
 
     switch (camId)

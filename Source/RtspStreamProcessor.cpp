@@ -87,19 +87,19 @@ inline QImage CvMatToQImage(cv::Mat const& inMat)
 
 } // namespace utils
 
-static constexpr int    NUM_DILATION_ITERATIONS  = 2;
-static constexpr double GAUSSIAN_BLUR_PERCENTAGE = 0.025;
-static constexpr double DIFF_THRESHOLD           = 50.0;
-static constexpr double DIFF_MAX_VALUE           = 255.0;
-static constexpr double CONTOUR_POLYGON_EPSILON  = 3.0;
-static constexpr int    CONTOUR_LINE_THICKNESS   = 2;
-static constexpr int    DRAW_CONTOUR_MAX_LEVEL   = 0;
+static constexpr int    NUM_DILATION_ITERATIONS           = 2;
+static constexpr int    GAUSSIAN_BLUR_SIZE                = 21;
+static constexpr double DIFF_THRESHOLD                    = 50.0;
+static constexpr double DIFF_MAX_VALUE                    = 255.0;
+static constexpr double MIN_BOUNDING_RECT_AREA_PERCENTAGE = 0.05;
+static constexpr double CONTOUR_POLYGON_EPSILON           = 3.0;
+static constexpr int    CONTOUR_LINE_THICKNESS            = 2;
 
 RtspStreamProcessor::RtspStreamProcessor(
     std::string const& name, std::string const& completeRtspUrl, std::string const& saveFolderPath,
     double const requiredFileDurationSecs, std::vector<std::vector<bool>> const& recordingSchedule,
     std::vector<std::vector<bool>> const& motionSchedule, double const motionSensitivity,
-    double const motionTrackInterval)
+    double const motionDetectorInterval)
     : ThreadBase()
     , m_name(core_lib::string_utils::RemoveIllegalChars(name))
     , m_completeRtspUrl(completeRtspUrl)
@@ -172,8 +172,10 @@ RtspStreamProcessor::RtspStreamProcessor(
         BOOST_THROW_EXCEPTION(std::runtime_error("Failed to open VideoCapture object."));
     }
 
-    cv::Size videoSize = cv::Size(static_cast<int>(m_videoCapture->get(CV_CAP_PROP_FRAME_WIDTH)),
-                                  static_cast<int>(m_videoCapture->get(CV_CAP_PROP_FRAME_HEIGHT)));
+    cv::Mat initialFrame;
+    *m_videoCapture >> initialFrame;
+
+    cv::Size videoSize      = initialFrame.size();
     m_videoWidth            = videoSize.width;
     m_videoHeight           = videoSize.height;
     m_fps                   = m_videoCapture->get(CV_CAP_PROP_FPS);
@@ -182,17 +184,20 @@ RtspStreamProcessor::RtspStreamProcessor(
     if (m_useMotionSchedule)
     {
         // Initialse our reference tracking frame.
-        m_refTrackingFrame = cv::makePtr<cv::Mat>();
+        m_refDetectorFrame = cv::makePtr<cv::Mat>();
 
         // Compute how often in terms of number of frames will update
         // the reference tracking frame.
-        m_numFramesInInterval = static_cast<int>(motionTrackInterval * m_fps);
+        m_numFramesInInterval = static_cast<int>(motionDetectorInterval * m_fps);
 
-        // WOrk out size of Gaussian blur kernel as a percentage of frame size.
-        int dim = static_cast<int>(static_cast<double>(m_videoHeight) * GAUSSIAN_BLUR_PERCENTAGE);
-        // Kernel size must be positive and odd.
-        dim                  = dim % 2 ? dim : dim + 1;
-        m_gaussianBlurKernel = cv::Size(dim, dim);
+        // Set the size of Gaussian blur kernel.
+        m_gaussianBlurKernel = cv::Size(GAUSSIAN_BLUR_SIZE, GAUSSIAN_BLUR_SIZE);
+
+        // Minimum bounding rectangle area for detected motion regions. We discard small
+        // areas of motion and regard them as insignificant.
+        m_minBoundingRectArea = static_cast<double>(m_videoWidth * m_videoHeight) *
+                                MIN_BOUNDING_RECT_AREA_PERCENTAGE *
+                                MIN_BOUNDING_RECT_AREA_PERCENTAGE;
     }
 
     DEBUG_MESSAGE_EX_INFO("Stream at: " << m_completeRtspUrl << " running with FPS of: " << m_fps
@@ -284,7 +289,7 @@ void RtspStreamProcessor::ThreadIteration() noexcept
         CreateCaptureObjects();
         GrabVideoFrame();
         WriteVideoFrame();
-        CheckMotionTracking();
+        CheckMotionDetector();
     }
     catch (...)
     {
@@ -408,12 +413,12 @@ bool RtspStreamProcessor::CheckMotionSchedule() const
         localTime->tm_hour)];
 }
 
-bool RtspStreamProcessor::TrackMotion()
+bool RtspStreamProcessor::DetectMotion()
 {
     // Note: The algorithm I'm using in this method took inspiration
-    // from an example found here:
-    //
+    // from examples found at the URLs below:    //
     // https://github.com/markuscraig/opencv-rtsp-motion-detection
+    // https://www.pyimagesearch.com/2015/05/25/basic-motion-detection-and-tracking-with-python-and-opencv/
 
     // Shrink image according to sensitivty setting.
     cv::Mat greyFrame;
@@ -424,23 +429,22 @@ bool RtspStreamProcessor::TrackMotion()
     cv::cvtColor(greyFrame, greyFrame, CV_BGR2GRAY);
 
     // Add Gaussian blur to resized greyscaled frame.
-
     cv::GaussianBlur(greyFrame, greyFrame, m_gaussianBlurKernel, 0);
 
     // Do we need to update our reference tracking frame?
-    if (m_trackedFrameCount == 0)
+    if (m_detectorFrameCount == 0)
     {
-        *m_refTrackingFrame = greyFrame;
+        *m_refDetectorFrame = greyFrame;
     }
-    else if (m_trackedFrameCount == m_numFramesInInterval)
+    else if (m_detectorFrameCount == m_numFramesInInterval)
     {
         // Make sure next frame we get becomes the next reference tracking frame.
-        m_trackedFrameCount = 0;
+        m_detectorFrameCount = 0;
     }
 
     // Create difference frame.
     cv::Mat deltaFrame;
-    cv::absdiff(*m_refTrackingFrame, greyFrame, deltaFrame);
+    cv::absdiff(*m_refDetectorFrame, greyFrame, deltaFrame);
     cv::threshold(deltaFrame, deltaFrame, DIFF_THRESHOLD, DIFF_MAX_VALUE, cv::THRESH_BINARY);
 
     // Dilate to fill-in holes and find contours.
@@ -450,9 +454,8 @@ bool RtspStreamProcessor::TrackMotion()
     m_contours.clear();
     m_hierarchy.clear();
     m_contoursPoly.clear();
-    m_boundingRects.clear();
 
-    // Fins contours around tracked motion regions.
+    // Find contours around tracked motion regions.
     cv::findContours(
         deltaFrame, m_contours, m_hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
 
@@ -466,14 +469,27 @@ bool RtspStreamProcessor::TrackMotion()
         }
     }
 
-    // Convert contours to polygons and their boudning rectangles.
+    // Convert contours to polygons and their bounding rectangles.
     m_contoursPoly.resize(m_contours.size());
-    m_boundingRects.resize(m_contours.size());
+    cv::Rect maxBoundingRect(0, 0, 0, 0);
+    bool     motionDetected = false;
 
     for (size_t i = 0; i < m_contours.size(); i++)
     {
         cv::approxPolyDP(cv::Mat(m_contours[i]), m_contoursPoly[i], CONTOUR_POLYGON_EPSILON, true);
-        m_boundingRects[i] = cv::boundingRect(cv::Mat(m_contoursPoly[i]));
+        auto boundingRect = cv::boundingRect(cv::Mat(m_contoursPoly[i]));
+        auto area         = boundingRect.area();
+
+        if (area < m_minBoundingRectArea)
+        {
+            continue;
+        }
+
+        if (area > maxBoundingRect.area())
+        {
+            maxBoundingRect = boundingRect;
+            motionDetected  = true;
+        }
     }
 
     // Update resultant frame.
@@ -489,44 +505,31 @@ bool RtspStreamProcessor::TrackMotion()
             m_motionVideoFrame = cv::makePtr<cv::Mat>(*m_videoFrame);
         }
 
-        // Draw polygonal contour on result frame.
-        for (size_t i = 0; i < m_contours.size(); i++)
-        {
-            /*cv::drawContours(*m_motionVideoFrame,
-                             m_contoursPoly,
-                             static_cast<int>(i),
-                             m_contourColor,
-                             CONTOUR_LINE_THICKNESS,
-                             cv::LINE_8,
-                             {},
-                             DRAW_CONTOUR_MAX_LEVEL,
-                             {});*/
-
-            cv::rectangle(*m_motionVideoFrame,
-                          m_boundingRects[i].tl(),
-                          m_boundingRects[i].br(),
-                          m_contourColor,
-                          CONTOUR_LINE_THICKNESS,
-                          cv::LINE_8);
-        }
+        // Draw bounding rectangle on result frame.
+        cv::rectangle(*m_motionVideoFrame,
+                      maxBoundingRect.tl(),
+                      maxBoundingRect.br(),
+                      m_contourColor,
+                      CONTOUR_LINE_THICKNESS,
+                      cv::LINE_8);
     }
 
-    ++m_trackedFrameCount;
+    ++m_detectorFrameCount;
 
-    return !m_contours.empty();
+    return motionDetected;
 }
 
-void RtspStreamProcessor::CheckMotionTracking()
+void RtspStreamProcessor::CheckMotionDetector()
 {
     if (!CheckMotionSchedule())
     {
-        m_trackedFrameCount = 0;
+        m_detectorFrameCount = 0;
         return;
     }
 
     // TODO: if motion detected then trigger screen capture/writing of video
     // around motion, plus email alert.
-    if (TrackMotion())
+    if (DetectMotion())
     {
     }
     else

@@ -57,10 +57,10 @@ public:
      * \param[in] saveFolderPath - A local folder to save captured videos to.
      * \param[in] requiredFileDurationSecs - Duration to use for captured video files.
      * \param[in] recordingSchedule - (Optional) The daily/hourly recording schedule.
-     * \param[in] motionSchedule - (Optional) The daily/hourly motion tracking schedule.
-     * \param[in] motionSensitivity - (Optional) The sensitivity of the motion tracking in
+     * \param[in] motionSchedule - (Optional) The daily/hourly motion detector schedule.
+     * \param[in] motionSensitivity - (Optional) The sensitivity of the motion detector in
      * [0.0, 1.0].
-     * \param[in] motionTrackInterval - (Optional) Mtion tracker will test grab a new reference
+     * \param[in] motionDetectorInterval - (Optional) Motion detector will test grab a new reference
      * frame.
      *
      * The stream processor can be used to receive and thus display RTSP video streams but can also
@@ -69,10 +69,10 @@ public:
      */
     RtspStreamProcessor(std::string const& name, std::string const& completeRtspUrl,
                         std::string const& saveFolderPath, double const requiredFileDurationSecs,
-                        std::vector<std::vector<bool>> const& recordingSchedule   = {},
-                        std::vector<std::vector<bool>> const& motionSchedule      = {},
-                        double const                          motionSensitivity   = 0.5,
-                        double const                          motionTrackInterval = 1.0);
+                        std::vector<std::vector<bool>> const& recordingSchedule      = {},
+                        std::vector<std::vector<bool>> const& motionSchedule         = {},
+                        double const                          motionSensitivity      = 0.5,
+                        double const                          motionDetectorInterval = 1.0);
 
     /*! \brief RtspStreamProcessor destructor. */
     virtual ~RtspStreamProcessor();
@@ -95,7 +95,7 @@ public:
      */
     bool GetEnableVideoWriting() const noexcept;
 
-    /*!
+    /*!c
      * \brief VideoFrameUpdated monitors stream activity.
      * \return A flag denoting if the captured videdo stream is being updated.
      */
@@ -131,8 +131,8 @@ private:
     void GrabVideoFrame();
     void WriteVideoFrame();
     bool CheckMotionSchedule() const;
-    bool TrackMotion();
-    void CheckMotionTracking();
+    bool DetectMotion();
+    void CheckMotionDetector();
 
 private:
     mutable std::mutex                  m_writingMutex{};
@@ -155,17 +155,17 @@ private:
     int                                 m_videoHeight{0};
     cv::Ptr<cv::VideoCapture>           m_videoCapture{};
     cv::Ptr<cv::Mat>                    m_videoFrame{};
-    cv::Ptr<cv::Mat>                    m_refTrackingFrame{};
+    cv::Ptr<cv::Mat>                    m_refDetectorFrame{};
     cv::Ptr<cv::Mat>                    m_motionVideoFrame{};
     cv::Ptr<cv::VideoWriter>            m_videoWriter{};
     std::vector<std::vector<cv::Point>> m_contours;
     std::vector<cv::Vec4i>              m_hierarchy;
+    double                              m_minBoundingRectArea{0.0};
     std::vector<std::vector<cv::Point>> m_contoursPoly;
-    std::vector<cv::Rect>               m_boundingRects;
     cv::Size                            m_gaussianBlurKernel{0, 0};
     cv::Scalar                          m_contourColor;
     int                                 m_numFramesInInterval{0};
-    int                                 m_trackedFrameCount{0};
+    int                                 m_detectorFrameCount{0};
     double                              m_fileDurationSecs{0.0};
     bool                                m_videoFrameUpdated{false};
     time_t                              m_currentTime{};
