@@ -125,14 +125,14 @@ public:
 private:
     virtual void ThreadIteration() noexcept;
     virtual void ProcessTerminationConditions() noexcept;
-    void         SetEnableVideoWriting(bool enable) noexcept;
-    void         CheckRecordingSchedule();
-    void         CreateCaptureObjects();
-    void         GrabVideoFrame();
-    void         WriteVideoFrame();
-    bool         CheckMotionSchedule() const;
-    void         TrackMotion();
-    void         CheckMotionTracking();
+    void SetEnableVideoWriting(bool enable) noexcept;
+    void CheckRecordingSchedule();
+    void CreateCaptureObjects();
+    void GrabVideoFrame();
+    void WriteVideoFrame();
+    bool CheckMotionSchedule() const;
+    bool TrackMotion();
+    void CheckMotionTracking();
 
 private:
     mutable std::mutex                  m_writingMutex{};
@@ -155,14 +155,15 @@ private:
     int                                 m_videoHeight{0};
     cv::Ptr<cv::VideoCapture>           m_videoCapture{};
     cv::Ptr<cv::Mat>                    m_videoFrame{};
-    cv::Ptr<cv::Mat>                    m_lastFrame{};
-    cv::Ptr<cv::Mat>                    m_greyFrame{};
-    cv::Ptr<cv::Mat>                    m_deltaFrame{};
+    cv::Ptr<cv::Mat>                    m_refTrackingFrame{};
     cv::Ptr<cv::Mat>                    m_motionVideoFrame{};
     cv::Ptr<cv::VideoWriter>            m_videoWriter{};
     std::vector<std::vector<cv::Point>> m_contours;
     std::vector<cv::Vec4i>              m_hierarchy;
     std::vector<std::vector<cv::Point>> m_contoursPoly;
+    std::vector<cv::Rect>               m_boundingRects;
+    cv::Size                            m_gaussianBlurKernel{0, 0};
+    cv::Scalar                          m_contourColor;
     int                                 m_numFramesInInterval{0};
     int                                 m_trackedFrameCount{0};
     double                              m_fileDurationSecs{0.0};
