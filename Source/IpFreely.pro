@@ -75,8 +75,8 @@ else {
             -lopencv_imgcodecs \
             -lopencv_imgproc   \
             -lopencv_video     \
-            -lopencv_videoio \
-            -lopencv_highgui
+            -lopencv_videoio #\
+            #-lopencv_highgui
 
     SOURCES += \
         /home/duncan/projects/ThirdParty/singleapplication/singleapplication.cpp

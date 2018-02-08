@@ -101,10 +101,10 @@ public:
 
     /*!
      * \brief CurrentVideoFrame gives acces to current video frame.
-     * \param[in] getMotionFrame - (Optional) Get motion tracking frame if available.
+     * \param[out] motionRectangle - (Optional) Used to get motion bounding rect.
      * \return A QImage of the current video frame at full stream resolution.
      */
-    QImage CurrentVideoFrame(bool const getMotionFrame = false) const;
+    QImage CurrentVideoFrame(QRect* motionRectangle = nullptr) const;
 
     /*!
      * \brief CurrentFps gives acces to current stream FPS.

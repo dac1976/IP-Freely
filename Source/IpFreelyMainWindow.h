@@ -130,6 +130,7 @@ private:
     int                                m_numConnections;
     std::shared_ptr<IpFreelyVideoForm> m_videoForm;
     ipfreely::eCamId                   m_videoFormId;
+    QRect                              m_motionBoundingRect;
 };
 
 #endif // IPFREELYMAINWINDOW_H

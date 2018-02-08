@@ -242,22 +242,25 @@ double RtspStreamProcessor::GetAspectRatioAndSize(int& width, int& height) const
     return static_cast<double>(m_videoWidth) / static_cast<double>(m_videoHeight);
 }
 
-QImage RtspStreamProcessor::CurrentVideoFrame(bool const getMotionFrame) const
+QImage RtspStreamProcessor::CurrentVideoFrame(QRect* motionRectangle) const
 {
-    cv::Mat  result;
-    cv::Rect boundingRect;
+    cv::Mat result;
 
     {
         std::lock_guard<std::mutex> lock(m_frameMutex);
         result = m_videoFrame;
     }
 
+    if (motionRectangle)
     {
         std::lock_guard<std::mutex> lock(m_motionMutex);
-        boundingRect = m_motionBoundingRect;
+        *motionRectangle = QRect(m_motionBoundingRect.tl().x,
+                                 m_motionBoundingRect.tl().y,
+                                 m_motionBoundingRect.width,
+                                 m_motionBoundingRect.height);
     }
 
-    if (getMotionFrame && (boundingRect.area() > 0))
+    /*if (getMotionFrame && (boundingRect.area() > 0))
     {
         cv::rectangle(result,
                       m_motionBoundingRect.tl(),
@@ -271,7 +274,9 @@ QImage RtspStreamProcessor::CurrentVideoFrame(bool const getMotionFrame) const
     else
     {
         return utils::CvMatToQImage(result);
-    }
+    }*/
+
+    return utils::CvMatToQImage(result);
 }
 
 double RtspStreamProcessor::CurrentFps() const noexcept

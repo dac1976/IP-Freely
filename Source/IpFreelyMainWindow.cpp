@@ -455,7 +455,8 @@ void IpFreelyMainWindow::on_updateFeedsTimer()
     {
         if (streamProcessor.second->VideoFrameUpdated())
         {
-            auto currentVideoFrame = streamProcessor.second->CurrentVideoFrame(true);
+            auto currentVideoFrame =
+                streamProcessor.second->CurrentVideoFrame(&m_motionBoundingRect);
 
             auto fps = streamProcessor.second->CurrentFps();
 
@@ -1035,6 +1036,8 @@ void IpFreelyMainWindow::UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage
         return;
     }
 
+    QImage displayFrame;
+
     if ((camFeedIter->second->width() < videoFrame.width()) ||
         (camFeedIter->second->height() < videoFrame.height()))
     {
@@ -1056,48 +1059,42 @@ void IpFreelyMainWindow::UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage
             newWidth  = static_cast<int>(static_cast<double>(newHeight) * frameAspectRatio);
         }
 
+        displayFrame =
+            videoFrame.scaled(newWidth, newHeight, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    }
+    else
+    {
+        displayFrame = videoFrame;
+    }
+
+    if (!m_motionBoundingRect.isNull() || streamProcIsWriting)
+    {
+        QPainter p(&displayFrame);
+
+        if (!m_motionBoundingRect.isNull())
+        {
+            auto pen = QPen(Qt::green);
+            pen.setWidth(2);
+            p.setPen(pen);
+            p.setBackground(QBrush(Qt::NoBrush));
+            p.setBackgroundMode(Qt::TransparentMode);
+            p.setBrush(QBrush(Qt::NoBrush));
+            p.drawRect(m_motionBoundingRect);
+        }
+
         if (streamProcIsWriting)
         {
-            QImage image = videoFrame.scaled(
-                newWidth, newHeight, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-            QPainter p(&image);
             p.setPen(QPen(Qt::red));
             p.setBackground(QBrush(Qt::white, Qt::SolidPattern));
             p.setBackgroundMode(Qt::OpaqueMode);
             p.setFont(QFont("Segoe UI", 16, QFont::Bold));
-            auto posRec = image.rect();
+            auto posRec = displayFrame.rect();
             posRec.setTop(posRec.top() + 16);
             p.drawText(posRec, Qt::AlignHCenter | Qt::AlignTop, tr("Recording").toLocal8Bit());
-
-            camFeedIter->second->setPixmap(QPixmap::fromImage(image));
-        }
-        else
-        {
-            camFeedIter->second->setPixmap(QPixmap::fromImage(videoFrame.scaled(
-                newWidth, newHeight, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
         }
     }
-    else
-    {
-        if (streamProcIsWriting)
-        {
-            QImage   image = videoFrame;
-            QPainter p(&image);
-            p.setPen(QPen(Qt::red));
-            p.setBackground(QBrush(Qt::white, Qt::SolidPattern));
-            p.setBackgroundMode(Qt::OpaqueMode);
-            p.setFont(QFont("Times", 16, QFont::Bold));
-            auto posRec = image.rect();
-            posRec.setTop(posRec.top() + 16);
-            p.drawText(posRec, Qt::AlignHCenter | Qt::AlignTop, tr("Recording").toLocal8Bit());
 
-            camFeedIter->second->setPixmap(QPixmap::fromImage(image));
-        }
-        else
-        {
-            camFeedIter->second->setPixmap(QPixmap::fromImage(videoFrame));
-        }
-    }
+    camFeedIter->second->setPixmap(QPixmap::fromImage(displayFrame));
 }
 
 void IpFreelyMainWindow::SaveImageSnapshot(ipfreely::eCamId const camId)
