@@ -34,14 +34,6 @@
 #include "Threads/ThreadBase.h"
 #include "Threads/SyncEvent.h"
 
-// Forward declarations
-namespace cv
-{
-class VideoCapture;
-class Mat;
-class VideoWriter;
-} // namespace cv
-
 /*! \brief The ipfreely namespace. */
 namespace ipfreely
 {
@@ -79,8 +71,8 @@ public:
                         std::string const& saveFolderPath, double const requiredFileDurationSecs,
                         std::vector<std::vector<bool>> const& recordingSchedule = {},
                         std::vector<std::vector<bool>> const& motionSchedule    = {},
-                        eMotionDetectorMode const motionSensitivity      = eMotionDetectorMode::off,
-                        double const              motionDetectorInterval = 1.0);
+                        eMotionDetectorMode const motionSensitivity = eMotionDetectorMode::off,
+                        bool const                shrinkFramesForMotionDetection = false);
 
     /*! \brief RtspStreamProcessor destructor. */
     virtual ~RtspStreamProcessor();
@@ -138,45 +130,48 @@ private:
     void CreateCaptureObjects();
     void GrabVideoFrame();
     void WriteVideoFrame();
+    void InitialiseMotionDetector(eMotionDetectorMode const motionSensitivity);
     bool CheckMotionSchedule() const;
     bool DetectMotion();
+    void UpdateNextFrame();
+    void RotateFrames();
     void CheckMotionDetector();
 
 private:
-    mutable std::mutex                  m_writingMutex{};
-    mutable std::mutex                  m_frameMutex{};
-    mutable std::mutex                  m_fpsMutex{};
-    unsigned int                        m_updatePeriodMillisecs{40};
-    double                              m_fps{25.0};
-    std::string                         m_name{"cam"};
-    std::string                         m_completeRtspUrl{};
-    std::string                         m_saveFolderPath{};
-    double                              m_requiredFileDurationSecs{0.0};
-    std::vector<std::vector<bool>>      m_recordingSchedule{};
-    bool                                m_useRecordingSchedule{false};
-    std::vector<std::vector<bool>>      m_motionSchedule{};
-    bool                                m_useMotionSchedule{false};
-    double                              m_motionFrameScalar{0.0};
-    core_lib::threads::SyncEvent        m_updateEvent{};
-    bool                                m_enableVideoWriting{false};
-    int                                 m_videoWidth{0};
-    int                                 m_videoHeight{0};
-    cv::Ptr<cv::VideoCapture>           m_videoCapture{};
-    cv::Ptr<cv::Mat>                    m_videoFrame{};
-    cv::Ptr<cv::Mat>                    m_refDetectorFrame{};
-    cv::Ptr<cv::Mat>                    m_motionVideoFrame{};
-    cv::Ptr<cv::VideoWriter>            m_videoWriter{};
-    std::vector<std::vector<cv::Point>> m_contours;
-    std::vector<cv::Vec4i>              m_hierarchy;
-    double                              m_minBoundingRectArea{0.0};
-    std::vector<std::vector<cv::Point>> m_contoursPoly;
-    cv::Size                            m_gaussianBlurKernel{0, 0};
-    cv::Scalar                          m_contourColor;
-    int                                 m_numFramesInInterval{0};
-    int                                 m_detectorFrameCount{0};
-    double                              m_fileDurationSecs{0.0};
-    bool                                m_videoFrameUpdated{false};
-    time_t                              m_currentTime{};
+    mutable std::mutex             m_writingMutex{};
+    mutable std::mutex             m_frameMutex{};
+    mutable std::mutex             m_motionMutex{};
+    unsigned int                   m_updatePeriodMillisecs{40};
+    double                         m_fps{25.0};
+    std::string                    m_name{"cam"};
+    std::string                    m_completeRtspUrl{};
+    std::string                    m_saveFolderPath{};
+    double                         m_requiredFileDurationSecs{0.0};
+    std::vector<std::vector<bool>> m_recordingSchedule{};
+    bool                           m_useRecordingSchedule{false};
+    std::vector<std::vector<bool>> m_motionSchedule{};
+    bool                           m_useMotionSchedule{false};
+    bool                           m_shrinkFramesForMotionDetection{false};
+    double                         m_motionFrameScalar{1.0};
+    core_lib::threads::SyncEvent   m_updateEvent{};
+    bool                           m_enableVideoWriting{false};
+    int                            m_videoWidth{0};
+    int                            m_videoHeight{0};
+    cv::VideoCapture               m_videoCapture{};
+    cv::Mat                        m_videoFrame{};
+    cv::Ptr<cv::VideoWriter>       m_videoWriter{};
+    cv::Scalar                     m_rectangleColor{0, 255, 0};
+    cv::Mat                        m_erosionKernel{};
+    double                         m_maxImageDeviation{0.0};
+    int                            m_minImageChangeArea{0};
+    size_t                         m_imageChangesThreshold{0};
+    cv::Mat                        m_prevGreyFrame{};
+    cv::Mat                        m_currentGreyFrame{};
+    cv::Mat                        m_nextGreyFrame{};
+    cv::Rect                       m_motionBoundingRect{0, 0, 0, 0};
+    double                         m_fileDurationSecs{0.0};
+    bool                           m_videoFrameUpdated{false};
+    time_t                         m_currentTime{};
 };
 
 } // namespace ipfreely

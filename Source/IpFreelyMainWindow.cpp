@@ -825,7 +825,6 @@ void IpFreelyMainWindow::SetupCameraInDb(ipfreely::eCamId const camId, QToolButt
     }
 
     m_camDb.Save();
-
     connectBtn->setEnabled(camera.IsValid());
 }
 
@@ -941,7 +940,7 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
                 m_prefs.FileDurationInSecs(),
                 schedule,
                 motionSchedule,
-                ipfreely::eMotionDetectorMode::mediumSensitivity);
+                ipfreely::eMotionDetectorMode::lowSensitivity);
         }
         catch (std::exception& e)
         {
@@ -994,9 +993,8 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
         connectBtn->setIcon(QIcon(":/icons/icons/WallCam_Disconnect_48.png"));
         connectBtn->setToolTip("Disconnect from camera stream.");
 
-        m_streamProcessors[camera.camId]->Start();
-
         ++m_numConnections;
+
         m_updateFeedsTimer->start(DEFAULT_UPDATE_PERIOD_MS);
     }
 }
