@@ -46,6 +46,15 @@ enum class eCamId
     cam4
 };
 
+/*! \brief Motion detector mode. */
+enum class eMotionDetectorMode
+{
+    off,
+    lowSensitivity,
+    mediumSensitivity,
+    highSensitivity
+};
+
 /*! \brief Camera's details structure. */
 struct IpCamera final
 {
@@ -69,6 +78,12 @@ struct IpCamera final
 
     /*! \brief Enabled scheduled recording mode, when enabled this disables maual recording. */
     bool enableScheduledRecording{false};
+
+    /*! \brief Motion detector mode for this camera. */
+    eMotionDetectorMode motionDectorMode{eMotionDetectorMode::off};
+
+    /*! \brief Shrink camera's video frames for motion detector. */
+    bool shrinkVideoFrames{false};
 
     /*! \brief IpCamera's default constructor. */
     IpCamera() = default;
@@ -140,6 +155,17 @@ struct IpCamera final
         int temp = enableScheduledRecording ? 1 : 0;
         ar(CEREAL_NVP(temp));
         enableScheduledRecording = temp == 1;
+
+        if (version > 1)
+        {
+            // Added with version 2.
+            ar(CEREAL_NVP(motionDectorMode));
+
+            // Added with version 2.
+            temp = shrinkVideoFrames ? 1 : 0;
+            ar(CEREAL_NVP(temp));
+            shrinkVideoFrames = temp == 1;
+        }
     }
 };
 
@@ -234,13 +260,13 @@ private:
     }
 
 private:
-    std::string                m_dbPath{};
+    std::string m_dbPath{};
     std::map<eCamId, IpCamera> m_cameras{};
 };
 
 } // namespace ipfreely
 
-CEREAL_CLASS_VERSION(ipfreely::IpCamera, 1);
+CEREAL_CLASS_VERSION(ipfreely::IpCamera, 2);
 CEREAL_CLASS_VERSION(ipfreely::IpFreelyCameraDatabase, 1);
 
 #endif // IPFREELYCAMERADATABASE_H

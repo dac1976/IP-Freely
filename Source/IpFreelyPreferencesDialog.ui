@@ -1669,7 +1669,7 @@
         </layout>
        </item>
        <item>
-        <spacer name="verticalSpacer">
+        <spacer name="verticalSpacer_1">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -1687,7 +1687,7 @@
       <attribute name="title">
        <string>Motion Tracking Schedule</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <layout class="QVBoxLayout" name="verticalLayout_21">
        <item>
         <widget class="QTableWidget" name="motionTrackingTableWidget">
          <property name="minimumSize">
@@ -3175,7 +3175,7 @@
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_4">
+          <spacer name="horizontalSpacer_41">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>

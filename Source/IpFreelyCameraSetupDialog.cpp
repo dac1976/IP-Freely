@@ -57,6 +57,23 @@ void IpFreelyCameraSetupDialog::on_buttonBox_accepted()
     m_camera.description              = ui->descriptionLineEdit->text().toStdString();
     m_camera.enableScheduledRecording = ui->scheduledRecordingCheckBox->checkState() == Qt::Checked;
 
+    switch (ui->motionDetectModeComboBox->currentIndex())
+    {
+    case 1:
+        m_camera.motionDectorMode = ipfreely::eMotionDetectorMode::lowSensitivity;
+        break;
+    case 2:
+        m_camera.motionDectorMode = ipfreely::eMotionDetectorMode::mediumSensitivity;
+        break;
+    case 3:
+        m_camera.motionDectorMode = ipfreely::eMotionDetectorMode::highSensitivity;
+        break;
+    case 0:
+    default:
+        m_camera.motionDectorMode = ipfreely::eMotionDetectorMode::off;
+        break;
+    }
+
     accept();
 }
 
@@ -80,7 +97,7 @@ void IpFreelyCameraSetupDialog::SetDisplaySize()
 {
     static constexpr double DEFAULT_SCREEN_SIZE = 1080.0;
     static constexpr int    MIN_DISPLAY_WIDTH   = 640;
-    static constexpr int    MIN_DISPLAY_HEIGHT  = 256;
+    static constexpr int    MIN_DISPLAY_HEIGHT  = 340;
 
     auto      displayGeometry = geometry();
     auto      screenPos       = mapToGlobal(QPoint(displayGeometry.left(), displayGeometry.top()));
@@ -136,4 +153,19 @@ void IpFreelyCameraSetupDialog::InitialiseCameraSettings(ipfreely::IpCamera cons
     ui->descriptionLineEdit->setText(QString::fromStdString(camera.description));
     ui->scheduledRecordingCheckBox->setCheckState(camera.enableScheduledRecording ? Qt::Checked
                                                                                   : Qt::Unchecked);
+    switch (m_camera.motionDectorMode)
+    {
+    case ipfreely::eMotionDetectorMode::off:
+        ui->motionDetectModeComboBox->setCurrentIndex(0);
+        break;
+    case ipfreely::eMotionDetectorMode::lowSensitivity:
+        ui->motionDetectModeComboBox->setCurrentIndex(1);
+        break;
+    case ipfreely::eMotionDetectorMode::mediumSensitivity:
+        ui->motionDetectModeComboBox->setCurrentIndex(2);
+        break;
+    case ipfreely::eMotionDetectorMode::highSensitivity:
+        ui->motionDetectModeComboBox->setCurrentIndex(3);
+        break;
+    }
 }

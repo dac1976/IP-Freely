@@ -31,20 +31,13 @@
 #include <vector>
 #include <ctime>
 #include <opencv/cv.hpp>
+#include "IpFreelyCameraDatabase.h"
 #include "Threads/ThreadBase.h"
 #include "Threads/SyncEvent.h"
 
 /*! \brief The ipfreely namespace. */
 namespace ipfreely
 {
-
-enum class eMotionDetectorMode
-{
-    off,
-    lowSensitivity,
-    mediumSensitivity,
-    highSensitivity
-};
 
 /*! \brief Class defining a RTSP stream processor thread. */
 class RtspStreamProcessor final : public core_lib::threads::ThreadBase
@@ -58,14 +51,11 @@ public:
      * \param[in] requiredFileDurationSecs - Duration to use for captured video files.
      * \param[in] recordingSchedule - (Optional) The daily/hourly recording schedule.
      * \param[in] motionSchedule - (Optional) The daily/hourly motion detector schedule.
-     * \param[in] motionSensitivity - (Optional) The sensitivity of the motion detector in
-     * [0.0, 1.0].
-     * \param[in] motionDetectorInterval - (Optional) Motion detector will test grab a new reference
-     * frame.
+     * \param[in] motionSensitivity - (Optional) The sensitivity of the motion detector.
      *
      * The stream processor can be used to receive and thus display RTSP video streams but can also
      * record the stream in DivX format mp4 files to disk. Files are recorded with the given
-     * duration. One recording sessino can span multiple back-to-back video files.
+     * duration. One recording session can span multiple back-to-back video files.
      */
     RtspStreamProcessor(std::string const& name, std::string const& completeRtspUrl,
                         std::string const& saveFolderPath, double const requiredFileDurationSecs,

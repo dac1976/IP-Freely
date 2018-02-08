@@ -933,14 +933,15 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
             // TODO: get motion trackenabled state, motion sensitivity
             // and motion trakc intervak from camera settings.
 
-            m_streamProcessors[camera.camId] = std::make_shared<ipfreely::RtspStreamProcessor>(
-                camName,
-                camera.CompleteRtspUrl(),
-                p.string(),
-                m_prefs.FileDurationInSecs(),
-                schedule,
-                motionSchedule,
-                ipfreely::eMotionDetectorMode::lowSensitivity);
+            m_streamProcessors[camera.camId] =
+                std::make_shared<ipfreely::RtspStreamProcessor>(camName,
+                                                                camera.CompleteRtspUrl(),
+                                                                p.string(),
+                                                                m_prefs.FileDurationInSecs(),
+                                                                schedule,
+                                                                motionSchedule,
+                                                                camera.motionDectorMode,
+                                                                camera.shrinkVideoFrames);
         }
         catch (std::exception& e)
         {
