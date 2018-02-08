@@ -46,23 +46,20 @@ public:
     /*!
      * \brief RtspStreamProcessor constructor.
      * \param[in] name - A name for the stream, used to name output video files.
-     * \param[in] completeRtspUrl - The complete URL to the RSTP stream (inc username and password).
+     * \param[in] cameraDetails - Camera details we want to stream from.
      * \param[in] saveFolderPath - A local folder to save captured videos to.
      * \param[in] requiredFileDurationSecs - Duration to use for captured video files.
      * \param[in] recordingSchedule - (Optional) The daily/hourly recording schedule.
      * \param[in] motionSchedule - (Optional) The daily/hourly motion detector schedule.
-     * \param[in] motionSensitivity - (Optional) The sensitivity of the motion detector.
      *
      * The stream processor can be used to receive and thus display RTSP video streams but can also
      * record the stream in DivX format mp4 files to disk. Files are recorded with the given
      * duration. One recording session can span multiple back-to-back video files.
      */
-    RtspStreamProcessor(std::string const& name, std::string const& completeRtspUrl,
+    RtspStreamProcessor(std::string const& name, IpCamera const& cameraDetails,
                         std::string const& saveFolderPath, double const requiredFileDurationSecs,
                         std::vector<std::vector<bool>> const& recordingSchedule = {},
-                        std::vector<std::vector<bool>> const& motionSchedule    = {},
-                        eMotionDetectorMode const motionSensitivity = eMotionDetectorMode::off,
-                        bool const                shrinkFramesForMotionDetection = false);
+                        std::vector<std::vector<bool>> const& motionSchedule    = {});
 
     /*! \brief RtspStreamProcessor destructor. */
     virtual ~RtspStreamProcessor();
@@ -115,17 +112,17 @@ public:
 private:
     virtual void ThreadIteration() noexcept;
     virtual void ProcessTerminationConditions() noexcept;
-    void SetEnableVideoWriting(bool enable) noexcept;
-    void CheckRecordingSchedule();
-    void CreateCaptureObjects();
-    void GrabVideoFrame();
-    void WriteVideoFrame();
-    void InitialiseMotionDetector(eMotionDetectorMode const motionSensitivity);
-    bool CheckMotionSchedule() const;
-    bool DetectMotion();
-    void UpdateNextFrame();
-    void RotateFrames();
-    void CheckMotionDetector();
+    void         SetEnableVideoWriting(bool enable) noexcept;
+    void         CheckRecordingSchedule();
+    void         CreateCaptureObjects();
+    void         GrabVideoFrame();
+    void         WriteVideoFrame();
+    void         InitialiseMotionDetector();
+    bool         CheckMotionSchedule() const;
+    bool         DetectMotion();
+    void         UpdateNextFrame();
+    void         RotateFrames();
+    void         CheckMotionDetector();
 
 private:
     mutable std::mutex             m_writingMutex{};
@@ -134,15 +131,15 @@ private:
     unsigned int                   m_updatePeriodMillisecs{40};
     double                         m_fps{25.0};
     std::string                    m_name{"cam"};
-    std::string                    m_completeRtspUrl{};
+    IpCamera                       m_cameraDetails{};
     std::string                    m_saveFolderPath{};
     double                         m_requiredFileDurationSecs{0.0};
     std::vector<std::vector<bool>> m_recordingSchedule{};
     bool                           m_useRecordingSchedule{false};
     std::vector<std::vector<bool>> m_motionSchedule{};
     bool                           m_useMotionSchedule{false};
-    bool                           m_shrinkFramesForMotionDetection{false};
     double                         m_motionFrameScalar{1.0};
+    int                            m_minImageChangeArea{0};
     core_lib::threads::SyncEvent   m_updateEvent{};
     bool                           m_enableVideoWriting{false};
     int                            m_videoWidth{0};
@@ -152,8 +149,6 @@ private:
     cv::Ptr<cv::VideoWriter>       m_videoWriter{};
     cv::Scalar                     m_rectangleColor{0, 255, 0};
     cv::Mat                        m_erosionKernel{};
-    double                         m_maxImageDeviation{0.0};
-    int                            m_minImageChangeArea{0};
     size_t                         m_imageChangesThreshold{0};
     cv::Mat                        m_prevGreyFrame{};
     cv::Mat                        m_currentGreyFrame{};

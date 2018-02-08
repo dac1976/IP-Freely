@@ -87,32 +87,26 @@ inline QImage CvMatToQImage(cv::Mat const& inMat)
 
 } // namespace utils
 
-static constexpr double DIFF_THRESHOLD                  = 50.0;
-static constexpr double DIFF_MAX_VALUE                  = 255.0;
-static constexpr int    IDEAL_FRAME_HEIGHT              = 600;
-static constexpr int    CONTOUR_LINE_THICKNESS          = 2;
-static constexpr double LOW_SENSITIVITY_STDDEV          = 10.0;
-static constexpr double MEDIUM_SENSITIVITY_STDDEV       = 20.0;
-static constexpr double HIGH_SENSITIVITY_STDDEV         = 40.0;
-static constexpr double LOW_SENSITIVITY_AREA_PERCENT    = 0.05;
-static constexpr double MEDIUM_SENSITIVITY_AREA_PERCENT = 0.025;
-static constexpr double HIGH_SENSITIVITY_AREA_PERCENT   = 0.01;
-static constexpr double BOUNDING_RECT_SMOOTHING_FACTOR  = 0.1;
+static constexpr double DIFF_MAX_VALUE     = 255.0;
+static constexpr int    IDEAL_FRAME_HEIGHT = 600;
 
-RtspStreamProcessor::RtspStreamProcessor(
-    std::string const& name, std::string const& completeRtspUrl, std::string const& saveFolderPath,
-    double const requiredFileDurationSecs, std::vector<std::vector<bool>> const& recordingSchedule,
-    std::vector<std::vector<bool>> const& motionSchedule,
-    eMotionDetectorMode const motionSensitivity, bool const shrinkFramesForMotionDetection)
+#if defined(MOTION_DETECTOR_DEBUG)
+static constexpr int CONTOUR_LINE_THICKNESS = 2;
+#endif
+
+RtspStreamProcessor::RtspStreamProcessor(std::string const& name, IpCamera const& cameraDetails,
+                                         std::string const& saveFolderPath,
+                                         double const       requiredFileDurationSecs,
+                                         std::vector<std::vector<bool>> const& recordingSchedule,
+                                         std::vector<std::vector<bool>> const& motionSchedule)
     : ThreadBase()
     , m_name(core_lib::string_utils::RemoveIllegalChars(name))
-    , m_completeRtspUrl(completeRtspUrl)
+    , m_cameraDetails(cameraDetails)
     , m_saveFolderPath(saveFolderPath)
     , m_requiredFileDurationSecs(requiredFileDurationSecs)
     , m_recordingSchedule(recordingSchedule)
     , m_motionSchedule(motionSchedule)
-    , m_shrinkFramesForMotionDetection(shrinkFramesForMotionDetection)
-    , m_videoCapture(completeRtspUrl.c_str())
+    , m_videoCapture(cameraDetails.CompleteRtspUrl().c_str())
     , m_erosionKernel(cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2, 2)))
 {
     if (!m_recordingSchedule.empty())
@@ -131,7 +125,7 @@ RtspStreamProcessor::RtspStreamProcessor(
         DEBUG_MESSAGE_EX_INFO("Recording schedule enabled.");
     }
 
-    if (!m_motionSchedule.empty() && (motionSensitivity != eMotionDetectorMode::off))
+    if (!m_motionSchedule.empty() && (m_cameraDetails.motionDectorMode != eMotionDetectorMode::off))
     {
         if (m_motionSchedule.size() != 7)
         {
@@ -180,16 +174,16 @@ RtspStreamProcessor::RtspStreamProcessor(
 
     if (m_useMotionSchedule)
     {
-        InitialiseMotionDetector(motionSensitivity);
+        InitialiseMotionDetector();
     }
     else
     {
         DEBUG_MESSAGE_EX_INFO("Motion tracking disabled for camera: " << name);
     }
 
-    DEBUG_MESSAGE_EX_INFO("Stream at: " << m_completeRtspUrl << " running with FPS of: " << m_fps
-                                        << ", thread update period (ms): "
-                                        << m_updatePeriodMillisecs);
+    DEBUG_MESSAGE_EX_INFO("Stream at: "
+                          << m_cameraDetails.rtspUrl << " running with FPS of: " << m_fps
+                          << ", thread update period (ms): " << m_updatePeriodMillisecs);
 
     Start();
 }
@@ -259,22 +253,6 @@ QImage RtspStreamProcessor::CurrentVideoFrame(QRect* motionRectangle) const
                                  m_motionBoundingRect.width,
                                  m_motionBoundingRect.height);
     }
-
-    /*if (getMotionFrame && (boundingRect.area() > 0))
-    {
-        cv::rectangle(result,
-                      m_motionBoundingRect.tl(),
-                      m_motionBoundingRect.br(),
-                      m_rectangleColor,
-                      CONTOUR_LINE_THICKNESS,
-                      cv::LINE_8);
-
-        return utils::CvMatToQImage(result);
-    }
-    else
-    {
-        return utils::CvMatToQImage(result);
-    }*/
 
     return utils::CvMatToQImage(result);
 }
@@ -411,13 +389,13 @@ void RtspStreamProcessor::WriteVideoFrame()
     }
 }
 
-void RtspStreamProcessor::InitialiseMotionDetector(eMotionDetectorMode const motionSensitivity)
+void RtspStreamProcessor::InitialiseMotionDetector()
 {
 #if defined(MOTION_DETECTOR_DEBUG)
     cv::namedWindow("motion");
 #endif
 
-    if (m_shrinkFramesForMotionDetection && (m_videoHeight > IDEAL_FRAME_HEIGHT))
+    if (m_cameraDetails.shrinkVideoFrames && (m_videoHeight > IDEAL_FRAME_HEIGHT))
     {
         m_motionFrameScalar =
             static_cast<double>(IDEAL_FRAME_HEIGHT) / static_cast<double>(m_videoHeight);
@@ -432,29 +410,23 @@ void RtspStreamProcessor::InitialiseMotionDetector(eMotionDetectorMode const mot
     double const motionFrameArea = static_cast<double>(m_videoHeight * m_videoWidth) *
                                    m_motionFrameScalar * m_motionFrameScalar;
 
-    // m_maxImageDeviation: Lower values means less sensitivity to movement.
-    //                      Greater values means more sensitive to movement.
-    //
-    // m_minImageChangeArea: Lower values mean smaller areas of motion trigger detection.
-    //                       Greater values mean larger areas of motion are required to trigger
-    //                       detection.
-    switch (motionSensitivity)
+    m_minImageChangeArea =
+        static_cast<int>(motionFrameArea * m_cameraDetails.minMotionAreaPercentFactor);
+
+    switch (m_cameraDetails.motionDectorMode)
     {
     case eMotionDetectorMode::lowSensitivity:
-        m_maxImageDeviation  = LOW_SENSITIVITY_STDDEV;
-        m_minImageChangeArea = static_cast<int>(motionFrameArea * LOW_SENSITIVITY_AREA_PERCENT);
         DEBUG_MESSAGE_EX_INFO("Motion tracking (low sensitivity) enabled for camera: " << m_name);
         break;
     case eMotionDetectorMode::mediumSensitivity:
-        m_maxImageDeviation  = MEDIUM_SENSITIVITY_STDDEV;
-        m_minImageChangeArea = static_cast<int>(motionFrameArea * MEDIUM_SENSITIVITY_AREA_PERCENT);
         DEBUG_MESSAGE_EX_INFO(
             "Motion tracking (medium sensitivity) enabled for camera: " << m_name);
         break;
     case eMotionDetectorMode::highSensitivity:
-        m_maxImageDeviation  = HIGH_SENSITIVITY_STDDEV;
-        m_minImageChangeArea = static_cast<int>(motionFrameArea * HIGH_SENSITIVITY_AREA_PERCENT);
         DEBUG_MESSAGE_EX_INFO("Motion tracking (high sensitivity) enabled for camera: " << m_name);
+        break;
+    case eMotionDetectorMode::manual:
+        DEBUG_MESSAGE_EX_INFO("Motion tracking (manual settings) enabled for camera: " << m_name);
         break;
     case eMotionDetectorMode::off:
         // Do nothing - but remove compiler warning
@@ -464,7 +436,7 @@ void RtspStreamProcessor::InitialiseMotionDetector(eMotionDetectorMode const mot
     m_videoCapture >> m_prevGreyFrame;
     m_videoCapture >> m_currentGreyFrame;
 
-    if (m_shrinkFramesForMotionDetection)
+    if (m_cameraDetails.shrinkVideoFrames)
     {
         cv::resize(m_prevGreyFrame,
                    m_prevGreyFrame,
@@ -476,7 +448,7 @@ void RtspStreamProcessor::InitialiseMotionDetector(eMotionDetectorMode const mot
 
     cv::cvtColor(m_prevGreyFrame, m_prevGreyFrame, CV_BGR2GRAY);
 
-    if (m_shrinkFramesForMotionDetection)
+    if (m_cameraDetails.shrinkVideoFrames)
     {
         cv::resize(m_currentGreyFrame,
                    m_currentGreyFrame,
@@ -517,7 +489,7 @@ bool RtspStreamProcessor::DetectMotion()
     cv::absdiff(m_prevGreyFrame, m_nextGreyFrame, diff1);
     cv::absdiff(m_nextGreyFrame, m_currentGreyFrame, diff2);
     cv::bitwise_and(diff1, diff2, motion);
-    cv::threshold(motion, motion, DIFF_THRESHOLD, DIFF_MAX_VALUE, CV_THRESH_BINARY);
+    cv::threshold(motion, motion, m_cameraDetails.pixelThreshold, DIFF_MAX_VALUE, CV_THRESH_BINARY);
     cv::erode(motion, motion, m_erosionKernel);
 
     // Now work out the std dev of the motion frame.
@@ -533,7 +505,7 @@ bool RtspStreamProcessor::DetectMotion()
 
     // This check guards against there being too much motion all at once,
     // e.g. changes related to rain, snow, sunlight flares etc.
-    if (stddev[0] < m_maxImageDeviation)
+    if (stddev[0] < m_cameraDetails.maxMotionStdDev)
     {
         size_t numChanges = 0;
 
@@ -640,40 +612,43 @@ bool RtspStreamProcessor::DetectMotion()
         // smoothed rolling average controlled by the smoothing factor.
         std::lock_guard<std::mutex> lock(m_motionMutex);
 
-        double left =
-            (static_cast<double>(m_motionBoundingRect.tl().x) * BOUNDING_RECT_SMOOTHING_FACTOR) +
-            (static_cast<double>(minBoundingRect.tl().x) * (1.0 - BOUNDING_RECT_SMOOTHING_FACTOR));
-        double top =
-            (static_cast<double>(m_motionBoundingRect.tl().y) * BOUNDING_RECT_SMOOTHING_FACTOR) +
-            (static_cast<double>(minBoundingRect.tl().y) * (1.0 - BOUNDING_RECT_SMOOTHING_FACTOR));
-        double right =
-            (static_cast<double>(m_motionBoundingRect.br().x) * BOUNDING_RECT_SMOOTHING_FACTOR) +
-            (static_cast<double>(minBoundingRect.br().x) * (1.0 - BOUNDING_RECT_SMOOTHING_FACTOR));
-        double bottom =
-            (static_cast<double>(m_motionBoundingRect.br().y) * BOUNDING_RECT_SMOOTHING_FACTOR) +
-            (static_cast<double>(minBoundingRect.br().y) * (1.0 - BOUNDING_RECT_SMOOTHING_FACTOR));
+        double l = (static_cast<double>(m_motionBoundingRect.tl().x) *
+                    m_cameraDetails.motionAreaAveFactor) +
+                   (static_cast<double>(minBoundingRect.tl().x) *
+                    (1.0 - m_cameraDetails.motionAreaAveFactor));
+        double t = (static_cast<double>(m_motionBoundingRect.tl().y) *
+                    m_cameraDetails.motionAreaAveFactor) +
+                   (static_cast<double>(minBoundingRect.tl().y) *
+                    (1.0 - m_cameraDetails.motionAreaAveFactor));
+        double r = (static_cast<double>(m_motionBoundingRect.br().x) *
+                    m_cameraDetails.motionAreaAveFactor) +
+                   (static_cast<double>(minBoundingRect.br().x) *
+                    (1.0 - m_cameraDetails.motionAreaAveFactor));
+        double b = (static_cast<double>(m_motionBoundingRect.br().y) *
+                    m_cameraDetails.motionAreaAveFactor) +
+                   (static_cast<double>(minBoundingRect.br().y) *
+                    (1.0 - m_cameraDetails.motionAreaAveFactor));
 
-        cv::Point tl2(static_cast<int>(left), static_cast<int>(top));
-        cv::Point br2(static_cast<int>(right), static_cast<int>(bottom));
+        cv::Point tl2(static_cast<int>(l), static_cast<int>(t));
+        cv::Point br2(static_cast<int>(r), static_cast<int>(b));
 
         m_motionBoundingRect = cv::Rect(tl2, br2);
     }
     else
     {
-        // We have no current motion but rather than instantly removign the bounding
-        // rectangle instead we maitain its top-left position but shrink it down
-        // to zero area using the bounding rectangle.
+        // We have no current motion but rather than instantly removing the bounding
+        // rectangle instead shrink it down to zero area using the bounding rectangle.
         std::lock_guard<std::mutex> lock(m_motionMutex);
-
+        double                      l = m_motionBoundingRect.tl().x +
+                   static_cast<int>(static_cast<double>(m_motionBoundingRect.width) * 0.5);
+        double t = m_motionBoundingRect.tl().y +
+                   static_cast<int>(static_cast<double>(m_motionBoundingRect.height) * 0.5);
         double w =
-            (static_cast<double>(m_motionBoundingRect.width) * BOUNDING_RECT_SMOOTHING_FACTOR);
-        double h =
-            (static_cast<double>(m_motionBoundingRect.height) * BOUNDING_RECT_SMOOTHING_FACTOR);
+            (static_cast<double>(m_motionBoundingRect.width) * m_cameraDetails.motionAreaAveFactor);
+        double h = (static_cast<double>(m_motionBoundingRect.height) * 0.25);
 
-        m_motionBoundingRect = cv::Rect(m_motionBoundingRect.tl().x,
-                                        m_motionBoundingRect.tl().y,
-                                        static_cast<int>(w),
-                                        static_cast<int>(h));
+        m_motionBoundingRect = cv::Rect(
+            static_cast<int>(l), static_cast<int>(t), static_cast<int>(w), static_cast<int>(h));
 
         // If we still have a bounding rect keep motion detected flag set.
         motionDetected = m_motionBoundingRect.area() > 0;
@@ -689,7 +664,7 @@ void RtspStreamProcessor::UpdateNextFrame()
         m_nextGreyFrame = m_videoFrame;
     }
 
-    if (m_shrinkFramesForMotionDetection)
+    if (m_cameraDetails.shrinkVideoFrames)
     {
         cv::resize(m_nextGreyFrame,
                    m_nextGreyFrame,

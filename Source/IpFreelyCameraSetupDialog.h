@@ -61,6 +61,7 @@ private slots:
     void on_buttonBox_rejected();
     void on_clearSettingsPushButton_clicked();
     void on_revertChangesPushButton_clicked();
+    void on_motionDetectModeComboBox_currentIndexChanged(int index);
 
 private:
     void SetDisplaySize();

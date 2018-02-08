@@ -27,6 +27,15 @@
 #include <QScreen>
 #include "IpFreelyCameraDatabase.h"
 
+static constexpr double DIFF_THRESHOLD                  = 50.0;
+static constexpr double LOW_SENSITIVITY_STDDEV          = 10.0;
+static constexpr double MEDIUM_SENSITIVITY_STDDEV       = 20.0;
+static constexpr double HIGH_SENSITIVITY_STDDEV         = 40.0;
+static constexpr double LOW_SENSITIVITY_AREA_PERCENT    = 0.05;
+static constexpr double MEDIUM_SENSITIVITY_AREA_PERCENT = 0.025;
+static constexpr double HIGH_SENSITIVITY_AREA_PERCENT   = 0.01;
+static constexpr double BOUNDING_RECT_SMOOTHING_FACTOR  = 0.1;
+
 IpFreelyCameraSetupDialog::IpFreelyCameraSetupDialog(ipfreely::IpCamera& camera, QWidget* parent)
     : QDialog(parent)
     , ui(new Ui::IpFreelyCameraSetupDialog)
@@ -68,11 +77,20 @@ void IpFreelyCameraSetupDialog::on_buttonBox_accepted()
     case 3:
         m_camera.motionDectorMode = ipfreely::eMotionDetectorMode::highSensitivity;
         break;
+    case 4:
+        m_camera.motionDectorMode = ipfreely::eMotionDetectorMode::manual;
+        break;
     case 0:
     default:
         m_camera.motionDectorMode = ipfreely::eMotionDetectorMode::off;
         break;
     }
+
+    m_camera.pixelThreshold             = ui->pixelLevelThresholdDoubleSpinBox->value();
+    m_camera.maxMotionStdDev            = ui->maxStdDevDoubleSpinBox->value();
+    m_camera.minMotionAreaPercentFactor = ui->minMotionAreaPercentDoubleSpinBox->value() / 100.0;
+    m_camera.motionAreaAveFactor        = ui->motionAreaAveFactorDoubleSpinBox->value();
+    m_camera.shrinkVideoFrames          = ui->shrinkFramesCheckBox->checkState() == Qt::Checked;
 
     accept();
 }
@@ -91,6 +109,46 @@ void IpFreelyCameraSetupDialog::on_clearSettingsPushButton_clicked()
 void IpFreelyCameraSetupDialog::on_revertChangesPushButton_clicked()
 {
     InitialiseCameraSettings(m_camera);
+}
+
+void IpFreelyCameraSetupDialog::on_motionDetectModeComboBox_currentIndexChanged(int index)
+{
+    ui->motionDetectSettingsGroupBox->setEnabled(index == 4);
+
+    switch (index)
+    {
+    case 1:
+        ui->maxStdDevDoubleSpinBox->setValue(LOW_SENSITIVITY_STDDEV);
+        ui->minMotionAreaPercentDoubleSpinBox->setValue(LOW_SENSITIVITY_AREA_PERCENT * 100.0);
+        ui->pixelLevelThresholdDoubleSpinBox->setValue(DIFF_THRESHOLD);
+        ui->motionAreaAveFactorDoubleSpinBox->setValue(BOUNDING_RECT_SMOOTHING_FACTOR);
+        break;
+    case 2:
+        ui->maxStdDevDoubleSpinBox->setValue(MEDIUM_SENSITIVITY_STDDEV);
+        ui->minMotionAreaPercentDoubleSpinBox->setValue(MEDIUM_SENSITIVITY_AREA_PERCENT * 100.0);
+        ui->pixelLevelThresholdDoubleSpinBox->setValue(DIFF_THRESHOLD);
+        ui->motionAreaAveFactorDoubleSpinBox->setValue(BOUNDING_RECT_SMOOTHING_FACTOR);
+        break;
+    case 3:
+        ui->maxStdDevDoubleSpinBox->setValue(HIGH_SENSITIVITY_STDDEV);
+        ui->minMotionAreaPercentDoubleSpinBox->setValue(HIGH_SENSITIVITY_AREA_PERCENT * 100.0);
+        ui->pixelLevelThresholdDoubleSpinBox->setValue(DIFF_THRESHOLD);
+        ui->motionAreaAveFactorDoubleSpinBox->setValue(BOUNDING_RECT_SMOOTHING_FACTOR);
+        break;
+    case 4:
+        ui->maxStdDevDoubleSpinBox->setValue(MEDIUM_SENSITIVITY_STDDEV);
+        ui->minMotionAreaPercentDoubleSpinBox->setValue(MEDIUM_SENSITIVITY_AREA_PERCENT * 100.0);
+        ui->pixelLevelThresholdDoubleSpinBox->setValue(DIFF_THRESHOLD);
+        ui->motionAreaAveFactorDoubleSpinBox->setValue(BOUNDING_RECT_SMOOTHING_FACTOR);
+        break;
+    case 0:
+    default:
+        ui->maxStdDevDoubleSpinBox->setValue(0.0);
+        ui->minMotionAreaPercentDoubleSpinBox->setValue(0.0);
+        ui->pixelLevelThresholdDoubleSpinBox->setValue(0.0);
+        ui->motionAreaAveFactorDoubleSpinBox->setValue(0.0);
+        break;
+    }
 }
 
 void IpFreelyCameraSetupDialog::SetDisplaySize()
@@ -167,5 +225,14 @@ void IpFreelyCameraSetupDialog::InitialiseCameraSettings(ipfreely::IpCamera cons
     case ipfreely::eMotionDetectorMode::highSensitivity:
         ui->motionDetectModeComboBox->setCurrentIndex(3);
         break;
+    case ipfreely::eMotionDetectorMode::manual:
+        ui->motionDetectModeComboBox->setCurrentIndex(4);
+        break;
     }
+
+    ui->pixelLevelThresholdDoubleSpinBox->setValue(camera.pixelThreshold);
+    ui->maxStdDevDoubleSpinBox->setValue(camera.maxMotionStdDev);
+    ui->minMotionAreaPercentDoubleSpinBox->setValue(camera.minMotionAreaPercentFactor * 100.0);
+    ui->motionAreaAveFactorDoubleSpinBox->setValue(camera.motionAreaAveFactor);
+    ui->shrinkFramesCheckBox->setCheckState(camera.shrinkVideoFrames ? Qt::Checked : Qt::Unchecked);
 }

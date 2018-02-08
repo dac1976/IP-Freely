@@ -52,7 +52,8 @@ enum class eMotionDetectorMode
     off,
     lowSensitivity,
     mediumSensitivity,
-    highSensitivity
+    highSensitivity,
+    manual
 };
 
 /*! \brief Camera's details structure. */
@@ -84,6 +85,18 @@ struct IpCamera final
 
     /*! \brief Shrink camera's video frames for motion detector. */
     bool shrinkVideoFrames{false};
+
+    /*! \brief Threshold to filter out background motion noise. */
+    double pixelThreshold{0.0};
+
+    /*! \brief Max motionstd deviation to filter out large ambient changes in motion. */
+    double maxMotionStdDev{0};
+
+    /*! \brief Minimum motion area required for motion to count. */
+    double minMotionAreaPercentFactor{0.0};
+
+    /*! \brief Motion area averaging factor. */
+    double motionAreaAveFactor{0.0};
 
     /*! \brief IpCamera's default constructor. */
     IpCamera() = default;
@@ -165,6 +178,15 @@ struct IpCamera final
             temp = shrinkVideoFrames ? 1 : 0;
             ar(CEREAL_NVP(temp));
             shrinkVideoFrames = temp == 1;
+        }
+
+        if (version > 2)
+        {
+            // Added with version 3.
+            ar(CEREAL_NVP(pixelThreshold),
+               CEREAL_NVP(maxMotionStdDev),
+               CEREAL_NVP(minMotionAreaPercentFactor),
+               CEREAL_NVP(motionAreaAveFactor));
         }
     }
 };
@@ -260,13 +282,13 @@ private:
     }
 
 private:
-    std::string m_dbPath{};
+    std::string                m_dbPath{};
     std::map<eCamId, IpCamera> m_cameras{};
 };
 
 } // namespace ipfreely
 
-CEREAL_CLASS_VERSION(ipfreely::IpCamera, 2);
+CEREAL_CLASS_VERSION(ipfreely::IpCamera, 3);
 CEREAL_CLASS_VERSION(ipfreely::IpFreelyCameraDatabase, 1);
 
 #endif // IPFREELYCAMERADATABASE_H
