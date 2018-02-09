@@ -54,7 +54,8 @@ IpFreelyVideoForm::~IpFreelyVideoForm()
 }
 
 void IpFreelyVideoForm::SetVideoFrame(QImage const& videoFrame, double const fps,
-                                      QRect const& motionBoundingRect)
+                                      QRect const& motionBoundingRect,
+                                      bool const   streamBeingWritten)
 {
     auto title = m_title + ": " + QString::number(fps) + tr(" FPS");
     setWindowTitle(title);
@@ -113,6 +114,17 @@ void IpFreelyVideoForm::SetVideoFrame(QImage const& videoFrame, double const fps
         p.setBackgroundMode(Qt::TransparentMode);
         p.setBrush(QBrush(Qt::NoBrush));
         p.drawRect(rect);
+    }
+
+    if (streamBeingWritten)
+    {
+        p.setPen(QPen(Qt::red));
+        p.setBackground(QBrush(Qt::white, Qt::SolidPattern));
+        p.setBackgroundMode(Qt::OpaqueMode);
+        p.setFont(QFont("Segoe UI", 16, QFont::Bold));
+        auto posRec = resizedImage.rect();
+        posRec.setTop(posRec.top() + 16);
+        p.drawText(posRec, Qt::AlignHCenter | Qt::AlignTop, tr("Recording").toLocal8Bit());
     }
 
     m_videoFrame->setPixmap(QPixmap::fromImage(resizedImage));

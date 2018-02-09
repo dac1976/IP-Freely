@@ -458,18 +458,18 @@ void IpFreelyMainWindow::on_updateFeedsTimer()
             QRect motionBoundingRect;
             auto currentVideoFrame = streamProcessor.second->CurrentVideoFrame(&motionBoundingRect);
 
-            auto fps = streamProcessor.second->CurrentFps();
+            auto fps           = streamProcessor.second->CurrentFps();
+            auto enableWriting = streamProcessor.second->GetEnableVideoWriting();
 
-            UpdateCamFeedFrame(streamProcessor.first,
-                               currentVideoFrame,
-                               motionBoundingRect,
-                               streamProcessor.second->GetEnableVideoWriting());
+            UpdateCamFeedFrame(
+                streamProcessor.first, currentVideoFrame, motionBoundingRect, enableWriting);
 
             SetFpsInTitle(streamProcessor.first, fps);
 
             if (m_videoForm->isVisible() && (m_videoFormId == streamProcessor.first))
             {
-                m_videoForm->SetVideoFrame(currentVideoFrame, fps, motionBoundingRect);
+                m_videoForm->SetVideoFrame(
+                    currentVideoFrame, fps, motionBoundingRect, enableWriting);
             }
         }
     }
