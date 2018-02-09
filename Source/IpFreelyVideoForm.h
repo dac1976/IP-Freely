@@ -57,7 +57,7 @@ public:
      * \param[in] videoFrame - The frame of video to display.
      * \param[in] fps - The video stream's actual FPS.
      */
-    void SetVideoFrame(QImage const& videoFrame, double const fps);
+    void SetVideoFrame(QImage const& videoFrame, double const fps, QRect const& motionBoundingRect);
 
     /*!
      * \brief SetTitle sets title text of the form.

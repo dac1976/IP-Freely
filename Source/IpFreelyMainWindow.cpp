@@ -455,20 +455,21 @@ void IpFreelyMainWindow::on_updateFeedsTimer()
     {
         if (streamProcessor.second->VideoFrameUpdated())
         {
-            auto currentVideoFrame =
-                streamProcessor.second->CurrentVideoFrame(&m_motionBoundingRect);
+            QRect motionBoundingRect;
+            auto currentVideoFrame = streamProcessor.second->CurrentVideoFrame(&motionBoundingRect);
 
             auto fps = streamProcessor.second->CurrentFps();
 
             UpdateCamFeedFrame(streamProcessor.first,
                                currentVideoFrame,
+                               motionBoundingRect,
                                streamProcessor.second->GetEnableVideoWriting());
 
             SetFpsInTitle(streamProcessor.first, fps);
 
             if (m_videoForm->isVisible() && (m_videoFormId == streamProcessor.first))
             {
-                m_videoForm->SetVideoFrame(currentVideoFrame, fps);
+                m_videoForm->SetVideoFrame(currentVideoFrame, fps, motionBoundingRect);
             }
         }
     }
@@ -932,17 +933,18 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
             auto motionSchedule = m_prefs.MotionTrackingSchedule();
 
             m_streamProcessors[camera.camId] =
-                std::make_shared<ipfreely::IpFreelyRtspStreamProcessor>(camName,
-                                                                camera,
-                                                                p.string(),
-                                                                m_prefs.FileDurationInSecs(),
-                                                                schedule,
-                                                                motionSchedule);
+                std::make_shared<ipfreely::IpFreelyRtspStreamProcessor>(
+                    camName,
+                    camera,
+                    p.string(),
+                    m_prefs.FileDurationInSecs(),
+                    schedule,
+                    motionSchedule);
         }
         catch (std::exception& e)
         {
-            DEBUG_MESSAGE_EX_ERROR("Stream Error, camera: " << camName
-                                                            << ", error message: " << e.what());
+            DEBUG_MESSAGE_EX_ERROR(
+                "Stream Error, camera: " << camName << ", error message: " << e.what());
             QMessageBox::critical(this,
                                   "Stream Error",
                                   QString::fromLocal8Bit(e.what()),
@@ -1022,7 +1024,8 @@ void IpFreelyMainWindow::RecordActionHandler(ipfreely::eCamId const camId, QTool
 }
 
 void IpFreelyMainWindow::UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage const& videoFrame,
-                                            bool const streamProcIsWriting)
+                                            QRect const& motionBoundingRect,
+                                            bool const   streamProcIsWriting)
 {
     auto camFeedIter = m_camFeeds.find(camId);
 
@@ -1065,20 +1068,19 @@ void IpFreelyMainWindow::UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage
         displayFrame = videoFrame;
     }
 
-    if (!m_motionBoundingRect.isNull() || streamProcIsWriting)
+    if (!motionBoundingRect.isNull() || streamProcIsWriting)
     {
         QPainter p(&displayFrame);
 
-        if (!m_motionBoundingRect.isNull())
+        if (!motionBoundingRect.isNull())
         {
-            m_motionBoundingRect.setTop(
-                static_cast<int>(static_cast<double>(m_motionBoundingRect.top()) * scalar));
-            m_motionBoundingRect.setLeft(
-                static_cast<int>(static_cast<double>(m_motionBoundingRect.left()) * scalar));
-            m_motionBoundingRect.setRight(
-                static_cast<int>(static_cast<double>(m_motionBoundingRect.right()) * scalar));
-            m_motionBoundingRect.setBottom(
-                static_cast<int>(static_cast<double>(m_motionBoundingRect.bottom()) * scalar));
+            QRect rect;
+            rect.setTop(static_cast<int>(static_cast<double>(motionBoundingRect.top()) * scalar));
+            rect.setLeft(static_cast<int>(static_cast<double>(motionBoundingRect.left()) * scalar));
+            rect.setRight(
+                static_cast<int>(static_cast<double>(motionBoundingRect.right()) * scalar));
+            rect.setBottom(
+                static_cast<int>(static_cast<double>(motionBoundingRect.bottom()) * scalar));
 
             auto pen = QPen(Qt::green);
             pen.setWidth(2);
@@ -1086,7 +1088,7 @@ void IpFreelyMainWindow::UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage
             p.setBackground(QBrush(Qt::NoBrush));
             p.setBackgroundMode(Qt::TransparentMode);
             p.setBrush(QBrush(Qt::NoBrush));
-            p.drawRect(m_motionBoundingRect);
+            p.drawRect(rect);
         }
 
         if (streamProcIsWriting)

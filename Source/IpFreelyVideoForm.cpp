@@ -29,6 +29,9 @@
 #include <QLabel>
 #include <QShowEvent>
 #include <QScreen>
+#include <QPainter>
+#include <QPen>
+#include <QBrush>
 
 IpFreelyVideoForm::IpFreelyVideoForm(QWidget* parent)
     : QWidget(parent)
@@ -50,7 +53,8 @@ IpFreelyVideoForm::~IpFreelyVideoForm()
     delete ui;
 }
 
-void IpFreelyVideoForm::SetVideoFrame(QImage const& videoFrame, double const fps)
+void IpFreelyVideoForm::SetVideoFrame(QImage const& videoFrame, double const fps,
+                                      QRect const& motionBoundingRect)
 {
     auto title = m_title + ": " + QString::number(fps) + tr(" FPS");
     setWindowTitle(title);
@@ -61,7 +65,7 @@ void IpFreelyVideoForm::SetVideoFrame(QImage const& videoFrame, double const fps
     if (m_resetSize)
     {
         m_resetSize            = false;
-        auto availableGeometry = QApplication::primaryScreen()->availableGeometry();
+        auto availableGeometry = qApp->screenAt(this->geometry().topLeft())->availableGeometry();
         auto w                 = 0.9 * static_cast<double>(availableGeometry.width() -
                                            (layout()->contentsMargins().left() +
                                             layout()->contentsMargins().right() + 2));
@@ -84,10 +88,34 @@ void IpFreelyVideoForm::SetVideoFrame(QImage const& videoFrame, double const fps
         setMaximumSize(static_cast<int>(w), static_cast<int>(h));
     }
 
-    m_videoFrame->setPixmap(QPixmap::fromImage(videoFrame.scaled(m_videoFrame->width(),
-                                                                 m_videoFrame->height(),
-                                                                 Qt::KeepAspectRatio,
-                                                                 Qt::SmoothTransformation)));
+    double scalar =
+        static_cast<double>(m_videoFrame->height()) / static_cast<double>(videoFrame.height());
+
+    auto resizedImage = videoFrame.scaled(m_videoFrame->width(),
+                                          m_videoFrame->height(),
+                                          Qt::KeepAspectRatio,
+                                          Qt::SmoothTransformation);
+
+    QPainter p(&resizedImage);
+    auto     rect = motionBoundingRect;
+
+    if (!rect.isNull())
+    {
+        rect.setTop(static_cast<int>(static_cast<double>(rect.top()) * scalar));
+        rect.setLeft(static_cast<int>(static_cast<double>(rect.left()) * scalar));
+        rect.setRight(static_cast<int>(static_cast<double>(rect.right()) * scalar));
+        rect.setBottom(static_cast<int>(static_cast<double>(rect.bottom()) * scalar));
+
+        auto pen = QPen(Qt::green);
+        pen.setWidth(2);
+        p.setPen(pen);
+        p.setBackground(QBrush(Qt::NoBrush));
+        p.setBackgroundMode(Qt::TransparentMode);
+        p.setBrush(QBrush(Qt::NoBrush));
+        p.drawRect(rect);
+    }
+
+    m_videoFrame->setPixmap(QPixmap::fromImage(resizedImage));
 }
 
 void IpFreelyVideoForm::SetTitle(QString const& title)

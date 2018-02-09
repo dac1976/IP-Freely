@@ -113,7 +113,7 @@ private:
     void RecordActionHandler(ipfreely::eCamId const camId, QToolButton* recordBtn);
     QWidget* GetParentFrame(ipfreely::eCamId const camId) const;
     void UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage const& videoFrame,
-                            bool const streamProcIsWriting);
+                            QRect const& motionBoundingRect, bool const streamProcIsWriting);
     void SaveImageSnapshot(ipfreely::eCamId const camId);
     void SetFpsInTitle(ipfreely::eCamId const camId, double const fps);
     void ShowExpandedVideoForm(ipfreely::eCamId const camId);
@@ -130,7 +130,6 @@ private:
     int                                m_numConnections;
     std::shared_ptr<IpFreelyVideoForm> m_videoForm;
     ipfreely::eCamId                   m_videoFormId;
-    QRect                              m_motionBoundingRect;
 };
 
 #endif // IPFREELYMAINWINDOW_H
