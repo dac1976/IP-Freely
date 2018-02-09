@@ -19,11 +19,11 @@
 // not, see <http://www.gnu.org/licenses/>.
 
 /*!
- * \file RtspStreamProcessor.h
- * \brief File containing declaration of RtspStreamProcessor threaded class.
+ * \file IpFreelyRtspStreamProcessor.h
+ * \brief File containing declaration of IpFreelyRtspStreamProcessor threaded class.
  */
-#ifndef RTSPSTREAMPROCESSOR_H
-#define RTSPSTREAMPROCESSOR_H
+#ifndef IPFREELYRTSPSTREAMPROCESSOR_H
+#define IPFREELYRTSPSTREAMPROCESSOR_H
 
 #include <QImage>
 #include <string>
@@ -40,11 +40,11 @@ namespace ipfreely
 {
 
 /*! \brief Class defining a RTSP stream processor thread. */
-class RtspStreamProcessor final : public core_lib::threads::ThreadBase
+class IpFreelyRtspStreamProcessor final : public core_lib::threads::ThreadBase
 {
 public:
     /*!
-     * \brief RtspStreamProcessor constructor.
+     * \brief IpFreelyRtspStreamProcessor constructor.
      * \param[in] name - A name for the stream, used to name output video files.
      * \param[in] cameraDetails - Camera details we want to stream from.
      * \param[in] saveFolderPath - A local folder to save captured videos to.
@@ -56,19 +56,20 @@ public:
      * record the stream in DivX format mp4 files to disk. Files are recorded with the given
      * duration. One recording session can span multiple back-to-back video files.
      */
-    RtspStreamProcessor(std::string const& name, IpCamera const& cameraDetails,
-                        std::string const& saveFolderPath, double const requiredFileDurationSecs,
-                        std::vector<std::vector<bool>> const& recordingSchedule = {},
-                        std::vector<std::vector<bool>> const& motionSchedule    = {});
+    IpFreelyRtspStreamProcessor(std::string const& name, IpCamera const& cameraDetails,
+                                std::string const&                    saveFolderPath,
+                                double const                          requiredFileDurationSecs,
+                                std::vector<std::vector<bool>> const& recordingSchedule = {},
+                                std::vector<std::vector<bool>> const& motionSchedule    = {});
 
-    /*! \brief RtspStreamProcessor destructor. */
-    virtual ~RtspStreamProcessor();
+    /*! \brief IpFreelyRtspStreamProcessor destructor. */
+    virtual ~IpFreelyRtspStreamProcessor();
 
-    /*! \brief RtspStreamProcessor deleted copy constructor. */
-    RtspStreamProcessor(RtspStreamProcessor const&) = delete;
+    /*! \brief IpFreelyRtspStreamProcessor deleted copy constructor. */
+    IpFreelyRtspStreamProcessor(IpFreelyRtspStreamProcessor const&) = delete;
 
-    /*! \brief RtspStreamProcessor deleted copy assignment operator. */
-    RtspStreamProcessor& operator=(RtspStreamProcessor const&) = delete;
+    /*! \brief IpFreelyRtspStreamProcessor deleted copy assignment operator. */
+    IpFreelyRtspStreamProcessor& operator=(IpFreelyRtspStreamProcessor const&) = delete;
 
     /*! \brief StartVideoWriting begins recording video to disk. */
     void StartVideoWriting() noexcept;
@@ -112,17 +113,17 @@ public:
 private:
     virtual void ThreadIteration() noexcept;
     virtual void ProcessTerminationConditions() noexcept;
-    void         SetEnableVideoWriting(bool enable) noexcept;
-    void         CheckRecordingSchedule();
-    void         CreateCaptureObjects();
-    void         GrabVideoFrame();
-    void         WriteVideoFrame();
-    void         InitialiseMotionDetector();
-    bool         CheckMotionSchedule() const;
-    bool         DetectMotion();
-    void         UpdateNextFrame();
-    void         RotateFrames();
-    void         CheckMotionDetector();
+    void SetEnableVideoWriting(bool enable) noexcept;
+    void CheckRecordingSchedule();
+    void CreateCaptureObjects();
+    void GrabVideoFrame();
+    void WriteVideoFrame();
+    void InitialiseMotionDetector();
+    bool CheckMotionSchedule() const;
+    bool DetectMotion();
+    void UpdateNextFrame();
+    void RotateFrames();
+    void CheckMotionDetector();
 
 private:
     mutable std::mutex             m_writingMutex{};
@@ -161,4 +162,4 @@ private:
 
 } // namespace ipfreely
 
-#endif // RTSPSTREAMPROCESSOR_H
+#endif // IPFREELYRTSPSTREAMPROCESSOR_H

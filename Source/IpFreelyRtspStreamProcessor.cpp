@@ -19,10 +19,10 @@
 // not, see <http://www.gnu.org/licenses/>.
 
 /*!
- * \file RtspStreamProcessor.cpp
- * \brief File containing definition of RtspStreamProcessor threaded class.
+ * \file IpFreelyRtspStreamProcessor.cpp
+ * \brief File containing definition of IpFreelyRtspStreamProcessor threaded class.
  */
-#include "RtspStreamProcessor.h"
+#include "IpFreelyRtspStreamProcessor.h"
 #include <sstream>
 #include <chrono>
 #include <boost/throw_exception.hpp>
@@ -94,11 +94,10 @@ static constexpr int    IDEAL_FRAME_HEIGHT = 600;
 static constexpr int CONTOUR_LINE_THICKNESS = 2;
 #endif
 
-RtspStreamProcessor::RtspStreamProcessor(std::string const& name, IpCamera const& cameraDetails,
-                                         std::string const& saveFolderPath,
-                                         double const       requiredFileDurationSecs,
-                                         std::vector<std::vector<bool>> const& recordingSchedule,
-                                         std::vector<std::vector<bool>> const& motionSchedule)
+IpFreelyRtspStreamProcessor::IpFreelyRtspStreamProcessor(
+    std::string const& name, IpCamera const& cameraDetails, std::string const& saveFolderPath,
+    double const requiredFileDurationSecs, std::vector<std::vector<bool>> const& recordingSchedule,
+    std::vector<std::vector<bool>> const& motionSchedule)
     : ThreadBase()
     , m_name(core_lib::string_utils::RemoveIllegalChars(name))
     , m_cameraDetails(cameraDetails)
@@ -181,19 +180,20 @@ RtspStreamProcessor::RtspStreamProcessor(std::string const& name, IpCamera const
         DEBUG_MESSAGE_EX_INFO("Motion tracking disabled for camera: " << name);
     }
 
-    DEBUG_MESSAGE_EX_INFO("Stream at: "
-                          << m_cameraDetails.rtspUrl << " running with FPS of: " << m_fps
-                          << ", thread update period (ms): " << m_updatePeriodMillisecs);
+    DEBUG_MESSAGE_EX_INFO("Stream at: " << m_cameraDetails.rtspUrl << " running with FPS of: "
+                                        << m_fps
+                                        << ", thread update period (ms): "
+                                        << m_updatePeriodMillisecs);
 
     Start();
 }
 
-RtspStreamProcessor::~RtspStreamProcessor()
+IpFreelyRtspStreamProcessor::~IpFreelyRtspStreamProcessor()
 {
     Stop();
 }
 
-void RtspStreamProcessor::StartVideoWriting() noexcept
+void IpFreelyRtspStreamProcessor::StartVideoWriting() noexcept
 {
     if (m_useRecordingSchedule)
     {
@@ -205,7 +205,7 @@ void RtspStreamProcessor::StartVideoWriting() noexcept
     SetEnableVideoWriting(true);
 }
 
-void RtspStreamProcessor::StopVideoWriting() noexcept
+void IpFreelyRtspStreamProcessor::StopVideoWriting() noexcept
 {
     if (m_useRecordingSchedule)
     {
@@ -217,26 +217,26 @@ void RtspStreamProcessor::StopVideoWriting() noexcept
     SetEnableVideoWriting(false);
 }
 
-bool RtspStreamProcessor::GetEnableVideoWriting() const noexcept
+bool IpFreelyRtspStreamProcessor::GetEnableVideoWriting() const noexcept
 {
     std::lock_guard<std::mutex> lock(m_writingMutex);
     return m_enableVideoWriting;
 }
 
-bool RtspStreamProcessor::VideoFrameUpdated() const noexcept
+bool IpFreelyRtspStreamProcessor::VideoFrameUpdated() const noexcept
 {
     std::lock_guard<std::mutex> lock(m_frameMutex);
     return m_videoFrameUpdated;
 }
 
-double RtspStreamProcessor::GetAspectRatioAndSize(int& width, int& height) const
+double IpFreelyRtspStreamProcessor::GetAspectRatioAndSize(int& width, int& height) const
 {
     width  = m_videoWidth;
     height = m_videoHeight;
     return static_cast<double>(m_videoWidth) / static_cast<double>(m_videoHeight);
 }
 
-QImage RtspStreamProcessor::CurrentVideoFrame(QRect* motionRectangle) const
+QImage IpFreelyRtspStreamProcessor::CurrentVideoFrame(QRect* motionRectangle) const
 {
     cv::Mat result;
 
@@ -257,12 +257,12 @@ QImage RtspStreamProcessor::CurrentVideoFrame(QRect* motionRectangle) const
     return utils::CvMatToQImage(result);
 }
 
-double RtspStreamProcessor::CurrentFps() const noexcept
+double IpFreelyRtspStreamProcessor::CurrentFps() const noexcept
 {
     return m_fps;
 }
 
-void RtspStreamProcessor::ThreadIteration() noexcept
+void IpFreelyRtspStreamProcessor::ThreadIteration() noexcept
 {
     if (m_updateEvent.WaitForTime(m_updatePeriodMillisecs))
     {
@@ -287,18 +287,18 @@ void RtspStreamProcessor::ThreadIteration() noexcept
     }
 }
 
-void RtspStreamProcessor::ProcessTerminationConditions() noexcept
+void IpFreelyRtspStreamProcessor::ProcessTerminationConditions() noexcept
 {
     m_updateEvent.Signal();
 }
 
-void RtspStreamProcessor::SetEnableVideoWriting(bool enable) noexcept
+void IpFreelyRtspStreamProcessor::SetEnableVideoWriting(bool enable) noexcept
 {
     std::lock_guard<std::mutex> lock(m_writingMutex);
     m_enableVideoWriting = enable;
 }
 
-void RtspStreamProcessor::CheckRecordingSchedule()
+void IpFreelyRtspStreamProcessor::CheckRecordingSchedule()
 {
     if (m_recordingSchedule.empty())
     {
@@ -328,7 +328,7 @@ void RtspStreamProcessor::CheckRecordingSchedule()
     }
 }
 
-void RtspStreamProcessor::CreateCaptureObjects()
+void IpFreelyRtspStreamProcessor::CreateCaptureObjects()
 {
     if (GetEnableVideoWriting())
     {
@@ -369,14 +369,14 @@ void RtspStreamProcessor::CreateCaptureObjects()
     }
 }
 
-void RtspStreamProcessor::GrabVideoFrame()
+void IpFreelyRtspStreamProcessor::GrabVideoFrame()
 {
     std::lock_guard<std::mutex> lock(m_frameMutex);
     m_videoCapture >> m_videoFrame;
     m_videoFrameUpdated = true;
 }
 
-void RtspStreamProcessor::WriteVideoFrame()
+void IpFreelyRtspStreamProcessor::WriteVideoFrame()
 {
     if (m_videoWriter)
     {
@@ -389,7 +389,7 @@ void RtspStreamProcessor::WriteVideoFrame()
     }
 }
 
-void RtspStreamProcessor::InitialiseMotionDetector()
+void IpFreelyRtspStreamProcessor::InitialiseMotionDetector()
 {
 #if defined(MOTION_DETECTOR_DEBUG)
     cv::namedWindow("motion");
@@ -461,7 +461,7 @@ void RtspStreamProcessor::InitialiseMotionDetector()
     cv::cvtColor(m_currentGreyFrame, m_currentGreyFrame, CV_BGR2GRAY);
 }
 
-bool RtspStreamProcessor::CheckMotionSchedule() const
+bool IpFreelyRtspStreamProcessor::CheckMotionSchedule() const
 {
     if (!m_useMotionSchedule || m_motionSchedule.empty())
     {
@@ -474,7 +474,7 @@ bool RtspStreamProcessor::CheckMotionSchedule() const
         localTime->tm_hour)];
 }
 
-bool RtspStreamProcessor::DetectMotion()
+bool IpFreelyRtspStreamProcessor::DetectMotion()
 {
     // This algorithm is based on an example given here:
     // https://github.com/cedricve/motion-detection
@@ -657,7 +657,7 @@ bool RtspStreamProcessor::DetectMotion()
     return motionDetected;
 }
 
-void RtspStreamProcessor::UpdateNextFrame()
+void IpFreelyRtspStreamProcessor::UpdateNextFrame()
 {
     {
         std::lock_guard<std::mutex> lock(m_frameMutex);
@@ -677,13 +677,13 @@ void RtspStreamProcessor::UpdateNextFrame()
     cv::cvtColor(m_nextGreyFrame, m_nextGreyFrame, CV_BGR2GRAY);
 }
 
-void RtspStreamProcessor::RotateFrames()
+void IpFreelyRtspStreamProcessor::RotateFrames()
 {
     m_prevGreyFrame    = m_currentGreyFrame;
     m_currentGreyFrame = m_nextGreyFrame;
 }
 
-void RtspStreamProcessor::CheckMotionDetector()
+void IpFreelyRtspStreamProcessor::CheckMotionDetector()
 {
     if (!CheckMotionSchedule())
     {

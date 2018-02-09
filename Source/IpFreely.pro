@@ -88,7 +88,6 @@ else {
 SOURCES += \
     main.cpp \
     IpFreelyMainWindow.cpp \
-    RtspStreamProcessor.cpp \
     IpFreelyCameraDatabase.cpp \
     IpFreelyVideoForm.cpp \
     IpFreelyAbout.cpp \
@@ -96,11 +95,11 @@ SOURCES += \
     IpFreelyPreferences.cpp \
     IpFreelyCameraSetupDialog.cpp \
     IpFreelyDownloadWidget.cpp \
-    IpFreelySdCardViewerDialog.cpp
+    IpFreelySdCardViewerDialog.cpp \
+    IpFreelyRtspStreamProcessor.cpp
 
 HEADERS += \
     IpFreelyMainWindow.h \
-    RtspStreamProcessor.h \
     IpFreelyCameraDatabase.h \
     IpFreelyVideoForm.h \
     IpFreelyAbout.h \
@@ -108,7 +107,8 @@ HEADERS += \
     IpFreelyPreferences.h \
     IpFreelyCameraSetupDialog.h \
     IpFreelyDownloadWidget.h \
-    IpFreelySdCardViewerDialog.h
+    IpFreelySdCardViewerDialog.h \
+    IpFreelyRtspStreamProcessor.h
 
 FORMS += \
     IpFreelyMainWindow.ui \

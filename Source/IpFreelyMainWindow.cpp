@@ -48,7 +48,7 @@
 #include "IpFreelyAbout.h"
 #include "IpFreelyCameraSetupDialog.h"
 #include "IpFreelySdCardViewerDialog.h"
-#include "RtspStreamProcessor.h"
+#include "IpFreelyRtspStreamProcessor.h"
 #include "StringUtils/StringUtils.h"
 #include "DebugLog/DebugLogging.h"
 
@@ -932,7 +932,7 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
             auto motionSchedule = m_prefs.MotionTrackingSchedule();
 
             m_streamProcessors[camera.camId] =
-                std::make_shared<ipfreely::RtspStreamProcessor>(camName,
+                std::make_shared<ipfreely::IpFreelyRtspStreamProcessor>(camName,
                                                                 camera,
                                                                 p.string(),
                                                                 m_prefs.FileDurationInSecs(),
