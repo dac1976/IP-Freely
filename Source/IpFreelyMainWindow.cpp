@@ -25,7 +25,6 @@
 #include "IpFreelyMainWindow.h"
 #include "ui_IpFreelyMainWindow.h"
 #include <QTimer>
-#include <QLabel>
 #include <QToolButton>
 #include <QResizeEvent>
 #include <QCloseEvent>
@@ -36,6 +35,7 @@
 #include <QPen>
 #include <QBrush>
 #include <QScreen>
+#include <QRectF>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -43,6 +43,7 @@
 #include <ctime>
 #include <set>
 #include <boost/filesystem.hpp>
+#include "IpFreelyVideoFrame.h"
 #include "IpFreelyVideoForm.h"
 #include "IpFreelyPreferencesDialog.h"
 #include "IpFreelyAbout.h"
@@ -491,7 +492,12 @@ void IpFreelyMainWindow::resizeEvent(QResizeEvent* event)
     {
         ClearLayout(ui->cam1Widget->layout(), true);
         m_camFeeds.erase(ipfreely::eCamId::cam1);
-        auto feed = new QLabel(this);
+        auto feed = new IpFreelyVideoFrame(1,
+                                           std::bind(&IpFreelyMainWindow::VideoFrameAreaSelection,
+                                                     this,
+                                                     std::placeholders::_1,
+                                                     std::placeholders::_2),
+                                           this);
         ui->cam1Widget->layout()->addWidget(feed);
         m_camFeeds[ipfreely::eCamId::cam1] = feed;
     }
@@ -500,7 +506,12 @@ void IpFreelyMainWindow::resizeEvent(QResizeEvent* event)
     {
         ClearLayout(ui->cam2Widget->layout(), true);
         m_camFeeds.erase(ipfreely::eCamId::cam2);
-        auto feed = new QLabel(this);
+        auto feed = new IpFreelyVideoFrame(2,
+                                           std::bind(&IpFreelyMainWindow::VideoFrameAreaSelection,
+                                                     this,
+                                                     std::placeholders::_1,
+                                                     std::placeholders::_2),
+                                           this);
         ui->cam2Widget->layout()->addWidget(feed);
         m_camFeeds[ipfreely::eCamId::cam2] = feed;
     }
@@ -509,7 +520,12 @@ void IpFreelyMainWindow::resizeEvent(QResizeEvent* event)
     {
         ClearLayout(ui->cam3Widget->layout(), true);
         m_camFeeds.erase(ipfreely::eCamId::cam3);
-        auto feed = new QLabel(this);
+        auto feed = new IpFreelyVideoFrame(3,
+                                           std::bind(&IpFreelyMainWindow::VideoFrameAreaSelection,
+                                                     this,
+                                                     std::placeholders::_1,
+                                                     std::placeholders::_2),
+                                           this);
         ui->cam3Widget->layout()->addWidget(feed);
         m_camFeeds[ipfreely::eCamId::cam3] = feed;
     }
@@ -518,7 +534,12 @@ void IpFreelyMainWindow::resizeEvent(QResizeEvent* event)
     {
         ClearLayout(ui->cam4Widget->layout(), true);
         m_camFeeds.erase(ipfreely::eCamId::cam4);
-        auto feed = new QLabel(this);
+        auto feed = new IpFreelyVideoFrame(4,
+                                           std::bind(&IpFreelyMainWindow::VideoFrameAreaSelection,
+                                                     this,
+                                                     std::placeholders::_1,
+                                                     std::placeholders::_2),
+                                           this);
         ui->cam4Widget->layout()->addWidget(feed);
         m_camFeeds[ipfreely::eCamId::cam4] = feed;
     }
@@ -897,20 +918,25 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
     else
     {
         std::string camName;
+        int         cameraId = 0;
 
         switch (camera.camId)
         {
         case ipfreely::eCamId::cam1:
-            camName = "Camera1";
+            camName  = "Camera1";
+            cameraId = 1;
             break;
         case ipfreely::eCamId::cam2:
-            camName = "Camera2";
+            camName  = "Camera2";
+            cameraId = 2;
             break;
         case ipfreely::eCamId::cam3:
-            camName = "Camera3";
+            camName  = "Camera3";
+            cameraId = 3;
             break;
         case ipfreely::eCamId::cam4:
-            camName = "Camera4";
+            camName  = "Camera4";
+            cameraId = 4;
             break;
         case ipfreely::eCamId::noCam:
             // Do nothing.
@@ -943,8 +969,8 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
         }
         catch (std::exception& e)
         {
-            DEBUG_MESSAGE_EX_ERROR(
-                "Stream Error, camera: " << camName << ", error message: " << e.what());
+            DEBUG_MESSAGE_EX_ERROR("Stream Error, camera: " << camName
+                                                            << ", error message: " << e.what());
             QMessageBox::critical(this,
                                   "Stream Error",
                                   QString::fromLocal8Bit(e.what()),
@@ -953,7 +979,13 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
             return;
         }
 
-        auto    feed = new QLabel(this);
+        auto feed = new IpFreelyVideoFrame(cameraId,
+                                           std::bind(&IpFreelyMainWindow::VideoFrameAreaSelection,
+                                                     this,
+                                                     std::placeholders::_1,
+                                                     std::placeholders::_2),
+                                           this);
+        ;
         QString hint = QString::fromStdString(camera.description);
 
         switch (camera.camId)
@@ -1103,7 +1135,7 @@ void IpFreelyMainWindow::UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage
         }
     }
 
-    camFeedIter->second->setPixmap(QPixmap::fromImage(displayFrame));
+    camFeedIter->second->SetVideoFrame(displayFrame);
 }
 
 void IpFreelyMainWindow::SaveImageSnapshot(ipfreely::eCamId const camId)
@@ -1236,4 +1268,11 @@ void IpFreelyMainWindow::ViewStorage(ipfreely::IpCamera const& camera)
     IpFreelySdCardViewerDialog sdCardDlg(camera, this);
     sdCardDlg.setModal(true);
     sdCardDlg.exec();
+}
+
+void IpFreelyMainWindow::VideoFrameAreaSelection(int const     cameraId,
+                                                 QRectF const& percentageSelection)
+{
+    // TODO:
+    bool wibble = false;
 }
