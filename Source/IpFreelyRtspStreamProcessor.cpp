@@ -133,10 +133,9 @@ IpFreelyRtspStreamProcessor::IpFreelyRtspStreamProcessor(
 
     m_updatePeriodMillisecs = static_cast<unsigned int>(1000.0 / m_fps);
 
-    DEBUG_MESSAGE_EX_INFO("Stream at: " << m_cameraDetails.rtspUrl << " running with FPS of: "
-                                        << m_fps
-                                        << ", thread update period (ms): "
-                                        << m_updatePeriodMillisecs);
+    DEBUG_MESSAGE_EX_INFO("Stream at: "
+                          << m_cameraDetails.rtspUrl << " running with FPS of: " << m_fps
+                          << ", thread update period (ms): " << m_updatePeriodMillisecs);
 
     Start();
 }
