@@ -358,7 +358,7 @@ void IpFreelyRtspStreamProcessor::CreateCaptureObjects()
         }
 
         std::ostringstream oss;
-        oss << m_name << "_" << m_currentTime << ".mp4";
+        oss << m_name << "_" << m_currentTime << ".avi";
         bfs::path p(m_saveFolderPath);
         p /= oss.str();
         p = bfs::system_complete(p);
