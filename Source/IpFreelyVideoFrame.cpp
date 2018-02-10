@@ -30,6 +30,11 @@ void IpFreelyVideoFrame::SetVideoFrame(QImage const& videoFrame)
     ui->videoFrameLabel->setPixmap(QPixmap::fromImage(videoFrame));
 }
 
+void IpFreelyVideoFrame::SetEnableSelection(bool const enable)
+{
+    m_enableSelection = enable;
+}
+
 void IpFreelyVideoFrame::mousePressEvent(QMouseEvent* event)
 {
     if (!m_enableSelection)
