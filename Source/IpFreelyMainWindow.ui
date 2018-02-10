@@ -185,7 +185,7 @@
            <item>
             <widget class="QToolButton" name="cam1RemoveMotionRegionsToolButton">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="minimumSize">
               <size>
@@ -563,7 +563,7 @@
            <item>
             <widget class="QToolButton" name="cam4RemoveMotionRegionsToolButton">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="minimumSize">
               <size>
@@ -935,7 +935,7 @@
            <item>
             <widget class="QToolButton" name="cam2RemoveMotionRegionsToolButton">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="minimumSize">
               <size>
@@ -1307,7 +1307,7 @@
            <item>
             <widget class="QToolButton" name="cam3RemoveMotionRegionsToolButton">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="minimumSize">
               <size>
