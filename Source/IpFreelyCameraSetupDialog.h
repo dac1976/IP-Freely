@@ -70,6 +70,7 @@ private:
 private:
     Ui::IpFreelyCameraSetupDialog* ui;
     ipfreely::IpCamera&            m_camera;
+    bool                           m_clear;
 };
 
 #endif // IPFREELYCAMERASETUPDIALOG_H

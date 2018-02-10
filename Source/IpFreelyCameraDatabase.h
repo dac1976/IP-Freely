@@ -27,8 +27,11 @@
 
 #include <string>
 #include <map>
+#include <vector>
 #include <cereal/types/map.hpp>
+#include <cereal/types/vector.hpp>
 #include <cereal/types/string.hpp>
+#include <cereal/types/utility.hpp>
 #include <cereal/access.hpp>
 #include "Serialization/SerializationIncludes.h"
 
@@ -97,6 +100,15 @@ struct IpCamera final
 
     /*! \brief Motion area averaging factor. */
     double motionAreaAveFactor{0.0};
+
+    /*! \brief Typedef to a point pair. */
+    typedef std::pair<double, double> point_t;
+
+    /*! \brief Typedef to a region pair. */
+    typedef std::pair<point_t /*top,left*/, point_t /*width,height*/> region_t;
+
+    /*! \brief Vector of motion detection regions. */
+    std::vector<region_t> motionRegions{};
 
     /*! \brief IpCamera's default constructor. */
     IpCamera() = default;
@@ -187,6 +199,12 @@ struct IpCamera final
                CEREAL_NVP(maxMotionStdDev),
                CEREAL_NVP(minMotionAreaPercentFactor),
                CEREAL_NVP(motionAreaAveFactor));
+        }
+
+        if (version > 3)
+        {
+            // Added with version 4.
+            ar(CEREAL_NVP(motionRegions));
         }
     }
 };
@@ -288,7 +306,7 @@ private:
 
 } // namespace ipfreely
 
-CEREAL_CLASS_VERSION(ipfreely::IpCamera, 3);
+CEREAL_CLASS_VERSION(ipfreely::IpCamera, 4);
 CEREAL_CLASS_VERSION(ipfreely::IpFreelyCameraDatabase, 1);
 
 #endif // IPFREELYCAMERADATABASE_H

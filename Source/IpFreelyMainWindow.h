@@ -76,24 +76,32 @@ private slots:
     void on_actionAbout_triggered();
     void on_settings1ToolButton_clicked();
     void on_connect1ToolButton_clicked();
+    void on_motionDetectorRegions1ToolButton_toggled(bool checked);
+    void on_removeMotionRegions1ToolButton_clicked();
     void on_record1ToolButton_clicked();
     void on_snapshot1ToolButton_clicked();
     void on_expand1ToolButton_clicked();
     void on_storage1ToolButton_clicked();
     void on_settings2ToolButton_clicked();
     void on_connect2ToolButton_clicked();
+    void on_motionDetectorRegions2ToolButton_toggled(bool checked);
+    void on_removeMotionRegions2ToolButton_clicked();
     void on_record2ToolButton_clicked();
     void on_snapshot2ToolButton_clicked();
     void on_expand2ToolButton_clicked();
     void on_storage2ToolButton_clicked();
     void on_settings3ToolButton_clicked();
     void on_connect3ToolButton_clicked();
+    void on_motionDetectorRegions3ToolButton_toggled(bool checked);
+    void on_removeMotionRegions3ToolButton_clicked();
     void on_record3ToolButton_clicked();
     void on_snapshot3ToolButton_clicked();
     void on_expand3ToolButton_clicked();
     void on_storage3ToolButton_clicked();
     void on_settings4ToolButton_clicked();
     void on_connect4ToolButton_clicked();
+    void on_motionDetectorRegions4ToolButton_toggled(bool checked);
+    void on_removeMotionRegions4ToolButton_clicked();
     void on_record4ToolButton_clicked();
     void on_snapshot4ToolButton_clicked();
     void on_expand4ToolButton_clicked();
@@ -122,6 +130,8 @@ private:
     void     ShowExpandedVideoForm(ipfreely::eCamId const camId);
     void     ViewStorage(ipfreely::IpCamera const& camera);
     void     VideoFrameAreaSelection(int const cameraId, QRectF const& percentageSelection);
+    void     EnableMotionRegionsSetup(ipfreely::eCamId const camId, bool const enable,
+                                      QToolButton* removeRegionsBtn);
 
 private:
     Ui::IpFreelyMainWindow*                         ui;

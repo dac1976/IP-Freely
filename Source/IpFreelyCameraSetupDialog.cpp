@@ -42,6 +42,7 @@ IpFreelyCameraSetupDialog::IpFreelyCameraSetupDialog(ipfreely::IpCamera& camera,
     : QDialog(parent)
     , ui(new Ui::IpFreelyCameraSetupDialog)
     , m_camera(camera)
+    , m_clear(false)
 {
     ui->setupUi(this);
 
@@ -61,6 +62,12 @@ IpFreelyCameraSetupDialog::~IpFreelyCameraSetupDialog()
 
 void IpFreelyCameraSetupDialog::on_buttonBox_accepted()
 {
+    if (m_clear)
+    {
+        m_clear  = false;
+        m_camera = {};
+    }
+
     m_camera.rtspUrl                  = ui->rtspUrlLineEdit->text().toStdString();
     m_camera.storageHttpUrl           = ui->storageUrlLineEdit->text().toStdString();
     m_camera.username                 = ui->usernameLineEdit->text().toStdString();
@@ -104,12 +111,14 @@ void IpFreelyCameraSetupDialog::on_buttonBox_rejected()
 
 void IpFreelyCameraSetupDialog::on_clearSettingsPushButton_clicked()
 {
+    m_clear = true;
     ipfreely::IpCamera blankCamera;
     InitialiseCameraSettings(blankCamera);
 }
 
 void IpFreelyCameraSetupDialog::on_revertChangesPushButton_clicked()
 {
+    m_clear = false;
     InitialiseCameraSettings(m_camera);
 }
 

@@ -108,6 +108,11 @@ IpFreelyMainWindow::IpFreelyMainWindow(QString const& appVersion, QWidget* paren
 
     ConnectButtons();
 
+    ui->cam1RemoveMotionRegionsToolButton->setVisible(false);
+    ui->cam2RemoveMotionRegionsToolButton->setVisible(false);
+    ui->cam3RemoveMotionRegionsToolButton->setVisible(false);
+    ui->cam4RemoveMotionRegionsToolButton->setVisible(false);
+
     QTimer::singleShot(100, this, &IpFreelyMainWindow::CheckStartupConnections);
 }
 
@@ -232,6 +237,17 @@ void IpFreelyMainWindow::on_connect1ToolButton_clicked()
                       ui->cam1StorageToolButton);
 }
 
+void IpFreelyMainWindow::on_motionDetectorRegions1ToolButton_toggled(bool checked)
+{
+    EnableMotionRegionsSetup(
+        ipfreely::eCamId::cam1, checked, ui->cam1RemoveMotionRegionsToolButton);
+}
+
+void IpFreelyMainWindow::on_removeMotionRegions1ToolButton_clicked()
+{
+    // TODO:
+}
+
 void IpFreelyMainWindow::on_record1ToolButton_clicked()
 {
     RecordActionHandler(ipfreely::eCamId::cam1, ui->cam1RecordToolButton);
@@ -295,6 +311,17 @@ void IpFreelyMainWindow::on_connect2ToolButton_clicked()
                       ui->cam2ImageToolButton,
                       ui->cam2ExpandToolButton,
                       ui->cam2StorageToolButton);
+}
+
+void IpFreelyMainWindow::on_motionDetectorRegions2ToolButton_toggled(bool checked)
+{
+    EnableMotionRegionsSetup(
+        ipfreely::eCamId::cam2, checked, ui->cam2RemoveMotionRegionsToolButton);
+}
+
+void IpFreelyMainWindow::on_removeMotionRegions2ToolButton_clicked()
+{
+    // TODO:
 }
 
 void IpFreelyMainWindow::on_record2ToolButton_clicked()
@@ -362,6 +389,17 @@ void IpFreelyMainWindow::on_connect3ToolButton_clicked()
                       ui->cam3StorageToolButton);
 }
 
+void IpFreelyMainWindow::on_motionDetectorRegions3ToolButton_toggled(bool checked)
+{
+    EnableMotionRegionsSetup(
+        ipfreely::eCamId::cam3, checked, ui->cam3RemoveMotionRegionsToolButton);
+}
+
+void IpFreelyMainWindow::on_removeMotionRegions3ToolButton_clicked()
+{
+    // TODO:
+}
+
 void IpFreelyMainWindow::on_record3ToolButton_clicked()
 {
     RecordActionHandler(ipfreely::eCamId::cam3, ui->cam3RecordToolButton);
@@ -425,6 +463,17 @@ void IpFreelyMainWindow::on_connect4ToolButton_clicked()
                       ui->cam4ImageToolButton,
                       ui->cam4ExpandToolButton,
                       ui->cam4StorageToolButton);
+}
+
+void IpFreelyMainWindow::on_motionDetectorRegions4ToolButton_toggled(bool checked)
+{
+    EnableMotionRegionsSetup(
+        ipfreely::eCamId::cam4, checked, ui->cam4RemoveMotionRegionsToolButton);
+}
+
+void IpFreelyMainWindow::on_removeMotionRegions4ToolButton_clicked()
+{
+    // TODO:
 }
 
 void IpFreelyMainWindow::on_record4ToolButton_clicked()
@@ -616,6 +665,8 @@ void IpFreelyMainWindow::SetDisplaySize()
 
     ui->cam1SettingsToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
     ui->cam1ConnectToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam1MotionRegionsToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam1RemoveMotionRegionsToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
     ui->cam1ImageToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
     ui->cam1RecordToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
     ui->cam1ExpandToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
@@ -623,6 +674,8 @@ void IpFreelyMainWindow::SetDisplaySize()
 
     ui->cam4SettingsToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
     ui->cam4ConnectToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam4MotionRegionsToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam4RemoveMotionRegionsToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
     ui->cam4ImageToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
     ui->cam4RecordToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
     ui->cam4ExpandToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
@@ -630,6 +683,8 @@ void IpFreelyMainWindow::SetDisplaySize()
 
     ui->cam2SettingsToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
     ui->cam2ConnectToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam2MotionRegionsToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam2RemoveMotionRegionsToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
     ui->cam2ImageToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
     ui->cam2RecordToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
     ui->cam2ExpandToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
@@ -637,6 +692,8 @@ void IpFreelyMainWindow::SetDisplaySize()
 
     ui->cam3SettingsToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
     ui->cam3ConnectToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam3MotionRegionsToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
+    ui->cam3RemoveMotionRegionsToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
     ui->cam3ImageToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
     ui->cam3RecordToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
     ui->cam3ExpandToolButton->setMinimumSize(QSize(buttonSize, buttonSize));
@@ -644,6 +701,8 @@ void IpFreelyMainWindow::SetDisplaySize()
 
     ui->cam1SettingsToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
     ui->cam1ConnectToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam1MotionRegionsToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam1RemoveMotionRegionsToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
     ui->cam1ImageToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
     ui->cam1RecordToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
     ui->cam1ExpandToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
@@ -651,6 +710,8 @@ void IpFreelyMainWindow::SetDisplaySize()
 
     ui->cam4SettingsToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
     ui->cam4ConnectToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam4MotionRegionsToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam4RemoveMotionRegionsToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
     ui->cam4ImageToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
     ui->cam4RecordToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
     ui->cam4ExpandToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
@@ -658,6 +719,8 @@ void IpFreelyMainWindow::SetDisplaySize()
 
     ui->cam2SettingsToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
     ui->cam2ConnectToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam2MotionRegionsToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam2RemoveMotionRegionsToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
     ui->cam2ImageToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
     ui->cam2RecordToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
     ui->cam2ExpandToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
@@ -665,6 +728,8 @@ void IpFreelyMainWindow::SetDisplaySize()
 
     ui->cam3SettingsToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
     ui->cam3ConnectToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam3MotionRegionsToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
+    ui->cam3RemoveMotionRegionsToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
     ui->cam3ImageToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
     ui->cam3RecordToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
     ui->cam3ExpandToolButton->setMaximumSize(QSize(buttonSize, buttonSize));
@@ -792,6 +857,46 @@ void IpFreelyMainWindow::ConnectButtons()
             &QToolButton::clicked,
             this,
             &IpFreelyMainWindow::on_storage4ToolButton_clicked);
+
+    connect(ui->cam1MotionRegionsToolButton,
+            &QToolButton::toggled,
+            this,
+            &IpFreelyMainWindow::on_motionDetectorRegions1ToolButton_toggled);
+
+    connect(ui->cam2MotionRegionsToolButton,
+            &QToolButton::toggled,
+            this,
+            &IpFreelyMainWindow::on_motionDetectorRegions2ToolButton_toggled);
+
+    connect(ui->cam3MotionRegionsToolButton,
+            &QToolButton::toggled,
+            this,
+            &IpFreelyMainWindow::on_motionDetectorRegions3ToolButton_toggled);
+
+    connect(ui->cam4MotionRegionsToolButton,
+            &QToolButton::toggled,
+            this,
+            &IpFreelyMainWindow::on_motionDetectorRegions4ToolButton_toggled);
+
+    connect(ui->cam1RemoveMotionRegionsToolButton,
+            &QToolButton::toggled,
+            this,
+            &IpFreelyMainWindow::on_removeMotionRegions1ToolButton_clicked);
+
+    connect(ui->cam2RemoveMotionRegionsToolButton,
+            &QToolButton::toggled,
+            this,
+            &IpFreelyMainWindow::on_removeMotionRegions2ToolButton_clicked);
+
+    connect(ui->cam3RemoveMotionRegionsToolButton,
+            &QToolButton::toggled,
+            this,
+            &IpFreelyMainWindow::on_removeMotionRegions3ToolButton_clicked);
+
+    connect(ui->cam4RemoveMotionRegionsToolButton,
+            &QToolButton::toggled,
+            this,
+            &IpFreelyMainWindow::on_removeMotionRegions4ToolButton_clicked);
 }
 
 void IpFreelyMainWindow::CheckStartupConnections()
@@ -1281,4 +1386,28 @@ void IpFreelyMainWindow::VideoFrameAreaSelection(int const     cameraId,
 {
     // TODO:
     bool wibble = false;
+}
+
+void IpFreelyMainWindow::EnableMotionRegionsSetup(ipfreely::eCamId const camId, bool const enable,
+                                                  QToolButton* removeRegionsBtn)
+{
+    removeRegionsBtn->setVisible(enable);
+
+    auto camFeedIter = m_camFeeds.find(camId);
+
+    if (camFeedIter == m_camFeeds.end())
+    {
+        return;
+    }
+
+    camFeedIter->second->SetEnableSelection(enable);
+
+    if (enable)
+    {
+        // TODO: draw regions on videoframe
+    }
+    else
+    {
+        // TODO: remove regions from video frame
+    }
 }
