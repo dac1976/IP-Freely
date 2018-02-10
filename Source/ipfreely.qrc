@@ -9,5 +9,6 @@
         <file>icons/Storage-48.png</file>
         <file>icons/WallCam_Connect_48.png</file>
         <file>icons/WallCam_Disconnect_48.png</file>
+        <file>icons/Motion-48.png</file>
     </qresource>
 </RCC>

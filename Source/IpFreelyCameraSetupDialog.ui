@@ -162,7 +162,7 @@
        <item>
         <widget class="QComboBox" name="motionDetectModeComboBox">
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the motion detection mode.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;This setting combined with the motino recording schedule in the preferences with control when and if motion detection takes place.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the motion detection mode.&lt;/p&gt;&lt;p&gt;This setting combined with the motino recording schedule in the preferences with control when and if motion detection takes place.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="currentIndex">
           <number>0</number>
@@ -238,7 +238,7 @@
            </size>
           </property>
           <property name="toolTip">
-           <string>The pixel threshold for the motion frame contrls how much ambient motion is filtered out from the detector.</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The pixel threshold for the motion frame.&lt;/p&gt;&lt;p&gt;This controls how much ambient motion is filtered out from the detector.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="decimals">
            <number>1</number>
@@ -344,7 +344,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Even with the other parameters that allow us to tune the motion detection we can detect valid motion that is still relatively small. &lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;With this parameter we can choose to ignore motion areas smaller than the defined percentage of the video frames area.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;With this parameter we can choose to ignore motion areas smaller than the defined percentage of the video frame's total area.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="decimals">
            <number>1</number>
@@ -387,7 +387,7 @@ p, li { white-space: pre-wrap; }
            </size>
           </property>
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When tracking the motion area between successive video frames we compute the tracked motion areas as follows.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;M[i] = M[i-1] * f + m[i] * (1- f)&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Where &lt;span style=&quot; font-weight:600;&quot;&gt;M[i]&lt;/span&gt; is the new averaged tracked motion, &lt;span style=&quot; font-weight:600;&quot;&gt;M[i-1]&lt;/span&gt; is the previous average tracked motion, &lt;span style=&quot; font-weight:600;&quot;&gt;m[i]&lt;/span&gt; is the new detected motion and &lt;span style=&quot; font-weight:600;&quot;&gt;f&lt;/span&gt; is theaveraging factor.&lt;/p&gt;&lt;p&gt;This means that the motion area is less erratic between successive video frames.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When tracking the motion area between successive video frames we compute the tracked motion areas as follows.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;M[i] = M[i-1] * f + m[i] * (1- f)&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Where &lt;span style=&quot; font-weight:600;&quot;&gt;M[i]&lt;/span&gt; is the new averaged tracked motion region, &lt;span style=&quot; font-weight:600;&quot;&gt;M[i-1]&lt;/span&gt; is the previous average tracked motion region, &lt;span style=&quot; font-weight:600;&quot;&gt;m[i]&lt;/span&gt; is the new detected motion region and &lt;span style=&quot; font-weight:600;&quot;&gt;f&lt;/span&gt; is the averaging factor.&lt;/p&gt;&lt;p&gt;This means that the motion area is less erratic between successive video frames.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="decimals">
            <number>3</number>
@@ -420,6 +420,9 @@ p, li { white-space: pre-wrap; }
    </item>
    <item>
     <widget class="QCheckBox" name="shrinkFramesCheckBox">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When this is unchecked the motion detector algorithm will processor full size video frames.&lt;/p&gt;&lt;p&gt;If you check this option then the motion detector first reduces frames to 800 * 600 if they are greater than this size. (Aspect ratio is maintained if original video frames are not 4:3 aspect ratio).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string>Shrink video frames for motion detection</string>
      </property>
@@ -445,6 +448,9 @@ p, li { white-space: pre-wrap; }
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="clearSettingsPushButton">
+       <property name="toolTip">
+        <string>Clear all settings.</string>
+       </property>
        <property name="text">
         <string>Clear</string>
        </property>
@@ -465,6 +471,9 @@ p, li { white-space: pre-wrap; }
      </item>
      <item>
       <widget class="QPushButton" name="revertChangesPushButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Revert settings back to original state when the camera settings were opened.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Revert</string>
        </property>

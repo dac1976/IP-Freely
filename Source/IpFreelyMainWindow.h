@@ -110,7 +110,8 @@ private:
     void     CheckStartupConnections();
     void     SetupCameraInDb(ipfreely::eCamId const camId, QToolButton* connectBtn);
     void     ConnectionHandler(ipfreely::IpCamera const& camera, QToolButton* connectBtn,
-                               QToolButton* recordBtn, QToolButton* snapshotBtn, QToolButton* expandBtn,
+                               QToolButton* motionRegionsBtn, QToolButton* recordBtn,
+                               QToolButton* snapshotBtn, QToolButton* expandBtn,
                                QToolButton* storageBtn);
     void     RecordActionHandler(ipfreely::eCamId const camId, QToolButton* recordBtn);
     QWidget* GetParentFrame(ipfreely::eCamId const camId) const;

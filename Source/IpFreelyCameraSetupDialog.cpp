@@ -27,14 +27,16 @@
 #include <QScreen>
 #include "IpFreelyCameraDatabase.h"
 
-static constexpr double DIFF_THRESHOLD                  = 50.0;
-static constexpr double LOW_SENSITIVITY_STDDEV          = 10.0;
-static constexpr double MEDIUM_SENSITIVITY_STDDEV       = 20.0;
-static constexpr double HIGH_SENSITIVITY_STDDEV         = 40.0;
-static constexpr double LOW_SENSITIVITY_AREA_PERCENT    = 0.05;
-static constexpr double MEDIUM_SENSITIVITY_AREA_PERCENT = 0.025;
-static constexpr double HIGH_SENSITIVITY_AREA_PERCENT   = 0.01;
-static constexpr double BOUNDING_RECT_SMOOTHING_FACTOR  = 0.1;
+static constexpr double LOW_SENSITIVITY_DIFF_THRESHOLD    = 75.0;
+static constexpr double MEDIUM_SENSITIVITY_DIFF_THRESHOLD = 50.0;
+static constexpr double HIGH_SENSITIVITY_DIFF_THRESHOLD   = 35.0;
+static constexpr double LOW_SENSITIVITY_STDDEV            = 10.0;
+static constexpr double MEDIUM_SENSITIVITY_STDDEV         = 20.0;
+static constexpr double HIGH_SENSITIVITY_STDDEV           = 40.0;
+static constexpr double LOW_SENSITIVITY_AREA_PERCENT      = 0.05;
+static constexpr double MEDIUM_SENSITIVITY_AREA_PERCENT   = 0.025;
+static constexpr double HIGH_SENSITIVITY_AREA_PERCENT     = 0.01;
+static constexpr double BOUNDING_RECT_SMOOTHING_FACTOR    = 0.1;
 
 IpFreelyCameraSetupDialog::IpFreelyCameraSetupDialog(ipfreely::IpCamera& camera, QWidget* parent)
     : QDialog(parent)
@@ -120,25 +122,25 @@ void IpFreelyCameraSetupDialog::on_motionDetectModeComboBox_currentIndexChanged(
     case 1:
         ui->maxStdDevDoubleSpinBox->setValue(LOW_SENSITIVITY_STDDEV);
         ui->minMotionAreaPercentDoubleSpinBox->setValue(LOW_SENSITIVITY_AREA_PERCENT * 100.0);
-        ui->pixelLevelThresholdDoubleSpinBox->setValue(DIFF_THRESHOLD);
+        ui->pixelLevelThresholdDoubleSpinBox->setValue(LOW_SENSITIVITY_DIFF_THRESHOLD);
         ui->motionAreaAveFactorDoubleSpinBox->setValue(BOUNDING_RECT_SMOOTHING_FACTOR);
         break;
     case 2:
         ui->maxStdDevDoubleSpinBox->setValue(MEDIUM_SENSITIVITY_STDDEV);
         ui->minMotionAreaPercentDoubleSpinBox->setValue(MEDIUM_SENSITIVITY_AREA_PERCENT * 100.0);
-        ui->pixelLevelThresholdDoubleSpinBox->setValue(DIFF_THRESHOLD);
+        ui->pixelLevelThresholdDoubleSpinBox->setValue(MEDIUM_SENSITIVITY_DIFF_THRESHOLD);
         ui->motionAreaAveFactorDoubleSpinBox->setValue(BOUNDING_RECT_SMOOTHING_FACTOR);
         break;
     case 3:
         ui->maxStdDevDoubleSpinBox->setValue(HIGH_SENSITIVITY_STDDEV);
         ui->minMotionAreaPercentDoubleSpinBox->setValue(HIGH_SENSITIVITY_AREA_PERCENT * 100.0);
-        ui->pixelLevelThresholdDoubleSpinBox->setValue(DIFF_THRESHOLD);
+        ui->pixelLevelThresholdDoubleSpinBox->setValue(HIGH_SENSITIVITY_DIFF_THRESHOLD);
         ui->motionAreaAveFactorDoubleSpinBox->setValue(BOUNDING_RECT_SMOOTHING_FACTOR);
         break;
     case 4:
         ui->maxStdDevDoubleSpinBox->setValue(MEDIUM_SENSITIVITY_STDDEV);
         ui->minMotionAreaPercentDoubleSpinBox->setValue(MEDIUM_SENSITIVITY_AREA_PERCENT * 100.0);
-        ui->pixelLevelThresholdDoubleSpinBox->setValue(DIFF_THRESHOLD);
+        ui->pixelLevelThresholdDoubleSpinBox->setValue(MEDIUM_SENSITIVITY_DIFF_THRESHOLD);
         ui->motionAreaAveFactorDoubleSpinBox->setValue(BOUNDING_RECT_SMOOTHING_FACTOR);
         break;
     case 0:

@@ -1634,6 +1634,9 @@
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
           <widget class="QPushButton" name="selectNonePushButton">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select no days or hours, globally disabling scheduled recording.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
             <string>Select None</string>
            </property>
@@ -1641,6 +1644,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="selectAllPushButton">
+           <property name="toolTip">
+            <string>Select all days and hours.</string>
+           </property>
            <property name="text">
             <string>Select All</string>
            </property>
@@ -1661,6 +1667,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="revertSchedulePushButton">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Revert schedule to original state from when the preferences were opened.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
             <string>Revert</string>
            </property>
@@ -3162,6 +3171,9 @@
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
           <widget class="QPushButton" name="selectNoneMtPushButton">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select no days or hours, globally disabling scheduled recording.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
             <string>Select None</string>
            </property>
@@ -3169,6 +3181,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="selectAllMtPushButton">
+           <property name="toolTip">
+            <string>Select all days and hours.</string>
+           </property>
            <property name="text">
             <string>Select All</string>
            </property>
@@ -3189,6 +3204,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="revertScheduleMtPushButton">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Revert schedule to original state from when the preferences were opened.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
             <string>Revert</string>
            </property>

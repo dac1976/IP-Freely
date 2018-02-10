@@ -225,6 +225,7 @@ void IpFreelyMainWindow::on_connect1ToolButton_clicked()
 
     ConnectionHandler(camera,
                       ui->cam1ConnectToolButton,
+                      ui->cam1MotionRegionsToolButton,
                       ui->cam1RecordToolButton,
                       ui->cam1ImageToolButton,
                       ui->cam1ExpandToolButton,
@@ -289,6 +290,7 @@ void IpFreelyMainWindow::on_connect2ToolButton_clicked()
 
     ConnectionHandler(camera,
                       ui->cam2ConnectToolButton,
+                      ui->cam2MotionRegionsToolButton,
                       ui->cam2RecordToolButton,
                       ui->cam2ImageToolButton,
                       ui->cam2ExpandToolButton,
@@ -353,6 +355,7 @@ void IpFreelyMainWindow::on_connect3ToolButton_clicked()
 
     ConnectionHandler(camera,
                       ui->cam3ConnectToolButton,
+                      ui->cam3MotionRegionsToolButton,
                       ui->cam3RecordToolButton,
                       ui->cam3ImageToolButton,
                       ui->cam3ExpandToolButton,
@@ -417,6 +420,7 @@ void IpFreelyMainWindow::on_connect4ToolButton_clicked()
 
     ConnectionHandler(camera,
                       ui->cam4ConnectToolButton,
+                      ui->cam4MotionRegionsToolButton,
                       ui->cam4RecordToolButton,
                       ui->cam4ImageToolButton,
                       ui->cam4ExpandToolButton,
@@ -852,9 +856,9 @@ void IpFreelyMainWindow::SetupCameraInDb(ipfreely::eCamId const camId, QToolButt
 }
 
 void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
-                                           QToolButton* connectBtn, QToolButton* recordBtn,
-                                           QToolButton* snapshotBtn, QToolButton* expandBtn,
-                                           QToolButton* storageBtn)
+                                           QToolButton* connectBtn, QToolButton* motionRegionsBtn,
+                                           QToolButton* recordBtn, QToolButton* snapshotBtn,
+                                           QToolButton* expandBtn, QToolButton* storageBtn)
 {
     if (m_updateFeedsTimer->isActive())
     {
@@ -909,6 +913,7 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
         snapshotBtn->setEnabled(false);
         expandBtn->setEnabled(false);
         storageBtn->setEnabled(false);
+        motionRegionsBtn->setEnabled(false);
 
         if (--m_numConnections > 0)
         {
@@ -1020,6 +1025,7 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
         snapshotBtn->setEnabled(true);
         expandBtn->setEnabled(true);
         storageBtn->setEnabled(true);
+        motionRegionsBtn->setEnabled(true);
 
         connectBtn->setIcon(QIcon(":/icons/icons/WallCam_Disconnect_48.png"));
         connectBtn->setToolTip("Disconnect from camera stream.");
