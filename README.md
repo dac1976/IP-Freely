@@ -18,23 +18,23 @@ I started this project shortly after buying and installing some RTSP compatible 
 * Clean and intuitive UI, hopefully!
 * If a suitable URL is provided then you can view a camera's on-board storage (e.g. SD card) and download the content to your PC.
 * Still snapshot images can be taken from the camera feeds at any time with the click of a button.
-* Local MP4 video recordings can be made from the camera streams at the click of button. 
+* Local MP4 video recordings can be made from the camera streams at the click of button.
 * Scheduled recording can be setup and enabled on a per camera basis, with the schedule allowing  selection of days and hours into the day.
 * The user can view a larger expanded view from any of the 4 streams.
 
 ## Screenshots ##
 ### Preferences ###
- 
+
 ![alt text][pic04]
 
 ![alt text][pic05]
 
 ### Camera Setup ###
- 
+
 ![alt text][pic03]
 
 ### Main Screen ###
- 
+
 ![alt text][pic01]
 
 ![alt text][pic02]
@@ -73,7 +73,4 @@ Please note that some of these libraries themselves require other dependencies, 
 I will fix bugs and improve the code as and when necessary but make no guarantees on how often this happens. I provide no warranty or support for any issues that are encountered while using it. Although if you are really stuck email me at the provided address and if I have the time I will try to help/fix the issue if it's within my power.
 
 ## To-do List ##
-* Automatic, user-configurable disk space management of recorded videos.
-* Motion-tracking triggered recording.
-* Email alerts.
-
+See my Trello [board](https://trello.com/b/jBeGcZ0k).
