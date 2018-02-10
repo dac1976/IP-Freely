@@ -192,10 +192,10 @@ void IpFreelyPreferencesDialog::SetDisplaySize()
     int displayTop =
         static_cast<int>(static_cast<double>(screen->size().height() - displayHeight) / 2.0);
 
-    displayGeometry.setWidth(displayWidth);
-    displayGeometry.setHeight(displayHeight);
     displayGeometry.setTop(displayTop);
     displayGeometry.setLeft(displayLeft);
+    displayGeometry.setWidth(displayWidth);
+    displayGeometry.setHeight(displayHeight);
     setGeometry(displayGeometry);
 }
 

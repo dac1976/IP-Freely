@@ -155,7 +155,7 @@ void IpFreelyCameraSetupDialog::SetDisplaySize()
 {
     static constexpr double DEFAULT_SCREEN_SIZE = 1080.0;
     static constexpr int    MIN_DISPLAY_WIDTH   = 640;
-    static constexpr int    MIN_DISPLAY_HEIGHT  = 340;
+    static constexpr int    MIN_DISPLAY_HEIGHT  = 490;
 
     auto      displayGeometry = geometry();
     auto      screenPos       = mapToGlobal(QPoint(displayGeometry.left(), displayGeometry.top()));
@@ -195,10 +195,10 @@ void IpFreelyCameraSetupDialog::SetDisplaySize()
     int displayTop =
         static_cast<int>(static_cast<double>(screen->size().height() - displayHeight) / 2.0);
 
-    displayGeometry.setWidth(displayWidth);
-    displayGeometry.setHeight(displayHeight);
     displayGeometry.setTop(displayTop);
     displayGeometry.setLeft(displayLeft);
+    displayGeometry.setWidth(displayWidth);
+    displayGeometry.setHeight(displayHeight);
     setGeometry(displayGeometry);
 }
 
