@@ -86,7 +86,6 @@ int main(int argc, char* argv[])
         SingleApplication a(argc, argv);
 
 #if BOOST_OS_WINDOWS
-        a.setApplicationName("IpFreely.exe");
         QString appVersion =
             QString::fromStdString(GetAppVersion(a.applicationFilePath().toStdString()));
 #else

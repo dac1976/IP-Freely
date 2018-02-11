@@ -61,7 +61,7 @@ public:
 
 private slots:
     void removeClicked(IpFreelyDownloadWidget* downloadWidget);
-    void downloadRequested(QWebEngineDownloadItem* webItem);
+    void downloadRequested(QWebEngineDownloadItem* download);
 
 private:
     void SetDisplaySize();
