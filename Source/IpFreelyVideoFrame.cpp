@@ -78,5 +78,5 @@ void IpFreelyVideoFrame::mouseReleaseEvent(QMouseEvent* /*event*/)
 
     m_selectionCallback(m_cameraId, QRectF(l, t, w, h));
 
-    m_rubberBand->deleteLater();
+    m_rubberBand->hide();
 }
