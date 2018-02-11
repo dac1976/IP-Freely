@@ -25,6 +25,8 @@ I started this project shortly after buying and installing some RTSP compatible 
 * (Being considered) Built-in webserver to display some basic features, such as periodically updated snapshots from the camera feeds.
 
 ## Screenshots ##
+Taken from release 1.0.1.0.
+
 ### Preferences ###
 
 ![alt text][pic04]
