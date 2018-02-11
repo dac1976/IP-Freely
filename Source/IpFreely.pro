@@ -41,9 +41,11 @@ win32 {
     CONFIG(debug, debug|release) {
       LIBS += -L$$(OPENCV_DIR)/lib \
               -lopencv_world340d
+      QMAKE_POST_LINK  = $$PWD/../WindowsBatchFiles/CopyDependencies_64Bit_Debug.bat
     } else {
       LIBS += -L$$(OPENCV_DIR)/lib \
               -lopencv_world340
+      QMAKE_POST_LINK  = $$PWD/../WindowsBatchFiles/CopyDependencies_64Bit_Release.bat
     }
 
     SOURCES += \
