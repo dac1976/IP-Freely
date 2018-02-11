@@ -18,9 +18,11 @@ I started this project shortly after buying and installing some RTSP compatible 
 * Clean and intuitive UI, hopefully!
 * If a suitable URL is provided then you can view a camera's on-board storage (e.g. SD card) and download the content to your PC.
 * Still snapshot images can be taken from the camera feeds at any time with the click of a button.
-* Local MP4 video recordings can be made from the camera streams at the click of button.
-* Scheduled recording can be setup and enabled on a per camera basis, with the schedule allowing  selection of days and hours into the day.
+* Local AVI (DivX) video recordings can be made from the camera streams at the click of button.
+* Scheduled recording can be setup and enabled on a per camera basis, with the schedule allowing selection of days and active hours in the day.
 * The user can view a larger expanded view from any of the 4 streams.
+* (Coming soon) Motion detection with user-configurable scheduling (similar to scheduled recordings), ability to trigger recordings and send email alerts. Per camera user definable motion detection regions, per camera motion detection algorithm sensitivity (off, low sensitivity, medium sensitivity, high sensitivity and manual settings)
+* (Being considered) Built-in webserver to display some basic features, such as periodically updated snapshots from the camera feeds.
 
 ## Screenshots ##
 ### Preferences ###
