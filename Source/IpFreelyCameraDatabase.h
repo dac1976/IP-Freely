@@ -105,10 +105,13 @@ struct IpCamera final
     typedef std::pair<double, double> point_t;
 
     /*! \brief Typedef to a region pair. */
-    typedef std::pair<point_t /*top,left*/, point_t /*width,height*/> region_t;
+    typedef std::pair<point_t /*left,top*/, point_t /*width,height*/> region_t;
+
+    /*! \brief Typedef to a a vector of region pairs. */
+    typedef std::vector<region_t> regions_t;
 
     /*! \brief Vector of motion detection regions. */
-    std::vector<region_t> motionRegions{};
+    regions_t motionRegions{};
 
     /*! \brief IpCamera's default constructor. */
     IpCamera() = default;

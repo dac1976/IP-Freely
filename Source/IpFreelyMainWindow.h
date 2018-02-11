@@ -132,18 +132,20 @@ private:
     void     VideoFrameAreaSelection(int const cameraId, QRectF const& percentageSelection);
     void     EnableMotionRegionsSetup(ipfreely::eCamId const camId, bool const enable,
                                       QToolButton* removeRegionsBtn);
+    void     RemoveMotionRegions(ipfreely::eCamId const camId);
 
 private:
-    Ui::IpFreelyMainWindow*                         ui;
-    QString                                         m_appVersion;
-    ipfreely::IpFreelyPreferences                   m_prefs;
-    ipfreely::IpFreelyCameraDatabase                m_camDb;
-    QTimer*                                         m_updateFeedsTimer;
-    std::map<ipfreely::eCamId, IpFreelyVideoFrame*> m_camFeeds;
-    std::map<ipfreely::eCamId, stream_proc_t>       m_streamProcessors;
-    int                                             m_numConnections;
-    std::shared_ptr<IpFreelyVideoForm>              m_videoForm;
-    ipfreely::eCamId                                m_videoFormId;
+    Ui::IpFreelyMainWindow*                                   ui;
+    QString                                                   m_appVersion;
+    ipfreely::IpFreelyPreferences                             m_prefs;
+    ipfreely::IpFreelyCameraDatabase                          m_camDb;
+    QTimer*                                                   m_updateFeedsTimer;
+    std::map<ipfreely::eCamId, IpFreelyVideoFrame*>           m_camFeeds;
+    std::map<ipfreely::eCamId, stream_proc_t>                 m_streamProcessors;
+    int                                                       m_numConnections;
+    std::shared_ptr<IpFreelyVideoForm>                        m_videoForm;
+    ipfreely::eCamId                                          m_videoFormId;
+    std::map<ipfreely::eCamId, ipfreely::IpCamera::regions_t> m_camMotionRegions;
 };
 
 #endif // IPFREELYMAINWINDOW_H

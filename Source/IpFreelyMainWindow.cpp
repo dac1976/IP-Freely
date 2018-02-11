@@ -246,7 +246,7 @@ void IpFreelyMainWindow::on_motionDetectorRegions1ToolButton_toggled(bool checke
 
 void IpFreelyMainWindow::on_removeMotionRegions1ToolButton_clicked()
 {
-    // TODO:
+    RemoveMotionRegions(ipfreely::eCamId::cam1);
 }
 
 void IpFreelyMainWindow::on_record1ToolButton_clicked()
@@ -323,7 +323,7 @@ void IpFreelyMainWindow::on_motionDetectorRegions2ToolButton_toggled(bool checke
 
 void IpFreelyMainWindow::on_removeMotionRegions2ToolButton_clicked()
 {
-    // TODO:
+    RemoveMotionRegions(ipfreely::eCamId::cam2);
 }
 
 void IpFreelyMainWindow::on_record2ToolButton_clicked()
@@ -400,7 +400,7 @@ void IpFreelyMainWindow::on_motionDetectorRegions3ToolButton_toggled(bool checke
 
 void IpFreelyMainWindow::on_removeMotionRegions3ToolButton_clicked()
 {
-    // TODO:
+    RemoveMotionRegions(ipfreely::eCamId::cam3);
 }
 
 void IpFreelyMainWindow::on_record3ToolButton_clicked()
@@ -477,7 +477,7 @@ void IpFreelyMainWindow::on_motionDetectorRegions4ToolButton_toggled(bool checke
 
 void IpFreelyMainWindow::on_removeMotionRegions4ToolButton_clicked()
 {
-    // TODO:
+    RemoveMotionRegions(ipfreely::eCamId::cam4);
 }
 
 void IpFreelyMainWindow::on_record4ToolButton_clicked()
@@ -985,6 +985,7 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
 
         m_streamProcessors.erase(camera.camId);
         m_camFeeds.erase(camera.camId);
+        m_camMotionRegions.erase(camera.camId);
 
         switch (camera.camId)
         {
@@ -1390,7 +1391,41 @@ void IpFreelyMainWindow::ViewStorage(ipfreely::IpCamera const& camera)
 void IpFreelyMainWindow::VideoFrameAreaSelection(int const     cameraId,
                                                  QRectF const& percentageSelection)
 {
-    // TODO:
+    ipfreely::eCamId camId;
+
+    switch (cameraId)
+    {
+    case 1:
+        camId = ipfreely::eCamId::cam1;
+        break;
+    case 2:
+        camId = ipfreely::eCamId::cam2;
+        break;
+    case 3:
+        camId = ipfreely::eCamId::cam3;
+        break;
+    case 4:
+        camId = ipfreely::eCamId::cam4;
+        break;
+    default:
+        DEBUG_MESSAGE_EX_ERROR("Invalid camera ID value: " << cameraId);
+        return;
+    }
+
+    ipfreely::IpCamera::point_t  leftTop(percentageSelection.left(), percentageSelection.top());
+    ipfreely::IpCamera::point_t  widthHeight(percentageSelection.width(),
+                                            percentageSelection.height());
+    ipfreely::IpCamera::region_t region(leftTop, widthHeight);
+    m_camMotionRegions[camId].emplace_back(region);
+
+    ipfreely::IpCamera camera;
+
+    if (m_camDb.FindCamera(camId, camera))
+    {
+        camera.motionRegions = m_camMotionRegions[camId];
+        m_camDb.UpdateCamera(camera);
+        m_camDb.Save();
+    }
 }
 
 void IpFreelyMainWindow::EnableMotionRegionsSetup(ipfreely::eCamId const camId, bool const enable,
@@ -1409,10 +1444,42 @@ void IpFreelyMainWindow::EnableMotionRegionsSetup(ipfreely::eCamId const camId, 
 
     if (enable)
     {
-        // TODO: draw regions on videoframe
+        ipfreely::IpCamera camera;
+
+        if (m_camDb.FindCamera(camId, camera))
+        {
+            m_camMotionRegions[camId] = camera.motionRegions;
+        }
     }
     else
     {
-        // TODO: remove regions from video frame
+        m_camMotionRegions.erase(camId);
     }
+}
+
+void IpFreelyMainWindow::RemoveMotionRegions(ipfreely::eCamId const camId)
+{
+    ipfreely::IpCamera camera;
+
+    if (!m_camDb.FindCamera(camId, camera))
+    {
+        DEBUG_MESSAGE_EX_ERROR("Failed to find camera ID: " << static_cast<int>(camId));
+        return;
+    }
+
+    if (QMessageBox::No ==
+        QMessageBox::question(
+            this,
+            tr("Question"),
+            tr("Do you want to remove the motion detection regions from this camera?"),
+            QMessageBox::Yes | QMessageBox::No,
+            QMessageBox::No))
+    {
+        return;
+    }
+
+    m_camMotionRegions[camId].clear();
+    camera.motionRegions = m_camMotionRegions[camId];
+    m_camDb.UpdateCamera(camera);
+    m_camDb.Save();
 }
