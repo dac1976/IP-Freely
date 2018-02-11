@@ -225,6 +225,8 @@ void IpFreelyMainWindow::on_connect1ToolButton_clicked()
 
     if (!m_camDb.FindCamera(ipfreely::eCamId::cam1, camera))
     {
+        DEBUG_MESSAGE_EX_ERROR(
+            "Failed to find camera, ID: " << static_cast<int>(ipfreely::eCamId::cam1));
         return;
     }
 
@@ -270,6 +272,8 @@ void IpFreelyMainWindow::on_storage1ToolButton_clicked()
 
     if (!m_camDb.FindCamera(ipfreely::eCamId::cam1, camera))
     {
+        DEBUG_MESSAGE_EX_ERROR(
+            "Failed to find camera, ID: " << static_cast<int>(ipfreely::eCamId::cam1));
         return;
     }
 
@@ -302,6 +306,8 @@ void IpFreelyMainWindow::on_connect2ToolButton_clicked()
 
     if (!m_camDb.FindCamera(ipfreely::eCamId::cam2, camera))
     {
+        DEBUG_MESSAGE_EX_ERROR(
+            "Failed to find camera, ID: " << static_cast<int>(ipfreely::eCamId::cam2));
         return;
     }
 
@@ -347,6 +353,8 @@ void IpFreelyMainWindow::on_storage2ToolButton_clicked()
 
     if (!m_camDb.FindCamera(ipfreely::eCamId::cam2, camera))
     {
+        DEBUG_MESSAGE_EX_ERROR(
+            "Failed to find camera, ID: " << static_cast<int>(ipfreely::eCamId::cam2));
         return;
     }
 
@@ -379,6 +387,8 @@ void IpFreelyMainWindow::on_connect3ToolButton_clicked()
 
     if (!m_camDb.FindCamera(ipfreely::eCamId::cam3, camera))
     {
+        DEBUG_MESSAGE_EX_ERROR(
+            "Failed to find camera, ID: " << static_cast<int>(ipfreely::eCamId::cam3));
         return;
     }
 
@@ -424,6 +434,8 @@ void IpFreelyMainWindow::on_storage3ToolButton_clicked()
 
     if (!m_camDb.FindCamera(ipfreely::eCamId::cam3, camera))
     {
+        DEBUG_MESSAGE_EX_ERROR(
+            "Failed to find camera, ID: " << static_cast<int>(ipfreely::eCamId::cam3));
         return;
     }
 
@@ -456,6 +468,8 @@ void IpFreelyMainWindow::on_connect4ToolButton_clicked()
 
     if (!m_camDb.FindCamera(ipfreely::eCamId::cam4, camera))
     {
+        DEBUG_MESSAGE_EX_ERROR(
+            "Failed to find camera, ID: " << static_cast<int>(ipfreely::eCamId::cam4));
         return;
     }
 
@@ -501,6 +515,8 @@ void IpFreelyMainWindow::on_storage4ToolButton_clicked()
 
     if (!m_camDb.FindCamera(ipfreely::eCamId::cam4, camera))
     {
+        DEBUG_MESSAGE_EX_ERROR(
+            "Failed to find camera, ID: " << static_cast<int>(ipfreely::eCamId::cam4));
         return;
     }
 
@@ -883,22 +899,22 @@ void IpFreelyMainWindow::ConnectButtons()
             &IpFreelyMainWindow::on_motionDetectorRegions4ToolButton_toggled);
 
     connect(ui->cam1RemoveMotionRegionsToolButton,
-            &QToolButton::toggled,
+            &QToolButton::clicked,
             this,
             &IpFreelyMainWindow::on_removeMotionRegions1ToolButton_clicked);
 
     connect(ui->cam2RemoveMotionRegionsToolButton,
-            &QToolButton::toggled,
+            &QToolButton::clicked,
             this,
             &IpFreelyMainWindow::on_removeMotionRegions2ToolButton_clicked);
 
     connect(ui->cam3RemoveMotionRegionsToolButton,
-            &QToolButton::toggled,
+            &QToolButton::clicked,
             this,
             &IpFreelyMainWindow::on_removeMotionRegions3ToolButton_clicked);
 
     connect(ui->cam4RemoveMotionRegionsToolButton,
-            &QToolButton::toggled,
+            &QToolButton::clicked,
             this,
             &IpFreelyMainWindow::on_removeMotionRegions4ToolButton_clicked);
 }
@@ -940,6 +956,7 @@ void IpFreelyMainWindow::SetupCameraInDb(ipfreely::eCamId const camId, QToolButt
 
     if (!m_camDb.FindCamera(camId, camera))
     {
+        DEBUG_MESSAGE_EX_ERROR("Failed to find camera, ID: " << static_cast<int>(camId));
         camera.camId = camId;
     }
 
@@ -1154,6 +1171,7 @@ void IpFreelyMainWindow::RecordActionHandler(ipfreely::eCamId const camId, QTool
 
     if (streamProcIter == m_streamProcessors.end())
     {
+        DEBUG_MESSAGE_EX_ERROR("Failed to find stream processor, ID: " << static_cast<int>(camId));
         return;
     }
 
@@ -1181,6 +1199,7 @@ void IpFreelyMainWindow::UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage
 
     if (camFeedIter == m_camFeeds.end())
     {
+        DEBUG_MESSAGE_EX_ERROR("Failed to find camera feed, ID: " << static_cast<int>(camId));
         return;
     }
 
@@ -1262,6 +1281,7 @@ void IpFreelyMainWindow::SaveImageSnapshot(ipfreely::eCamId const camId)
 
     if (streamProcIter == m_streamProcessors.end())
     {
+        DEBUG_MESSAGE_EX_ERROR("Failed to find stream processor, ID: " << static_cast<int>(camId));
         return;
     }
 
@@ -1437,6 +1457,7 @@ void IpFreelyMainWindow::EnableMotionRegionsSetup(ipfreely::eCamId const camId, 
 
     if (camFeedIter == m_camFeeds.end())
     {
+        DEBUG_MESSAGE_EX_ERROR("Failed to find camera feed, ID: " << static_cast<int>(camId));
         return;
     }
 
@@ -1463,7 +1484,7 @@ void IpFreelyMainWindow::RemoveMotionRegions(ipfreely::eCamId const camId)
 
     if (!m_camDb.FindCamera(camId, camera))
     {
-        DEBUG_MESSAGE_EX_ERROR("Failed to find camera ID: " << static_cast<int>(camId));
+        DEBUG_MESSAGE_EX_ERROR("Failed to find camera, ID: " << static_cast<int>(camId));
         return;
     }
 
