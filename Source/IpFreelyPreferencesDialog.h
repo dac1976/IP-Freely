@@ -49,7 +49,8 @@ public:
      * \param[in][out] prefs - The preferences object.
      * \param[in] parent - (Optional) The parent QWidget object.
      */
-    explicit IpFreelyPreferencesDialog(ipfreely::IpFreelyPreferences& prefs, QWidget* parent = 0);
+    explicit IpFreelyPreferencesDialog(ipfreely::IpFreelyPreferences& prefs,
+                                       QWidget*                       parent = nullptr);
 
     /*! \brief IpFreelyPreferencesDialog destructor. */
     virtual ~IpFreelyPreferencesDialog();

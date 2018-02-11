@@ -47,10 +47,10 @@ public:
      * \brief IpFreelyVideoForm constructor.
      * \param[in] parent - (Optional) Pointer to parent widget.
      */
-    explicit IpFreelyVideoForm(QWidget* parent = 0);
+    explicit IpFreelyVideoForm(QWidget* parent = nullptr);
 
     /*! \brief IpFreelyVideoForm destructor. */
-    ~IpFreelyVideoForm();
+    virtual ~IpFreelyVideoForm();
 
     /*!
      * \brief SetVideoFrame sets the current frame of video in the display.
