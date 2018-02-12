@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>640</width>
-    <height>490</height>
+    <height>523</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -37,7 +37,7 @@
      <item row="0" column="0">
       <widget class="QLabel" name="rtspUrlLabel">
        <property name="text">
-        <string>RTSP Stream URL</string>
+        <string>Camera Stream URL or ID</string>
        </property>
       </widget>
      </item>
@@ -72,10 +72,10 @@
      <item row="0" column="1">
       <widget class="QLineEdit" name="rtspUrlLineEdit">
        <property name="toolTip">
-        <string>Enter the stream's RTSP URL.</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If using an IP camera enter its RTSP or HTTP(S) URL.&lt;/p&gt;&lt;p&gt;If using a webcam enter its numerical ID, e.g. if ytou have one webcam then its ID will be 0.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="placeholderText">
-        <string>enter RTSP URL...</string>
+        <string>enter camera stream URL or ID...</string>
        </property>
       </widget>
      </item>
@@ -124,6 +124,55 @@
         <string>(optional) enter a description...</string>
        </property>
       </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Camera's Maximum FPS</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_7">
+       <item>
+        <widget class="QDoubleSpinBox" name="cameraFpsDoubleSpinBox">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Specify the camera's FPS as defined in its settings.</string>
+         </property>
+         <property name="decimals">
+          <number>1</number>
+         </property>
+         <property name="minimum">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>30.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>25.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_7">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

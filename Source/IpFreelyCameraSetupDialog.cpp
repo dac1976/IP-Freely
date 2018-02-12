@@ -73,6 +73,7 @@ void IpFreelyCameraSetupDialog::on_buttonBox_accepted()
     m_camera.username                 = ui->usernameLineEdit->text().toStdString();
     m_camera.password                 = ui->passwordLineEdit->text().toStdString();
     m_camera.description              = ui->descriptionLineEdit->text().toStdString();
+    m_camera.cameraMaxFps             = ui->cameraFpsDoubleSpinBox->value();
     m_camera.enableScheduledRecording = ui->scheduledRecordingCheckBox->checkState() == Qt::Checked;
 
     switch (ui->motionDetectModeComboBox->currentIndex())
@@ -220,6 +221,7 @@ void IpFreelyCameraSetupDialog::InitialiseCameraSettings(ipfreely::IpCamera cons
     ui->usernameLineEdit->setText(QString::fromStdString(camera.username));
     ui->passwordLineEdit->setText(QString::fromStdString(camera.password));
     ui->descriptionLineEdit->setText(QString::fromStdString(camera.description));
+    ui->cameraFpsDoubleSpinBox->setValue(camera.cameraMaxFps);
     ui->scheduledRecordingCheckBox->setCheckState(camera.enableScheduledRecording ? Qt::Checked
                                                                                   : Qt::Unchecked);
     switch (m_camera.motionDectorMode)

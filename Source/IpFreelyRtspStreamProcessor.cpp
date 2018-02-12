@@ -126,16 +126,17 @@ IpFreelyRtspStreamProcessor::IpFreelyRtspStreamProcessor(
     m_videoHeight = static_cast<int>(m_videoCapture.get(CV_CAP_PROP_FRAME_HEIGHT));
     m_fps         = m_videoCapture.get(CV_CAP_PROP_FPS);
 
-    if (m_fps < 0.1)
+    if ((m_fps < 1.0) || (m_fps > 30.0))
     {
-        m_fps = 25.0;
+        m_fps = cameraDetails.cameraMaxFps;
     }
 
     m_updatePeriodMillisecs = static_cast<unsigned int>(1000.0 / m_fps);
 
-    DEBUG_MESSAGE_EX_INFO("Stream at: "
-                          << m_cameraDetails.rtspUrl << " running with FPS of: " << m_fps
-                          << ", thread update period (ms): " << m_updatePeriodMillisecs);
+    DEBUG_MESSAGE_EX_INFO("Stream at: " << m_cameraDetails.rtspUrl << " running with FPS of: "
+                                        << m_fps
+                                        << ", thread update period (ms): "
+                                        << m_updatePeriodMillisecs);
 
     Start();
 }

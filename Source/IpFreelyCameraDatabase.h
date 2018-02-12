@@ -113,6 +113,9 @@ struct IpCamera final
     /*! \brief Vector of motion detection regions. */
     regions_t motionRegions{};
 
+    /*! \brief Camera's maximum FPS as defined in its settings. */
+    double cameraMaxFps{25.0};
+
     /*! \brief IpCamera's default constructor. */
     IpCamera() = default;
 
@@ -209,6 +212,12 @@ struct IpCamera final
             // Added with version 4.
             ar(CEREAL_NVP(motionRegions));
         }
+
+        if (version > 4)
+        {
+            // Added with version 5.
+            ar(CEREAL_NVP(cameraMaxFps));
+        }
     }
 };
 
@@ -303,13 +312,13 @@ private:
     }
 
 private:
-    std::string                m_dbPath{};
+    std::string m_dbPath{};
     std::map<eCamId, IpCamera> m_cameras{};
 };
 
 } // namespace ipfreely
 
-CEREAL_CLASS_VERSION(ipfreely::IpCamera, 4);
+CEREAL_CLASS_VERSION(ipfreely::IpCamera, 5);
 CEREAL_CLASS_VERSION(ipfreely::IpFreelyCameraDatabase, 1);
 
 #endif // IPFREELYCAMERADATABASE_H
