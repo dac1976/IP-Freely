@@ -1694,7 +1694,7 @@
      </widget>
      <widget class="QWidget" name="motionTrackingTab">
       <attribute name="title">
-       <string>Motion Tracking Schedule</string>
+       <string>Motion Detector Schedule</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_21">
        <item>
