@@ -1045,6 +1045,9 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
         motionRegionsBtn->setChecked(false);
         removeRegionsBtn->setVisible(false);
 
+        m_camMotionRegions.erase(camera.camId);
+        m_motionAreaSetupEnabled.erase(camera.camId);
+
         if (--m_numConnections > 0)
         {
             m_updateFeedsTimer->start(DEFAULT_UPDATE_PERIOD_MS);
@@ -1238,9 +1241,39 @@ void IpFreelyMainWindow::UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage
         displayFrame = videoFrame;
     }
 
-    if (!motionBoundingRect.isNull() || streamProcIsWriting)
+    auto motionRegionSetupEnabled = m_motionAreaSetupEnabled[camId];
+
+    if (!motionBoundingRect.isNull() || streamProcIsWriting || motionRegionSetupEnabled)
     {
         QPainter p(&displayFrame);
+
+        if (motionRegionSetupEnabled)
+        {
+            auto motionRectAreas = m_camMotionRegions[camId];
+
+            auto pen = QPen(Qt::cyan);
+            pen.setWidth(2);
+            p.setPen(pen);
+            p.setBackground(QBrush(Qt::NoBrush));
+            p.setBackgroundMode(Qt::TransparentMode);
+            p.setBrush(QBrush(Qt::NoBrush));
+
+            for (auto const& motionRegion : motionRectAreas)
+            {
+                QRect rect;
+                rect.setTop(static_cast<int>(static_cast<double>(displayFrame.height()) *
+                                             motionRegion.first.second));
+                rect.setLeft(static_cast<int>(static_cast<double>(displayFrame.width()) *
+                                              motionRegion.first.first));
+                rect.setRight(static_cast<int>(
+                    static_cast<double>(rect.left()) +
+                    (static_cast<double>(displayFrame.width()) * motionRegion.second.first)));
+                rect.setBottom(static_cast<int>(
+                    static_cast<double>(rect.top()) +
+                    (static_cast<double>(displayFrame.height()) * motionRegion.second.second)));
+                p.drawRect(rect);
+            }
+        }
 
         if (!motionBoundingRect.isNull())
         {
@@ -1470,12 +1503,14 @@ void IpFreelyMainWindow::EnableMotionRegionsSetup(ipfreely::eCamId const camId, 
 
         if (m_camDb.FindCamera(camId, camera))
         {
-            m_camMotionRegions[camId] = camera.motionRegions;
+            m_camMotionRegions[camId]       = camera.motionRegions;
+            m_motionAreaSetupEnabled[camId] = true;
         }
     }
     else
     {
         m_camMotionRegions.erase(camId);
+        m_motionAreaSetupEnabled.erase(camId);
     }
 }
 
