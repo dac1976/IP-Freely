@@ -126,10 +126,10 @@ void IpFreelyVideoForm::SetVideoFrame(QImage const& videoFrame, double const fps
             r.setLeft(static_cast<int>(static_cast<double>(resizedImage.width()) *
                                        motionRegion.first.first));
             r.setRight(static_cast<int>(
-                static_cast<double>(rect.left()) +
+                static_cast<double>(r.left()) +
                 (static_cast<double>(resizedImage.width()) * motionRegion.second.first)));
             r.setBottom(static_cast<int>(
-                static_cast<double>(rect.top()) +
+                static_cast<double>(r.top()) +
                 (static_cast<double>(resizedImage.height()) * motionRegion.second.second)));
 
             if (rect.intersects(r))

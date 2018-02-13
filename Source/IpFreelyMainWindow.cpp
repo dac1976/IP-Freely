@@ -1289,10 +1289,10 @@ void IpFreelyMainWindow::UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage
                 r.setLeft(static_cast<int>(static_cast<double>(displayFrame.width()) *
                                            motionRegion.first.first));
                 r.setRight(static_cast<int>(
-                    static_cast<double>(rect.left()) +
+                    static_cast<double>(r.left()) +
                     (static_cast<double>(displayFrame.width()) * motionRegion.second.first)));
                 r.setBottom(static_cast<int>(
-                    static_cast<double>(rect.top()) +
+                    static_cast<double>(r.top()) +
                     (static_cast<double>(displayFrame.height()) * motionRegion.second.second)));
 
                 if (rect.intersects(r))
