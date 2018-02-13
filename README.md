@@ -1,6 +1,6 @@
 # IP Freely (IP/Web camera stream viewer and recorder) #
 ## Introduction ##
-This project implements a hopefully useful cross-platform application to view and record from up to 4 IP camera live RTSP and HTTP(S) streams. You can also conenct to local webcams. The application also allows you to view a camera's on-board storage (e.g. SD card) and download video content from the camera's on-board storage to your PC (or anywhere else your PC can browse to on your network, e.g. a NAS).
+This project implements a hopefully useful cross-platform application to view and record from up to 4 IP camera live RTSP and HTTP(S) streams. You can also connect to local webcams. The application also allows you to view a camera's on-board storage (e.g. SD card) and download video content from the camera's on-board storage to your PC (or anywhere else your PC can browse to on your network, e.g. a NAS).
 
 It is licensed under the GNU Lesser General Public License 3.0 and the relevant documentation for this can be found at the top of each source file and the LICENSE text file.
 
