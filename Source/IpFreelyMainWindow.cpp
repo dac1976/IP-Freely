@@ -578,6 +578,7 @@ void IpFreelyMainWindow::resizeEvent(QResizeEvent* event)
                                                      std::placeholders::_1,
                                                      std::placeholders::_2),
                                            this);
+        feed->SetEnableSelection(m_motionAreaSetupEnabled[ipfreely::eCamId::cam1]);
         ui->cam1Widget->layout()->addWidget(feed);
         m_camFeeds[ipfreely::eCamId::cam1] = feed;
     }
@@ -592,6 +593,7 @@ void IpFreelyMainWindow::resizeEvent(QResizeEvent* event)
                                                      std::placeholders::_1,
                                                      std::placeholders::_2),
                                            this);
+        feed->SetEnableSelection(m_motionAreaSetupEnabled[ipfreely::eCamId::cam2]);
         ui->cam2Widget->layout()->addWidget(feed);
         m_camFeeds[ipfreely::eCamId::cam2] = feed;
     }
@@ -606,6 +608,7 @@ void IpFreelyMainWindow::resizeEvent(QResizeEvent* event)
                                                      std::placeholders::_1,
                                                      std::placeholders::_2),
                                            this);
+        feed->SetEnableSelection(m_motionAreaSetupEnabled[ipfreely::eCamId::cam3]);
         ui->cam3Widget->layout()->addWidget(feed);
         m_camFeeds[ipfreely::eCamId::cam3] = feed;
     }
@@ -620,6 +623,7 @@ void IpFreelyMainWindow::resizeEvent(QResizeEvent* event)
                                                      std::placeholders::_1,
                                                      std::placeholders::_2),
                                            this);
+        feed->SetEnableSelection(m_motionAreaSetupEnabled[ipfreely::eCamId::cam4]);
         ui->cam4Widget->layout()->addWidget(feed);
         m_camFeeds[ipfreely::eCamId::cam4] = feed;
     }
