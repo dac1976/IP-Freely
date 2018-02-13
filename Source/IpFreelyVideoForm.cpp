@@ -98,6 +98,16 @@ void IpFreelyVideoForm::SetVideoFrame(QImage const& videoFrame, double const fps
                                           Qt::SmoothTransformation);
 
     QPainter p(&resizedImage);
+    auto     rect                   = motionBoundingRect;
+    bool     intersectsMotionRegion = false;
+
+    if (!motionBoundingRect.isNull())
+    {
+        rect.setTop(static_cast<int>(static_cast<double>(motionBoundingRect.top()) * scalar));
+        rect.setLeft(static_cast<int>(static_cast<double>(motionBoundingRect.left()) * scalar));
+        rect.setRight(static_cast<int>(static_cast<double>(motionBoundingRect.right()) * scalar));
+        rect.setBottom(static_cast<int>(static_cast<double>(motionBoundingRect.bottom()) * scalar));
+    }
 
     if (!motionRegions.empty())
     {
@@ -110,31 +120,30 @@ void IpFreelyVideoForm::SetVideoFrame(QImage const& videoFrame, double const fps
 
         for (auto const& motionRegion : motionRegions)
         {
-            QRect rect;
-            rect.setTop(static_cast<int>(static_cast<double>(resizedImage.height()) *
-                                         motionRegion.first.second));
-            rect.setLeft(static_cast<int>(static_cast<double>(resizedImage.width()) *
-                                          motionRegion.first.first));
-            rect.setRight(static_cast<int>(
+            QRect r;
+            r.setTop(static_cast<int>(static_cast<double>(resizedImage.height()) *
+                                      motionRegion.first.second));
+            r.setLeft(static_cast<int>(static_cast<double>(resizedImage.width()) *
+                                       motionRegion.first.first));
+            r.setRight(static_cast<int>(
                 static_cast<double>(rect.left()) +
                 (static_cast<double>(resizedImage.width()) * motionRegion.second.first)));
-            rect.setBottom(static_cast<int>(
+            r.setBottom(static_cast<int>(
                 static_cast<double>(rect.top()) +
                 (static_cast<double>(resizedImage.height()) * motionRegion.second.second)));
-            p.drawRect(rect);
+
+            if (rect.intersects(r))
+            {
+                intersectsMotionRegion = true;
+            }
+
+            p.drawRect(r);
         }
     }
 
-    auto rect = motionBoundingRect;
-
     if (!rect.isNull())
     {
-        rect.setTop(static_cast<int>(static_cast<double>(rect.top()) * scalar));
-        rect.setLeft(static_cast<int>(static_cast<double>(rect.left()) * scalar));
-        rect.setRight(static_cast<int>(static_cast<double>(rect.right()) * scalar));
-        rect.setBottom(static_cast<int>(static_cast<double>(rect.bottom()) * scalar));
-
-        auto pen = QPen(Qt::green);
+        auto pen = QPen(intersectsMotionRegion ? Qt::green : Qt::red);
         pen.setWidth(2);
         p.setPen(pen);
         p.setBackground(QBrush(Qt::NoBrush));

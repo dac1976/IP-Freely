@@ -1257,6 +1257,18 @@ void IpFreelyMainWindow::UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage
     if (!motionBoundingRect.isNull() || streamProcIsWriting || motionRegionSetupEnabled)
     {
         QPainter p(&displayFrame);
+        QRect    rect                   = motionBoundingRect;
+        bool     intersectsMotionRegion = false;
+
+        if (!motionBoundingRect.isNull())
+        {
+            rect.setTop(static_cast<int>(static_cast<double>(motionBoundingRect.top()) * scalar));
+            rect.setLeft(static_cast<int>(static_cast<double>(motionBoundingRect.left()) * scalar));
+            rect.setRight(
+                static_cast<int>(static_cast<double>(motionBoundingRect.right()) * scalar));
+            rect.setBottom(
+                static_cast<int>(static_cast<double>(motionBoundingRect.bottom()) * scalar));
+        }
 
         if (motionRegionSetupEnabled)
         {
@@ -1271,32 +1283,30 @@ void IpFreelyMainWindow::UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage
 
             for (auto const& motionRegion : motionRectAreas)
             {
-                QRect rect;
-                rect.setTop(static_cast<int>(static_cast<double>(displayFrame.height()) *
-                                             motionRegion.first.second));
-                rect.setLeft(static_cast<int>(static_cast<double>(displayFrame.width()) *
-                                              motionRegion.first.first));
-                rect.setRight(static_cast<int>(
+                QRect r;
+                r.setTop(static_cast<int>(static_cast<double>(displayFrame.height()) *
+                                          motionRegion.first.second));
+                r.setLeft(static_cast<int>(static_cast<double>(displayFrame.width()) *
+                                           motionRegion.first.first));
+                r.setRight(static_cast<int>(
                     static_cast<double>(rect.left()) +
                     (static_cast<double>(displayFrame.width()) * motionRegion.second.first)));
-                rect.setBottom(static_cast<int>(
+                r.setBottom(static_cast<int>(
                     static_cast<double>(rect.top()) +
                     (static_cast<double>(displayFrame.height()) * motionRegion.second.second)));
-                p.drawRect(rect);
+
+                if (rect.intersects(r))
+                {
+                    intersectsMotionRegion = true;
+                }
+
+                p.drawRect(r);
             }
         }
 
-        if (!motionBoundingRect.isNull())
+        if (!rect.isNull())
         {
-            QRect rect;
-            rect.setTop(static_cast<int>(static_cast<double>(motionBoundingRect.top()) * scalar));
-            rect.setLeft(static_cast<int>(static_cast<double>(motionBoundingRect.left()) * scalar));
-            rect.setRight(
-                static_cast<int>(static_cast<double>(motionBoundingRect.right()) * scalar));
-            rect.setBottom(
-                static_cast<int>(static_cast<double>(motionBoundingRect.bottom()) * scalar));
-
-            auto pen = QPen(Qt::green);
+            auto pen = QPen(intersectsMotionRegion ? Qt::green : Qt::red);
             pen.setWidth(2);
             p.setPen(pen);
             p.setBackground(QBrush(Qt::NoBrush));
