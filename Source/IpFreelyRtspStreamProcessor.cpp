@@ -88,6 +88,9 @@ inline QImage CvMatToQImage(cv::Mat const& inMat)
 
 } // namespace utils
 
+static constexpr double MIN_FPS = 1.0;
+static constexpr double MAX_FPS = 30.0;
+
 IpFreelyRtspStreamProcessor::IpFreelyRtspStreamProcessor(
     std::string const& name, IpCamera const& cameraDetails, std::string const& saveFolderPath,
     double const requiredFileDurationSecs, std::vector<std::vector<bool>> const& recordingSchedule,
@@ -99,7 +102,6 @@ IpFreelyRtspStreamProcessor::IpFreelyRtspStreamProcessor(
     , m_requiredFileDurationSecs(requiredFileDurationSecs)
     , m_recordingSchedule(recordingSchedule)
     , m_motionSchedule(motionSchedule)
-    , m_videoCapture(cameraDetails.CompleteRtspUrl().c_str())
 {
     m_useRecordingSchedule = VerifySchedule("Recording", m_recordingSchedule);
     m_useMotionSchedule    = VerifySchedule("Motion", m_motionSchedule);
@@ -117,23 +119,35 @@ IpFreelyRtspStreamProcessor::IpFreelyRtspStreamProcessor(
         }
     }
 
-    if (!m_videoCapture.isOpened())
+    bool isId;
+    auto comleteStreamUrl = cameraDetails.CompleteStreamUrl(isId);
+
+    if (isId)
+    {
+        m_videoCapture = cv::makePtr<cv::VideoCapture>(std::stoi(comleteStreamUrl));
+    }
+    else
+    {
+        m_videoCapture = cv::makePtr<cv::VideoCapture>(comleteStreamUrl.c_str());
+    }
+
+    if (!m_videoCapture->isOpened())
     {
         BOOST_THROW_EXCEPTION(std::runtime_error("Failed to open VideoCapture object."));
     }
 
-    m_videoWidth  = static_cast<int>(m_videoCapture.get(CV_CAP_PROP_FRAME_WIDTH));
-    m_videoHeight = static_cast<int>(m_videoCapture.get(CV_CAP_PROP_FRAME_HEIGHT));
-    m_fps         = m_videoCapture.get(CV_CAP_PROP_FPS);
+    m_videoWidth  = static_cast<int>(m_videoCapture->get(CV_CAP_PROP_FRAME_WIDTH));
+    m_videoHeight = static_cast<int>(m_videoCapture->get(CV_CAP_PROP_FRAME_HEIGHT));
+    m_fps         = m_videoCapture->get(CV_CAP_PROP_FPS);
 
-    if ((m_fps < 1.0) || (m_fps > 30.0))
+    if ((m_fps < MIN_FPS) || (m_fps > MAX_FPS))
     {
         m_fps = cameraDetails.cameraMaxFps;
     }
 
     m_updatePeriodMillisecs = static_cast<unsigned int>(1000.0 / m_fps);
 
-    DEBUG_MESSAGE_EX_INFO("Stream at: " << m_cameraDetails.rtspUrl << " running with FPS of: "
+    DEBUG_MESSAGE_EX_INFO("Stream at: " << m_cameraDetails.streamUrl << " running with FPS of: "
                                         << m_fps
                                         << ", thread update period (ms): "
                                         << m_updatePeriodMillisecs);
@@ -387,7 +401,7 @@ void IpFreelyRtspStreamProcessor::CreateCaptureObjects()
 void IpFreelyRtspStreamProcessor::GrabVideoFrame()
 {
     std::lock_guard<std::mutex> lock(m_frameMutex);
-    m_videoCapture >> m_videoFrame;
+    *m_videoCapture >> m_videoFrame;
     m_videoFrameUpdated = true;
 }
 

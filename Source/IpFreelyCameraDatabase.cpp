@@ -29,6 +29,7 @@
 #include <boost/throw_exception.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/exception/all.hpp>
+#include <boost/algorithm/string.hpp>
 #include "Serialization/SerializeToVector.h"
 #include "DebugLog/DebugLogging.h"
 
@@ -63,9 +64,50 @@ std::string CompleteUrl(std::string const& url, std::string const& username,
 
 } // namespace utils
 
-std::string IpCamera::CompleteRtspUrl() const noexcept
+std::string IpCamera::CompleteStreamUrl(bool& isId) const noexcept
 {
-    return utils::CompleteUrl(rtspUrl, username, password, RTSP_OFFSET);
+    isId = false;
+    std::string url;
+
+    try
+    {
+        std::stoi(streamUrl);
+        url  = streamUrl;
+        isId = true;
+    }
+    catch (...)
+    {
+        std::string urlType = streamUrl.substr(0, RTSP_OFFSET);
+
+        if (boost::to_upper_copy(urlType) == "RTSP://")
+        {
+            url = utils::CompleteUrl(streamUrl, username, password, RTSP_OFFSET);
+        }
+        else
+        {
+            urlType = streamUrl.substr(0, HTTPS_OFFSET);
+
+            if (boost::to_upper_copy(urlType) == "HTTPS://")
+            {
+                url = utils::CompleteUrl(streamUrl, username, password, HTTPS_OFFSET);
+            }
+            else
+            {
+                urlType = streamUrl.substr(0, HTTP_OFFSET);
+
+                if (boost::to_upper_copy(urlType) == "HTTP://")
+                {
+                    url = utils::CompleteUrl(streamUrl, username, password, HTTP_OFFSET);
+                }
+                else
+                {
+                    BOOST_THROW_EXCEPTION(std::invalid_argument("invalid stream url"));
+                }
+            }
+        }
+    }
+
+    return url;
 }
 
 std::string IpCamera::CompleteStorageHttpUrl(bool const isHttps) const noexcept
@@ -76,7 +118,7 @@ std::string IpCamera::CompleteStorageHttpUrl(bool const isHttps) const noexcept
 
 bool IpCamera::IsValid() const noexcept
 {
-    return !rtspUrl.empty() && (camId != eCamId::noCam);
+    return !streamUrl.empty() && (camId != eCamId::noCam);
 }
 
 IpFreelyCameraDatabase::IpFreelyCameraDatabase(bool const load)

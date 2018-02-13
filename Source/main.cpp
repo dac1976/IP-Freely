@@ -48,10 +48,10 @@ std::string GetAppVersion(const std::string& appFilePath)
     std::wstring appFilePathW(appFilePath.begin(), appFilePath.end());
     const DWORD  blockSize = GetFileVersionInfoSize(appFilePathW.c_str(), NULL);
 
-    std::string                              appVersion;
-    auto                                     deleter = [](BYTE const* p) { delete[] p; };
+    std::string appVersion;
+    auto deleter = [](BYTE const* p) { delete[] p; };
     std::unique_ptr<BYTE, decltype(deleter)> block(new BYTE[blockSize], deleter);
-    LPVOID                                   pBlock = reinterpret_cast<LPVOID>(block.get());
+    LPVOID pBlock = reinterpret_cast<LPVOID>(block.get());
 
     if (GetFileVersionInfo(appFilePathW.c_str(), NULL, blockSize, pBlock))
     {
@@ -74,6 +74,8 @@ std::string GetAppVersion(const std::string& appFilePath)
 
     return appVersion;
 }
+#else
+#define IPFREELY_VERSION "1.0.2.0"
 #endif
 
 int main(int argc, char* argv[])
@@ -89,8 +91,9 @@ int main(int argc, char* argv[])
         QString appVersion =
             QString::fromStdString(GetAppVersion(a.applicationFilePath().toStdString()));
 #else
-        QString appVersion = a.applicationVersion();
+        QString appVersion = IPFREELY_VERSION;
 #endif
+        a.setApplicationVersion(appVersion);
 
         DEBUG_MESSAGE_INSTANTIATE_EX(
             appVersion.toStdString(), "", "IpFreely", core_lib::log::BYTES_IN_MEBIBYTE * 25);

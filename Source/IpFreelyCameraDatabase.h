@@ -62,8 +62,8 @@ enum class eMotionDetectorMode
 /*! \brief Camera's details structure. */
 struct IpCamera final
 {
-    /*! \brief Camera's video stream's RTSP URL. */
-    std::string rtspUrl{};
+    /*! \brief Camera's video stream's RTSP or HTTP(S) URL or local ID. */
+    std::string streamUrl{};
 
     /*! \brief Camera's onboard SD card URL. */
     std::string storageHttpUrl{};
@@ -135,23 +135,25 @@ struct IpCamera final
     IpCamera& operator=(IpCamera&&) = default;
 
     /*!
-     * \brief CompleteRtspUrl gives the full RTSP stream URL.
+     * \brief CompleteStreamUrl gives the full RTSP or HTTP(S) stream URL or simply the ID as a
+     * string id using a local webcam.
+     * \param[out] isId - True if URL is actually a numeric ID, false otherwise.
      * \return The full URL string.
      *
-     * Returns complete RTSP url with the format:
+     * In case of RTSP stream it returns complete url with the format:
      * rtsp://<username>:<password>@<path stub>
      * by splitting IpCamera::rtspUrl into: "rtsp://" and "<path stub>"
      * then combining these parts with IpCamera::username and
      * IpCamera::password.
      */
-    std::string CompleteRtspUrl() const noexcept;
+    std::string CompleteStreamUrl(bool& isId) const noexcept;
 
     /*!
      * \brief CompleteStorageHttpUrl gives the full HTTP(S) SD card URL.
      * \return The full URL string.
      *
-     * Returns complete RTSP url with the format:
-     * rtsp://<username>:<password>@<path stub>
+     * Returns complete HTTP(S) url with the format:
+     * http://<username>:<password>@<path stub>
      * by splitting IpCamera::rtspUrl into: "rtsp://" and "<path stub>"
      * then combining these parts with IpCamera::username and
      * IpCamera::password.
@@ -176,8 +178,18 @@ struct IpCamera final
             return;
         }
 
-        ar(CEREAL_NVP(rtspUrl),
-           CEREAL_NVP(storageHttpUrl),
+        if (version < 6)
+        {
+            std::string rtspUrl;
+            ar(CEREAL_NVP(rtspUrl));
+            streamUrl = rtspUrl;
+        }
+        else
+        {
+            ar(CEREAL_NVP(streamUrl));
+        }
+
+        ar(CEREAL_NVP(storageHttpUrl),
            CEREAL_NVP(description),
            CEREAL_NVP(username),
            CEREAL_NVP(password),
@@ -318,7 +330,7 @@ private:
 
 } // namespace ipfreely
 
-CEREAL_CLASS_VERSION(ipfreely::IpCamera, 5);
+CEREAL_CLASS_VERSION(ipfreely::IpCamera, 6);
 CEREAL_CLASS_VERSION(ipfreely::IpFreelyCameraDatabase, 1);
 
 #endif // IPFREELYCAMERADATABASE_H

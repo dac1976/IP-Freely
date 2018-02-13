@@ -41,7 +41,7 @@
       </font>
      </property>
      <property name="text">
-      <string>IP Freely (RTSP Stream Viewer and Recorder)</string>
+      <string>IP Freely (IP/Web camera stream viewer and recorder)</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

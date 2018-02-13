@@ -194,7 +194,7 @@ void IpFreelyMainWindow::on_actionAbout_triggered()
 {
     IpFreelyAbout aboutDlg;
     aboutDlg.setModal(true);
-    QString title = tr("IP Freely (RTSP Stream Viewer and Recorder) ") + m_appVersion;
+    QString title = tr("IP Freely (IP/Web camera stream viewer and recorder)") + " " + m_appVersion;
     aboutDlg.SetTitle(title);
     aboutDlg.exec();
 }
@@ -1043,6 +1043,7 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
         storageBtn->setEnabled(false);
         motionRegionsBtn->setEnabled(false);
         motionRegionsBtn->setChecked(false);
+        removeRegionsBtn->setVisible(false);
 
         if (--m_numConnections > 0)
         {
@@ -1103,8 +1104,8 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
         }
         catch (std::exception& e)
         {
-            DEBUG_MESSAGE_EX_ERROR("Stream Error, camera: " << camName
-                                                            << ", error message: " << e.what());
+            DEBUG_MESSAGE_EX_ERROR(
+                "Stream Error, camera: " << camName << ", error message: " << e.what());
             QMessageBox::critical(this,
                                   "Stream Error",
                                   QString::fromLocal8Bit(e.what()),
@@ -1153,7 +1154,7 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
 
         snapshotBtn->setEnabled(true);
         expandBtn->setEnabled(true);
-        storageBtn->setEnabled(true);
+        storageBtn->setEnabled(!camera.storageHttpUrl.empty());
         motionRegionsBtn->setEnabled(true);
 
         connectBtn->setIcon(QIcon(":/icons/icons/WallCam_Disconnect_48.png"));
@@ -1432,8 +1433,8 @@ void IpFreelyMainWindow::VideoFrameAreaSelection(int const     cameraId,
         return;
     }
 
-    ipfreely::IpCamera::point_t  leftTop(percentageSelection.left(), percentageSelection.top());
-    ipfreely::IpCamera::point_t  widthHeight(percentageSelection.width(),
+    ipfreely::IpCamera::point_t leftTop(percentageSelection.left(), percentageSelection.top());
+    ipfreely::IpCamera::point_t widthHeight(percentageSelection.width(),
                                             percentageSelection.height());
     ipfreely::IpCamera::region_t region(leftTop, widthHeight);
     m_camMotionRegions[camId].emplace_back(region);

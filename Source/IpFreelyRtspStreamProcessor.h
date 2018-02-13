@@ -145,7 +145,7 @@ private:
     bool                                    m_enableVideoWriting{false};
     int                                     m_videoWidth{0};
     int                                     m_videoHeight{0};
-    cv::VideoCapture                        m_videoCapture{};
+    cv::Ptr<cv::VideoCapture>               m_videoCapture{};
     cv::Mat                                 m_videoFrame{};
     cv::Ptr<cv::VideoWriter>                m_videoWriter{};
     double                                  m_fileDurationSecs{0.0};

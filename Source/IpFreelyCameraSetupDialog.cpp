@@ -68,7 +68,7 @@ void IpFreelyCameraSetupDialog::on_buttonBox_accepted()
         m_camera = {};
     }
 
-    m_camera.rtspUrl                  = ui->rtspUrlLineEdit->text().toStdString();
+    m_camera.streamUrl                = ui->rtspUrlLineEdit->text().toStdString();
     m_camera.storageHttpUrl           = ui->storageUrlLineEdit->text().toStdString();
     m_camera.username                 = ui->usernameLineEdit->text().toStdString();
     m_camera.password                 = ui->passwordLineEdit->text().toStdString();
@@ -216,7 +216,7 @@ void IpFreelyCameraSetupDialog::SetDisplaySize()
 
 void IpFreelyCameraSetupDialog::InitialiseCameraSettings(ipfreely::IpCamera const& camera)
 {
-    ui->rtspUrlLineEdit->setText(QString::fromStdString(camera.rtspUrl));
+    ui->rtspUrlLineEdit->setText(QString::fromStdString(camera.streamUrl));
     ui->storageUrlLineEdit->setText(QString::fromStdString(camera.storageHttpUrl));
     ui->usernameLineEdit->setText(QString::fromStdString(camera.username));
     ui->passwordLineEdit->setText(QString::fromStdString(camera.password));

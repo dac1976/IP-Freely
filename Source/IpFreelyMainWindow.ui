@@ -23,7 +23,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>IP Freely (RTSP Stream Viewer and Recorder)</string>
+   <string>IP Freely (IP/Web camera stream viewer and recorder)</string>
   </property>
   <property name="windowIcon">
    <iconset resource="ipfreely.qrc">
@@ -1540,7 +1540,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuEdit">
