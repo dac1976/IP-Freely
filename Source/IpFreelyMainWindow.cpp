@@ -1306,7 +1306,7 @@ void IpFreelyMainWindow::UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage
 
         if (!rect.isNull())
         {
-            auto pen = QPen(intersectsMotionRegion ? Qt::green : Qt::red);
+            auto pen = QPen(intersectsMotionRegion ? Qt::red : Qt::green);
             pen.setWidth(2);
             p.setPen(pen);
             p.setBackground(QBrush(Qt::NoBrush));

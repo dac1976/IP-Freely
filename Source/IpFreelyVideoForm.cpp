@@ -143,7 +143,7 @@ void IpFreelyVideoForm::SetVideoFrame(QImage const& videoFrame, double const fps
 
     if (!rect.isNull())
     {
-        auto pen = QPen(intersectsMotionRegion ? Qt::green : Qt::red);
+        auto pen = QPen(intersectsMotionRegion ? Qt::red : Qt::green);
         pen.setWidth(2);
         p.setPen(pen);
         p.setBackground(QBrush(Qt::NoBrush));
