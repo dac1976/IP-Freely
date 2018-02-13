@@ -542,8 +542,15 @@ void IpFreelyMainWindow::on_updateFeedsTimer()
 
             if (m_videoForm->isVisible() && (m_videoFormId == streamProcessor.first))
             {
+                ipfreely::IpCamera::regions_t motionRegions;
+
+                if (m_motionAreaSetupEnabled[streamProcessor.first])
+                {
+                    motionRegions = m_camMotionRegions[streamProcessor.first];
+                }
+
                 m_videoForm->SetVideoFrame(
-                    currentVideoFrame, fps, motionBoundingRect, enableWriting);
+                    currentVideoFrame, fps, motionBoundingRect, enableWriting, motionRegions);
             }
         }
     }

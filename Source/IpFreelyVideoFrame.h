@@ -85,6 +85,8 @@ private:
     QPoint                  m_origin;
     QRubberBand*            m_rubberBand;
     bool                    m_enableSelection;
+    int                     m_videoHeight;
+    int                     m_videoWidth;
 };
 
 #endif // IPFREELYVIDEOFRAME_H

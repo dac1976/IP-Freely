@@ -26,6 +26,8 @@
 #define IPFREELYVIDEOFORM_H
 
 #include <QWidget>
+#include <utility>
+#include <vector>
 
 // Forward declarations.
 namespace Ui
@@ -41,6 +43,15 @@ class QLabel;
 class IpFreelyVideoForm : public QWidget
 {
     Q_OBJECT
+
+    /*! \brief Typedef to a point pair. */
+    typedef std::pair<double, double> point_t;
+
+    /*! \brief Typedef to a region pair. */
+    typedef std::pair<point_t /*left,top*/, point_t /*width,height*/> region_t;
+
+    /*! \brief Typedef to a a vector of region pairs. */
+    typedef std::vector<region_t> regions_t;
 
 public:
     /*!
@@ -58,9 +69,10 @@ public:
      * \param[in] fps - The video stream's actual FPS.
      * \param[in] motionBoundingRect - The video stream's detected motion bounding rectangle.
      * \param[in] streamBeingWritten - The video stream is currently having data recorded.
+     * \param[in] motionRegions - (Optional) The motion rectangles being monitored.
      */
     void SetVideoFrame(QImage const& videoFrame, double const fps, QRect const& motionBoundingRect,
-                       bool const streamBeingWritten);
+                       bool const streamBeingWritten, regions_t const& motionRegions = {});
 
     /*!
      * \brief SetTitle sets title text of the form.

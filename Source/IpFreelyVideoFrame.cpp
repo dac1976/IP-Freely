@@ -40,6 +40,8 @@ IpFreelyVideoFrame::IpFreelyVideoFrame(int const                   cameraId,
     , m_selectionCallback(selectionCallback)
     , m_rubberBand(nullptr)
     , m_enableSelection(false)
+    , m_videoHeight(0)
+    , m_videoWidth(0)
 {
     ui->setupUi(this);
 }
@@ -51,6 +53,9 @@ IpFreelyVideoFrame::~IpFreelyVideoFrame()
 
 void IpFreelyVideoFrame::SetVideoFrame(QImage const& videoFrame)
 {
+    m_videoHeight = videoFrame.height();
+    m_videoWidth  = videoFrame.width();
+
     ui->videoFrameLabel->setPixmap(QPixmap::fromImage(videoFrame));
 }
 
@@ -94,13 +99,18 @@ void IpFreelyVideoFrame::mouseReleaseEvent(QMouseEvent* /*event*/)
         return;
     }
 
-    auto   selection = m_rubberBand->geometry();
-    double t = static_cast<double>(selection.top()) / static_cast<double>(geometry().height());
-    double l = static_cast<double>(selection.left()) / static_cast<double>(geometry().width());
-    double h = static_cast<double>(selection.height()) / static_cast<double>(geometry().height());
-    double w = static_cast<double>(selection.width()) / static_cast<double>(geometry().width());
+    auto selection = m_rubberBand->geometry();
+    m_rubberBand->hide();
+
+    double t = static_cast<double>(selection.top()) / static_cast<double>(m_videoHeight);
+    double l = static_cast<double>(selection.left()) / static_cast<double>(m_videoWidth);
+    double h = static_cast<double>(selection.height()) / static_cast<double>(m_videoHeight);
+    double w = static_cast<double>(selection.width()) / static_cast<double>(m_videoWidth);
+
+    if ((t >= 1.0) || (l >= 1.0) || (h >= 1.0) || (w >= 1.0) || (t + h > 1.0) || (l + w) > 1.0)
+    {
+        return;
+    }
 
     m_selectionCallback(m_cameraId, QRectF(l, t, w, h));
-
-    m_rubberBand->hide();
 }

@@ -55,7 +55,7 @@ IpFreelyVideoForm::~IpFreelyVideoForm()
 
 void IpFreelyVideoForm::SetVideoFrame(QImage const& videoFrame, double const fps,
                                       QRect const& motionBoundingRect,
-                                      bool const   streamBeingWritten)
+                                      bool const streamBeingWritten, regions_t const& motionRegions)
 {
     auto title = m_title + ": " + QString::number(fps) + tr(" FPS");
     setWindowTitle(title);
@@ -98,7 +98,34 @@ void IpFreelyVideoForm::SetVideoFrame(QImage const& videoFrame, double const fps
                                           Qt::SmoothTransformation);
 
     QPainter p(&resizedImage);
-    auto     rect = motionBoundingRect;
+
+    if (!motionRegions.empty())
+    {
+        auto pen = QPen(Qt::cyan);
+        pen.setWidth(2);
+        p.setPen(pen);
+        p.setBackground(QBrush(Qt::NoBrush));
+        p.setBackgroundMode(Qt::TransparentMode);
+        p.setBrush(QBrush(Qt::NoBrush));
+
+        for (auto const& motionRegion : motionRegions)
+        {
+            QRect rect;
+            rect.setTop(static_cast<int>(static_cast<double>(resizedImage.height()) *
+                                         motionRegion.first.second));
+            rect.setLeft(static_cast<int>(static_cast<double>(resizedImage.width()) *
+                                          motionRegion.first.first));
+            rect.setRight(static_cast<int>(
+                static_cast<double>(rect.left()) +
+                (static_cast<double>(resizedImage.width()) * motionRegion.second.first)));
+            rect.setBottom(static_cast<int>(
+                static_cast<double>(rect.top()) +
+                (static_cast<double>(resizedImage.height()) * motionRegion.second.second)));
+            p.drawRect(rect);
+        }
+    }
+
+    auto rect = motionBoundingRect;
 
     if (!rect.isNull())
     {
