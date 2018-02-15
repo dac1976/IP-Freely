@@ -200,7 +200,7 @@
               </size>
              </property>
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove motion detection regions.&lt;/p&gt;&lt;p&gt;By removing all user-defined motion detection regions the motion detector will monitor the whole video frame.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove motion detection regions.&lt;/p&gt;&lt;p&gt;By removing all user-defined motion detection regions the motion detector will monitor the whole video frame and highlight motion but detected motion will not trigger recording.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
               <string>...</string>
@@ -578,7 +578,7 @@
               </size>
              </property>
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove motion detection regions.&lt;/p&gt;&lt;p&gt;By removing all user-defined motion detection regions the motion detector will monitor the whole video frame.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove motion detection regions.&lt;/p&gt;&lt;p&gt;By removing all user-defined motion detection regions the motion detector will monitor the whole video frame and highlight motion but detected motion will not trigger recording.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
               <string>...</string>
@@ -950,7 +950,7 @@
               </size>
              </property>
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove motion detection regions.&lt;/p&gt;&lt;p&gt;By removing all user-defined motion detection regions the motion detector will monitor the whole video frame.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove motion detection regions.&lt;/p&gt;&lt;p&gt;By removing all user-defined motion detection regions the motion detector will monitor the whole video frame and highlight motion but detected motion will not trigger recording.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
               <string>...</string>
@@ -1322,7 +1322,7 @@
               </size>
              </property>
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove motion detection regions.&lt;/p&gt;&lt;p&gt;By removing all user-defined motion detection regions the motion detector will monitor the whole video frame.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove motion detection regions.&lt;/p&gt;&lt;p&gt;By removing all user-defined motion detection regions the motion detector will monitor the whole video frame and highlight motion but detected motion will not trigger recording.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
               <string>...</string>
@@ -1540,7 +1540,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuEdit">

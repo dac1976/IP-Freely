@@ -32,6 +32,7 @@
 #include <QPainter>
 #include <QPen>
 #include <QBrush>
+#include "IpFreelyCameraDatabase.h"
 
 IpFreelyVideoForm::IpFreelyVideoForm(QWidget* parent)
     : QWidget(parent)
@@ -70,7 +71,7 @@ void IpFreelyVideoForm::SetVideoFrame(QImage const& videoFrame, double const fps
         auto w                 = 0.9 * static_cast<double>(availableGeometry.width() -
                                            (layout()->contentsMargins().left() +
                                             layout()->contentsMargins().right() + 2));
-        auto h = 0.9 * static_cast<double>(availableGeometry.height() -
+        auto h                 = 0.9 * static_cast<double>(availableGeometry.height() -
                                            (layout()->contentsMargins().top() +
                                             layout()->contentsMargins().bottom() + 2));
 
@@ -120,17 +121,8 @@ void IpFreelyVideoForm::SetVideoFrame(QImage const& videoFrame, double const fps
 
         for (auto const& motionRegion : motionRegions)
         {
-            QRect r;
-            r.setTop(static_cast<int>(static_cast<double>(resizedImage.height()) *
-                                      motionRegion.first.second));
-            r.setLeft(static_cast<int>(static_cast<double>(resizedImage.width()) *
-                                       motionRegion.first.first));
-            r.setRight(static_cast<int>(
-                static_cast<double>(r.left()) +
-                (static_cast<double>(resizedImage.width()) * motionRegion.second.first)));
-            r.setBottom(static_cast<int>(
-                static_cast<double>(r.top()) +
-                (static_cast<double>(resizedImage.height()) * motionRegion.second.second)));
+            auto r = ipfreely::CreateQRectFromVidoFrameDims(
+                resizedImage.width(), resizedImage.height(), motionRegion);
 
             if (rect.intersects(r))
             {

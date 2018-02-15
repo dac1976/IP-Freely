@@ -28,6 +28,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <QRect>
 #include <cereal/types/map.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/string.hpp>
@@ -324,9 +325,20 @@ private:
     }
 
 private:
-    std::string m_dbPath{};
+    std::string                m_dbPath{};
     std::map<eCamId, IpCamera> m_cameras{};
 };
+
+/*!
+ * \brief CreateQRectFromVidoFrameDims create a motion region QRect as subregion of
+ * a video frame.
+ * \param[in] videoFrameWidth - Video frame's width.
+ * \param[in] videoFrameHeight - Video frame's height.
+ * \param[in] motionRegion - User defined motion detection region.
+ * \return QRect defining motion area.
+ */
+QRect CreateQRectFromVidoFrameDims(int const videoFrameWidth, int const videoFrameHeight,
+                                   IpCamera::region_t const& motionRegion);
 
 } // namespace ipfreely
 

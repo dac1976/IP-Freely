@@ -81,9 +81,7 @@ IpFreelyMotionDetector::IpFreelyMotionDetector(std::string const& name,
         std::bind(&IpFreelyMotionDetector::MessageHandler, this, std::placeholders::_1));
 }
 
-IpFreelyMotionDetector::~IpFreelyMotionDetector()
-{
-}
+IpFreelyMotionDetector::~IpFreelyMotionDetector() {}
 
 void IpFreelyMotionDetector::AddNextFrame(cv::Mat const& videoFrame)
 {
@@ -364,13 +362,16 @@ bool IpFreelyMotionDetector::DetectMotion()
         cv::Point br2(static_cast<int>(r), static_cast<int>(b));
 
         m_motionBoundingRect = cv::Rect(tl2, br2);
+
+        CheckForIntersections();
     }
     else
     {
         // We have no current motion but rather than instantly removing the bounding
         // rectangle instead shrink it down to zero area using the bounding rectangle.
         std::lock_guard<std::mutex> lock(m_motionMutex);
-        double                      l = m_motionBoundingRect.tl().x +
+
+        double l = m_motionBoundingRect.tl().x +
                    static_cast<int>(static_cast<double>(m_motionBoundingRect.width) * 0.5);
         double t = m_motionBoundingRect.tl().y +
                    static_cast<int>(static_cast<double>(m_motionBoundingRect.height) * 0.5);
@@ -383,9 +384,34 @@ bool IpFreelyMotionDetector::DetectMotion()
 
         // If we still have a bounding rect keep motion detected flag set.
         motionDetected = m_motionBoundingRect.area() > 0;
+
+        CheckForIntersections();
     }
 
     return motionDetected;
+}
+
+void IpFreelyMotionDetector::CheckForIntersections()
+{
+    QRect mr(m_motionBoundingRect.tl().x,
+             m_motionBoundingRect.tl().y,
+             m_motionBoundingRect.width,
+             m_motionBoundingRect.height);
+
+    bool motionIntersection{false};
+
+    for (auto const& region : m_cameraDetails.motionRegions)
+    {
+        auto r = ipfreely::CreateQRectFromVidoFrameDims(m_originalWidth, m_originalHeight, region);
+
+        if (mr.intersects(r))
+        {
+            motionIntersection = true;
+            break;
+        }
+    }
+
+    m_motionIntersection = motionIntersection;
 }
 
 void IpFreelyMotionDetector::RotateFrames()
@@ -408,7 +434,11 @@ bool IpFreelyMotionDetector::MessageHandler(video_frame_t& msg)
 
     if (DetectMotion())
     {
-        // TODO:
+        if (m_motionIntersection)
+        {
+            // TODO: If not already active start recording
+            // make sure we stop recording as necessary.
+        }
     }
 
     RotateFrames();
