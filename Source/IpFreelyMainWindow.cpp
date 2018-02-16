@@ -37,10 +37,7 @@
 #include <QScreen>
 #include <QRectF>
 #include <stdexcept>
-#include <string>
-#include <thread>
-#include <chrono>
-#include <ctime>
+#include <string>#include <ctime>
 #include <set>
 #include <boost/filesystem.hpp>
 #include "IpFreelyVideoFrame.h"
