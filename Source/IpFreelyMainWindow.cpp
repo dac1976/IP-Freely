@@ -49,7 +49,7 @@
 #include "IpFreelyAbout.h"
 #include "IpFreelyCameraSetupDialog.h"
 #include "IpFreelySdCardViewerDialog.h"
-#include "IpFreelyRtspStreamProcessor.h"
+#include "IpFreelyStreamProcessor.h"
 #include "StringUtils/StringUtils.h"
 #include "DebugLog/DebugLogging.h"
 
@@ -1095,7 +1095,6 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
         try
         {
             bfs::path p(m_prefs.SaveFolderPath());
-            p /= "videos";
             p = bfs::system_complete(p);
 
             auto schedule = m_prefs.RecordingSchedule();
@@ -1108,13 +1107,12 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
             auto motionSchedule = m_prefs.MotionTrackingSchedule();
 
             m_streamProcessors[camera.camId] =
-                std::make_shared<ipfreely::IpFreelyRtspStreamProcessor>(
-                    camName,
-                    camera,
-                    p.string(),
-                    m_prefs.FileDurationInSecs(),
-                    schedule,
-                    motionSchedule);
+                std::make_shared<ipfreely::IpFreelyStreamProcessor>(camName,
+                                                                    camera,
+                                                                    p.string(),
+                                                                    m_prefs.FileDurationInSecs(),
+                                                                    schedule,
+                                                                    motionSchedule);
         }
         catch (std::exception& e)
         {
@@ -1331,8 +1329,13 @@ void IpFreelyMainWindow::SaveImageSnapshot(ipfreely::eCamId const camId)
         return;
     }
 
+    time_t timestamp = time(0);
+    auto   localTime = std::localtime(&timestamp);
+    char   folderName[9];
+    std::strftime(folderName, sizeof(folderName), "%Y%m%d", localTime);
+
     bfs::path p(m_prefs.SaveFolderPath());
-    p /= "images";
+    p /= folderName;
     p = bfs::system_complete(p);
 
     if (!bfs::exists(p))
@@ -1372,7 +1375,6 @@ void IpFreelyMainWindow::SaveImageSnapshot(ipfreely::eCamId const camId)
         break;
     }
 
-    time_t             timestamp = time(0);
     std::ostringstream fileOss;
     fileOss << camName << "_" << timestamp << ".png";
     p /= fileOss.str();

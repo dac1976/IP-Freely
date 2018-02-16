@@ -41,7 +41,7 @@ class IpFreelyMainWindow;
 
 namespace ipfreely
 {
-class IpFreelyRtspStreamProcessor;
+class IpFreelyStreamProcessor;
 } // namespace ipfreely
 
 class QToolButton;
@@ -58,7 +58,7 @@ class IpFreelyMainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    typedef std::shared_ptr<ipfreely::IpFreelyRtspStreamProcessor> stream_proc_t;
+    typedef std::shared_ptr<ipfreely::IpFreelyStreamProcessor> stream_proc_t;
 
 public:
     /*!

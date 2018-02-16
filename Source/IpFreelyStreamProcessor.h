@@ -19,11 +19,11 @@
 // not, see <http://www.gnu.org/licenses/>.
 
 /*!
- * \file IpFreelyRtspStreamProcessor.h
- * \brief File containing declaration of IpFreelyRtspStreamProcessor threaded class.
+ * \file IpFreelyStreamProcessor.h
+ * \brief File containing declaration of IpFreelyStreamProcessor threaded class.
  */
-#ifndef IPFREELYRTSPSTREAMPROCESSOR_H
-#define IPFREELYRTSPSTREAMPROCESSOR_H
+#ifndef IPFREELYSTREAMPROCESSOR_H
+#define IPFREELYSTREAMPROCESSOR_H
 
 #include <QImage>
 #include <string>
@@ -42,11 +42,11 @@ namespace ipfreely
 class IpFreelyMotionDetector;
 
 /*! \brief Class defining a RTSP stream processor thread. */
-class IpFreelyRtspStreamProcessor final : public core_lib::threads::ThreadBase
+class IpFreelyStreamProcessor final : public core_lib::threads::ThreadBase
 {
 public:
     /*!
-     * \brief IpFreelyRtspStreamProcessor constructor.
+     * \brief IpFreelyStreamProcessor constructor.
      * \param[in] name - A name for the stream, used to name output video files.
      * \param[in] cameraDetails - Camera details we want to stream from.
      * \param[in] saveFolderPath - A local folder to save captured videos to.
@@ -58,20 +58,20 @@ public:
      * record the stream in DivX format mp4 files to disk. Files are recorded with the given
      * duration. One recording session can span multiple back-to-back video files.
      */
-    IpFreelyRtspStreamProcessor(std::string const& name, IpCamera const& cameraDetails,
-                                std::string const&                    saveFolderPath,
-                                double const                          requiredFileDurationSecs,
-                                std::vector<std::vector<bool>> const& recordingSchedule = {},
-                                std::vector<std::vector<bool>> const& motionSchedule    = {});
+    IpFreelyStreamProcessor(std::string const& name, IpCamera const& cameraDetails,
+                            std::string const&                    saveFolderPath,
+                            double const                          requiredFileDurationSecs,
+                            std::vector<std::vector<bool>> const& recordingSchedule = {},
+                            std::vector<std::vector<bool>> const& motionSchedule    = {});
 
-    /*! \brief IpFreelyRtspStreamProcessor destructor. */
-    virtual ~IpFreelyRtspStreamProcessor();
+    /*! \brief IpFreelyStreamProcessor destructor. */
+    virtual ~IpFreelyStreamProcessor();
 
-    /*! \brief IpFreelyRtspStreamProcessor deleted copy constructor. */
-    IpFreelyRtspStreamProcessor(IpFreelyRtspStreamProcessor const&) = delete;
+    /*! \brief IpFreelyStreamProcessor deleted copy constructor. */
+    IpFreelyStreamProcessor(IpFreelyStreamProcessor const&) = delete;
 
-    /*! \brief IpFreelyRtspStreamProcessor deleted copy assignment operator. */
-    IpFreelyRtspStreamProcessor& operator=(IpFreelyRtspStreamProcessor const&) = delete;
+    /*! \brief IpFreelyStreamProcessor deleted copy assignment operator. */
+    IpFreelyStreamProcessor& operator=(IpFreelyStreamProcessor const&) = delete;
 
     /*! \brief StartVideoWriting begins recording video to disk. */
     void StartVideoWriting() noexcept;
@@ -113,19 +113,19 @@ public:
     double CurrentFps() const noexcept;
 
 private:
-    static bool IsScheduleEnabled(std::vector<std::vector<bool>> const& schedule);
-    static bool VerifySchedule(std::string const&                    scheduleId,
-                               std::vector<std::vector<bool>> const& schedule);
+    static bool  IsScheduleEnabled(std::vector<std::vector<bool>> const& schedule);
+    static bool  VerifySchedule(std::string const&                    scheduleId,
+                                std::vector<std::vector<bool>> const& schedule);
     virtual void ThreadIteration() noexcept;
     virtual void ProcessTerminationConditions() noexcept;
-    void SetEnableVideoWriting(bool enable) noexcept;
-    void CheckRecordingSchedule();
-    void CreateCaptureObjects();
-    void GrabVideoFrame();
-    void WriteVideoFrame();
-    bool CheckMotionSchedule() const;
-    void InitialiseMotionDetector();
-    void CheckMotionDetector();
+    void         SetEnableVideoWriting(bool enable) noexcept;
+    void         CheckRecordingSchedule();
+    void         CreateCaptureObjects();
+    void         GrabVideoFrame();
+    void         WriteVideoFrame();
+    bool         CheckMotionSchedule() const;
+    void         InitialiseMotionDetector();
+    void         CheckMotionDetector();
 
 private:
     mutable std::mutex                      m_writingMutex{};
@@ -156,4 +156,4 @@ private:
 
 } // namespace ipfreely
 
-#endif // IPFREELYRTSPSTREAMPROCESSOR_H
+#endif // IPFREELYSTREAMPROCESSOR_H

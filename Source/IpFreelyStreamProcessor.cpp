@@ -19,10 +19,10 @@
 // not, see <http://www.gnu.org/licenses/>.
 
 /*!
- * \file IpFreelyRtspStreamProcessor.cpp
- * \brief File containing definition of IpFreelyRtspStreamProcessor threaded class.
+ * \file IpFreelyStreamProcessor.cpp
+ * \brief File containing definition of IpFreelyStreamProcessor threaded class.
  */
-#include "IpFreelyRtspStreamProcessor.h"
+#include "IpFreelyStreamProcessor.h"
 #include <sstream>
 #include <chrono>
 #include <boost/throw_exception.hpp>
@@ -91,7 +91,7 @@ inline QImage CvMatToQImage(cv::Mat const& inMat)
 static constexpr double MIN_FPS = 1.0;
 static constexpr double MAX_FPS = 30.0;
 
-IpFreelyRtspStreamProcessor::IpFreelyRtspStreamProcessor(
+IpFreelyStreamProcessor::IpFreelyStreamProcessor(
     std::string const& name, IpCamera const& cameraDetails, std::string const& saveFolderPath,
     double const requiredFileDurationSecs, std::vector<std::vector<bool>> const& recordingSchedule,
     std::vector<std::vector<bool>> const& motionSchedule)
@@ -147,20 +147,19 @@ IpFreelyRtspStreamProcessor::IpFreelyRtspStreamProcessor(
 
     m_updatePeriodMillisecs = static_cast<unsigned int>(1000.0 / m_fps);
 
-    DEBUG_MESSAGE_EX_INFO("Stream at: " << m_cameraDetails.streamUrl << " running with FPS of: "
-                                        << m_fps
-                                        << ", thread update period (ms): "
-                                        << m_updatePeriodMillisecs);
+    DEBUG_MESSAGE_EX_INFO("Stream at: "
+                          << m_cameraDetails.streamUrl << " running with FPS of: " << m_fps
+                          << ", thread update period (ms): " << m_updatePeriodMillisecs);
 
     Start();
 }
 
-IpFreelyRtspStreamProcessor::~IpFreelyRtspStreamProcessor()
+IpFreelyStreamProcessor::~IpFreelyStreamProcessor()
 {
     Stop();
 }
 
-void IpFreelyRtspStreamProcessor::StartVideoWriting() noexcept
+void IpFreelyStreamProcessor::StartVideoWriting() noexcept
 {
     if (m_useRecordingSchedule)
     {
@@ -172,7 +171,7 @@ void IpFreelyRtspStreamProcessor::StartVideoWriting() noexcept
     SetEnableVideoWriting(true);
 }
 
-void IpFreelyRtspStreamProcessor::StopVideoWriting() noexcept
+void IpFreelyStreamProcessor::StopVideoWriting() noexcept
 {
     if (m_useRecordingSchedule)
     {
@@ -184,26 +183,26 @@ void IpFreelyRtspStreamProcessor::StopVideoWriting() noexcept
     SetEnableVideoWriting(false);
 }
 
-bool IpFreelyRtspStreamProcessor::GetEnableVideoWriting() const noexcept
+bool IpFreelyStreamProcessor::GetEnableVideoWriting() const noexcept
 {
     std::lock_guard<std::mutex> lock(m_writingMutex);
     return m_enableVideoWriting;
 }
 
-bool IpFreelyRtspStreamProcessor::VideoFrameUpdated() const noexcept
+bool IpFreelyStreamProcessor::VideoFrameUpdated() const noexcept
 {
     std::lock_guard<std::mutex> lock(m_frameMutex);
     return m_videoFrameUpdated;
 }
 
-double IpFreelyRtspStreamProcessor::GetAspectRatioAndSize(int& width, int& height) const
+double IpFreelyStreamProcessor::GetAspectRatioAndSize(int& width, int& height) const
 {
     width  = m_videoWidth;
     height = m_videoHeight;
     return static_cast<double>(m_videoWidth) / static_cast<double>(m_videoHeight);
 }
 
-QImage IpFreelyRtspStreamProcessor::CurrentVideoFrame(QRect* motionRectangle) const
+QImage IpFreelyStreamProcessor::CurrentVideoFrame(QRect* motionRectangle) const
 {
     cv::Mat result;
 
@@ -225,12 +224,12 @@ QImage IpFreelyRtspStreamProcessor::CurrentVideoFrame(QRect* motionRectangle) co
     return utils::CvMatToQImage(result);
 }
 
-double IpFreelyRtspStreamProcessor::CurrentFps() const noexcept
+double IpFreelyStreamProcessor::CurrentFps() const noexcept
 {
     return m_fps;
 }
 
-bool IpFreelyRtspStreamProcessor::IsScheduleEnabled(std::vector<std::vector<bool>> const& schedule)
+bool IpFreelyStreamProcessor::IsScheduleEnabled(std::vector<std::vector<bool>> const& schedule)
 {
     bool recordEnabled = false;
 
@@ -254,8 +253,8 @@ bool IpFreelyRtspStreamProcessor::IsScheduleEnabled(std::vector<std::vector<bool
     return recordEnabled;
 }
 
-bool IpFreelyRtspStreamProcessor::VerifySchedule(std::string const&                    scheduleId,
-                                                 std::vector<std::vector<bool>> const& schedule)
+bool IpFreelyStreamProcessor::VerifySchedule(std::string const&                    scheduleId,
+                                             std::vector<std::vector<bool>> const& schedule)
 {
     bool scheduleOk = false;
 
@@ -291,7 +290,7 @@ bool IpFreelyRtspStreamProcessor::VerifySchedule(std::string const&             
     return scheduleOk;
 }
 
-void IpFreelyRtspStreamProcessor::ThreadIteration() noexcept
+void IpFreelyStreamProcessor::ThreadIteration() noexcept
 {
     if (m_updateEvent.WaitForTime(m_updatePeriodMillisecs))
     {
@@ -316,18 +315,18 @@ void IpFreelyRtspStreamProcessor::ThreadIteration() noexcept
     }
 }
 
-void IpFreelyRtspStreamProcessor::ProcessTerminationConditions() noexcept
+void IpFreelyStreamProcessor::ProcessTerminationConditions() noexcept
 {
     m_updateEvent.Signal();
 }
 
-void IpFreelyRtspStreamProcessor::SetEnableVideoWriting(bool enable) noexcept
+void IpFreelyStreamProcessor::SetEnableVideoWriting(bool enable) noexcept
 {
     std::lock_guard<std::mutex> lock(m_writingMutex);
     m_enableVideoWriting = enable;
 }
 
-void IpFreelyRtspStreamProcessor::CheckRecordingSchedule()
+void IpFreelyStreamProcessor::CheckRecordingSchedule()
 {
     if (m_recordingSchedule.empty())
     {
@@ -357,7 +356,7 @@ void IpFreelyRtspStreamProcessor::CheckRecordingSchedule()
     }
 }
 
-void IpFreelyRtspStreamProcessor::CreateCaptureObjects()
+void IpFreelyStreamProcessor::CreateCaptureObjects()
 {
     if (GetEnableVideoWriting())
     {
@@ -371,11 +370,28 @@ void IpFreelyRtspStreamProcessor::CreateCaptureObjects()
             m_videoWriter.release();
         }
 
+        auto localTime = std::localtime(&m_currentTime);
+        char folderName[9];
+        std::strftime(folderName, sizeof(folderName), "%Y%m%d", localTime);
+
+        bfs::path p(m_saveFolderPath);
+        p /= folderName;
+        p = bfs::system_complete(p);
+
+        if (!bfs::exists(p))
+        {
+            if (!bfs::create_directories(p))
+            {
+                std::ostringstream oss;
+                oss << "Failed to create directories: " << p.string();
+                BOOST_THROW_EXCEPTION(std::runtime_error(oss.str()));
+            }
+        }
+
         std::ostringstream oss;
         oss << m_name << "_" << m_currentTime << ".avi";
-        bfs::path p(m_saveFolderPath);
+
         p /= oss.str();
-        p = bfs::system_complete(p);
 
         DEBUG_MESSAGE_EX_INFO("Creating new output video file: " << p.string());
 
@@ -398,14 +414,14 @@ void IpFreelyRtspStreamProcessor::CreateCaptureObjects()
     }
 }
 
-void IpFreelyRtspStreamProcessor::GrabVideoFrame()
+void IpFreelyStreamProcessor::GrabVideoFrame()
 {
     std::lock_guard<std::mutex> lock(m_frameMutex);
     *m_videoCapture >> m_videoFrame;
     m_videoFrameUpdated = true;
 }
 
-void IpFreelyRtspStreamProcessor::WriteVideoFrame()
+void IpFreelyStreamProcessor::WriteVideoFrame()
 {
     if (m_videoWriter)
     {
@@ -418,7 +434,7 @@ void IpFreelyRtspStreamProcessor::WriteVideoFrame()
     }
 }
 
-bool IpFreelyRtspStreamProcessor::CheckMotionSchedule() const
+bool IpFreelyStreamProcessor::CheckMotionSchedule() const
 {
     if (!m_useMotionSchedule || m_motionSchedule.empty())
     {
@@ -431,7 +447,7 @@ bool IpFreelyRtspStreamProcessor::CheckMotionSchedule() const
         localTime->tm_hour)];
 }
 
-void IpFreelyRtspStreamProcessor::InitialiseMotionDetector()
+void IpFreelyStreamProcessor::InitialiseMotionDetector()
 {
     if (!m_motionDetector)
     {
@@ -445,7 +461,7 @@ void IpFreelyRtspStreamProcessor::InitialiseMotionDetector()
     }
 }
 
-void IpFreelyRtspStreamProcessor::CheckMotionDetector()
+void IpFreelyStreamProcessor::CheckMotionDetector()
 {
     bool enableMotionDetector = CheckMotionSchedule();
 

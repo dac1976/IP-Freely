@@ -98,7 +98,7 @@ SOURCES += \
     IpFreelyCameraSetupDialog.cpp \
     IpFreelyDownloadWidget.cpp \
     IpFreelySdCardViewerDialog.cpp \
-    IpFreelyRtspStreamProcessor.cpp \
+    IpFreelyStreamProcessor.cpp \
     IpFreelyMotionDetector.cpp \
     IpFreelyVideoFrame.cpp
 
@@ -112,7 +112,7 @@ HEADERS += \
     IpFreelyCameraSetupDialog.h \
     IpFreelyDownloadWidget.h \
     IpFreelySdCardViewerDialog.h \
-    IpFreelyRtspStreamProcessor.h \
+    IpFreelyStreamProcessor.h \
     IpFreelyMotionDetector.h \
     IpFreelyVideoFrame.h
 
