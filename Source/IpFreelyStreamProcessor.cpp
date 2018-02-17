@@ -95,8 +95,7 @@ IpFreelyStreamProcessor::IpFreelyStreamProcessor(
     std::string const& name, IpCamera const& cameraDetails, std::string const& saveFolderPath,
     double const requiredFileDurationSecs, std::vector<std::vector<bool>> const& recordingSchedule,
     std::vector<std::vector<bool>> const& motionSchedule)
-    : ThreadBase()
-    , m_name(core_lib::string_utils::RemoveIllegalChars(name))
+    : m_name(core_lib::string_utils::RemoveIllegalChars(name))
     , m_cameraDetails(cameraDetails)
     , m_saveFolderPath(saveFolderPath)
     , m_requiredFileDurationSecs(requiredFileDurationSecs)
@@ -151,12 +150,13 @@ IpFreelyStreamProcessor::IpFreelyStreamProcessor(
                           << m_cameraDetails.streamUrl << " running with FPS of: " << m_fps
                           << ", thread update period (ms): " << m_updatePeriodMillisecs);
 
-    Start();
+    m_eventThread = std::make_unique<core_lib::threads::EventThread>(
+        std::bind(&IpFreelyStreamProcessor::ThreadEventCallback, this), m_updatePeriodMillisecs);
 }
 
 IpFreelyStreamProcessor::~IpFreelyStreamProcessor()
 {
-    Stop();
+    // Do nothing.
 }
 
 void IpFreelyStreamProcessor::StartVideoWriting() noexcept
@@ -290,13 +290,8 @@ bool IpFreelyStreamProcessor::VerifySchedule(std::string const&                 
     return scheduleOk;
 }
 
-void IpFreelyStreamProcessor::ThreadIteration() noexcept
+void IpFreelyStreamProcessor::ThreadEventCallback() noexcept
 {
-    if (m_updateEvent.WaitForTime(m_updatePeriodMillisecs))
-    {
-        return;
-    }
-
     // Get current time stamp.
     m_currentTime = time(0);
 
@@ -313,11 +308,6 @@ void IpFreelyStreamProcessor::ThreadIteration() noexcept
         auto exceptionMsg = boost::current_exception_diagnostic_information();
         DEBUG_MESSAGE_EX_ERROR(exceptionMsg);
     }
-}
-
-void IpFreelyStreamProcessor::ProcessTerminationConditions() noexcept
-{
-    m_updateEvent.Signal();
 }
 
 void IpFreelyStreamProcessor::SetEnableVideoWriting(bool enable) noexcept
