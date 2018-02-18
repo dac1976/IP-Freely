@@ -125,6 +125,30 @@ public:
     void SetMotionTrackingSchedule(std::vector<std::vector<bool>> const& schedule);
 
     /*!
+     * \brief MaxNumDaysData returns the allowed max number of days of stored data.
+     * \return The number of days.
+     */
+    int MaxNumDaysData() const noexcept;
+
+    /*!
+     * \brief SetMaxNumDaysData sets the allowed max number of days of stored data.
+     * \param[in] maxNumDays - The maximum number of days to allow of stored data.
+     */
+    void SetMaxNumDaysData(int const maxNumDays) noexcept;
+
+    /*!
+     * \brief MaxUsedDiskSpacePercent returns the allowed max percentage of used disk space.
+     * \return The number of days.
+     */
+    int MaxUsedDiskSpacePercent() const noexcept;
+
+    /*!
+     * \brief SetMaxUsedDiskSpacePercent set the allowed max percentage of used disk space.
+     * \param[in] maxUsedPercent - The maximum used paercentage of disk space.
+     */
+    void SetMaxUsedDiskSpacePercent(int const maxUsedPercent) noexcept;
+
+    /*!
      * \brief Save the preferences to disk from memory.
      */
     void Save() const;
@@ -144,11 +168,14 @@ private:
 
         ar(CEREAL_NVP(m_saveFolderPath), CEREAL_NVP(m_fileDurationInSecs));
 
-        int32_t temp = m_connectToCamerasOnStartup ? 1 : 0;
-        ar(CEREAL_NVP(temp));
-        m_connectToCamerasOnStartup = temp == 1;
+        int32_t connectToCamerasOnStartup = m_connectToCamerasOnStartup ? 1 : 0;
+        ar(CEREAL_NVP(connectToCamerasOnStartup));
+        m_connectToCamerasOnStartup = connectToCamerasOnStartup == 1;
 
-        ar(CEREAL_NVP(m_schedule), CEREAL_NVP(m_mtSchedule));
+        ar(CEREAL_NVP(m_schedule),
+           CEREAL_NVP(m_mtSchedule),
+           CEREAL_NVP(m_maxNumDaysData),
+           CEREAL_NVP(m_maxUsedDiskSpacePercent));
     }
 
 private:
@@ -162,6 +189,8 @@ private:
     std::vector<std::vector<bool>> m_mtSchedule{
         7, {true, true, true, true, true, true, true, true, true, true, true, true,
             true, true, true, true, true, true, true, true, true, true, true, true}};
+    int m_maxNumDaysData{7};
+    int m_maxUsedDiskSpacePercent{90};
 };
 
 } // namespace ipfreely

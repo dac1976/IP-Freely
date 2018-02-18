@@ -35,14 +35,14 @@
    <item>
     <layout class="QFormLayout" name="formLayout">
      <item row="0" column="0">
-      <widget class="QLabel" name="rtspUrlLabel">
+      <widget class="QLabel" name="cameraStreamUrlLabel">
        <property name="text">
         <string>Camera Stream URL or ID</string>
        </property>
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="httpsUrlLabel">
+      <widget class="QLabel" name="storageUrlLabel">
        <property name="text">
         <string>Storage HTTP(S) URL</string>
        </property>
@@ -126,7 +126,7 @@
       </widget>
      </item>
      <item row="5" column="0">
-      <widget class="QLabel" name="label_5">
+      <widget class="QLabel" name="maxCamFpsLabel">
        <property name="text">
         <string>Camera's Maximum FPS</string>
        </property>
@@ -270,7 +270,7 @@
      </property>
      <layout class="QFormLayout" name="formLayout_4">
       <item row="0" column="0">
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="pixelThresholdLevelLabel">
         <property name="text">
          <string>Pixel Level Threshold</string>
         </property>
@@ -316,7 +316,7 @@
        </layout>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="maxMotionStdDevLabel">
         <property name="text">
          <string>Maximum motion standard deviation</string>
         </property>
@@ -371,7 +371,7 @@ p, li { white-space: pre-wrap; }
        </layout>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="minMotionAreaPercentLabel">
         <property name="text">
          <string>Minimum motion area as percentage of total video frame area</string>
         </property>
@@ -419,7 +419,7 @@ p, li { white-space: pre-wrap; }
        </layout>
       </item>
       <item row="3" column="0">
-       <widget class="QLabel" name="label_4">
+       <widget class="QLabel" name="motionAreaAveFactorLabel">
         <property name="text">
          <string>Motion area averaging factor</string>
         </property>

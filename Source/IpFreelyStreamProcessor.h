@@ -30,9 +30,19 @@
 #include <vector>
 #include <ctime>
 #include <memory>
+#include <mutex>
 #include <opencv/cv.hpp>
 #include "IpFreelyCameraDatabase.h"
-#include "Threads/EventThread.h"
+
+namespace core_lib
+{
+namespace threads
+{
+
+class EventThread;
+
+} // namespace threads
+} // namespace core_lib
 
 /*! \brief The ipfreely namespace. */
 namespace ipfreely
@@ -149,7 +159,7 @@ private:
     bool                                            m_videoFrameUpdated{false};
     time_t                                          m_currentTime{};
     std::shared_ptr<IpFreelyMotionDetector>         m_motionDetector;
-    std::unique_ptr<core_lib::threads::EventThread> m_eventThread;
+    std::shared_ptr<core_lib::threads::EventThread> m_eventThread;
 };
 
 } // namespace ipfreely

@@ -147,6 +147,26 @@ void IpFreelyPreferences::SetMotionTrackingSchedule(std::vector<std::vector<bool
     m_mtSchedule = schedule;
 }
 
+int IpFreelyPreferences::MaxNumDaysData() const noexcept
+{
+    return m_maxNumDaysData;
+}
+
+void IpFreelyPreferences::SetMaxNumDaysData(int const maxNumDays) noexcept
+{
+    m_maxNumDaysData = maxNumDays;
+}
+
+int IpFreelyPreferences::MaxUsedDiskSpacePercent() const noexcept
+{
+    return m_maxUsedDiskSpacePercent;
+}
+
+void IpFreelyPreferences::SetMaxUsedDiskSpacePercent(int const maxUsedPercent) noexcept
+{
+    m_maxUsedDiskSpacePercent = maxUsedPercent;
+}
+
 void IpFreelyPreferences::Save() const
 {
     if (bfs::exists(m_cfgPath))

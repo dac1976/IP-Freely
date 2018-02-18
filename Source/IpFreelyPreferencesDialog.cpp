@@ -44,7 +44,8 @@ IpFreelyPreferencesDialog::IpFreelyPreferencesDialog(ipfreely::IpFreelyPreferenc
     ui->saveFolderPathLineEdit->setText(QString::fromStdString(m_prefs.SaveFolderPath()));
     ui->fileDurationDoubleSpinBox->setValue(m_prefs.FileDurationInSecs());
     ui->connectOnStartupCheckBox->setChecked(m_prefs.ConnectToCamerasOnStartup());
-
+    ui->maxDaysOfDataSpinBox->setValue(m_prefs.MaxNumDaysData());
+    ui->percentDiskUsedSpinBox->setValue(m_prefs.MaxUsedDiskSpacePercent());
     SetDisplaySize();
 
     InitialisSchedules();
@@ -86,6 +87,8 @@ void IpFreelyPreferencesDialog::on_buttonBox_accepted()
     }
 
     m_prefs.SetMotionTrackingSchedule(schedule);
+    m_prefs.SetMaxNumDaysData(ui->maxDaysOfDataSpinBox->value());
+    m_prefs.SetMaxUsedDiskSpacePercent(ui->percentDiskUsedSpinBox->value());
 
     m_prefs.Save();
     accept();

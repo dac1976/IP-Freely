@@ -28,6 +28,7 @@
 #include <boost/throw_exception.hpp>
 #include <boost/filesystem.hpp>
 #include "IpFreelyMotionDetector.h"
+#include "Threads/EventThread.h"
 #include "StringUtils/StringUtils.h"
 #include "DebugLog/DebugLogging.h"
 
@@ -150,7 +151,7 @@ IpFreelyStreamProcessor::IpFreelyStreamProcessor(
                           << m_cameraDetails.streamUrl << " running with FPS of: " << m_fps
                           << ", thread update period (ms): " << m_updatePeriodMillisecs);
 
-    m_eventThread = std::make_unique<core_lib::threads::EventThread>(
+    m_eventThread = std::make_shared<core_lib::threads::EventThread>(
         std::bind(&IpFreelyStreamProcessor::ThreadEventCallback, this), m_updatePeriodMillisecs);
 }
 
