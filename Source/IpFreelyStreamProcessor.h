@@ -137,7 +137,6 @@ private:
     std::vector<std::vector<bool>>                  m_motionSchedule{};
     unsigned int                                    m_updatePeriodMillisecs{40};
     double                                          m_fps{25.0};
-    std::unique_ptr<core_lib::threads::EventThread> m_eventThread;
     bool                                            m_useRecordingSchedule{false};
     bool                                            m_useMotionSchedule{false};
     bool                                            m_enableVideoWriting{false};
@@ -150,6 +149,7 @@ private:
     bool                                            m_videoFrameUpdated{false};
     time_t                                          m_currentTime{};
     std::shared_ptr<IpFreelyMotionDetector>         m_motionDetector;
+    std::unique_ptr<core_lib::threads::EventThread> m_eventThread;
 };
 
 } // namespace ipfreely

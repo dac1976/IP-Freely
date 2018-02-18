@@ -58,7 +58,9 @@ win32 {
     RC_FILE = IpFreely.rc
 
     # Other files that we want to view in the editor.
-    DISTFILES += IpFreely.rc
+    DISTFILES += IpFreely.rc \
+                 $$PWD/../WindowsBatchFiles/CopyDependencies_64Bit_Debug.bat \
+                 $$PWD/../WindowsBatchFiles/CopyDependencies_64Bit_Release.bat
 }
 # On non-windows, assumed to be Linux, we do this.
 else {

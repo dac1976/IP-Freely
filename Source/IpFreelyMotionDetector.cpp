@@ -81,7 +81,10 @@ IpFreelyMotionDetector::IpFreelyMotionDetector(std::string const& name,
         std::bind(&IpFreelyMotionDetector::MessageHandler, this, std::placeholders::_1));
 }
 
-IpFreelyMotionDetector::~IpFreelyMotionDetector() {}
+IpFreelyMotionDetector::~IpFreelyMotionDetector()
+{
+    // Do nothing.
+}
 
 void IpFreelyMotionDetector::AddNextFrame(cv::Mat const& videoFrame)
 {
