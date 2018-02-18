@@ -24,7 +24,6 @@
  */
 #include "IpFreelyMotionDetector.h"
 #include <sstream>
-#include <chrono>
 #include <boost/throw_exception.hpp>
 #include <boost/filesystem.hpp>
 #include "StringUtils/StringUtils.h"
@@ -75,6 +74,8 @@ IpFreelyMotionDetector::IpFreelyMotionDetector(std::string const& name,
     }
 
     Initialise();
+
+    DEBUG_MESSAGE_EX_INFO("Started motion dectector for stream at: " << m_cameraDetails.streamUrl);
 
     m_msgQueueThread.RegisterMessageHandler(
         MESSAGE_ID,

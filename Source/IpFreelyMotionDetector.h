@@ -27,7 +27,6 @@
 
 #include <QRect>
 #include <string>
-#include <ctime>
 #include <memory>
 #include <opencv/cv.hpp>
 #include "Threads/MessageQueueThread.h"

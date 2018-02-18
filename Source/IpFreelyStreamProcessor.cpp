@@ -24,7 +24,6 @@
  */
 #include "IpFreelyStreamProcessor.h"
 #include <sstream>
-#include <chrono>
 #include <boost/throw_exception.hpp>
 #include <boost/filesystem.hpp>
 #include "IpFreelyMotionDetector.h"

@@ -42,6 +42,7 @@ class IpFreelyMainWindow;
 namespace ipfreely
 {
 class IpFreelyStreamProcessor;
+class IpFreelyDiskSpaceManager;
 } // namespace ipfreely
 
 class QToolButton;
@@ -113,38 +114,39 @@ protected:
     virtual void resizeEvent(QResizeEvent* event);
 
 private:
-    void SetDisplaySize();
-    void ConnectButtons();
-    void CheckStartupConnections();
-    void SetupCameraInDb(ipfreely::eCamId const camId, QToolButton* connectBtn);
-    void ConnectionHandler(ipfreely::IpCamera const& camera, QToolButton* connectBtn,
-                           QToolButton* motionRegionsBtn, QToolButton* removeRegionsBtn,
-                           QToolButton* recordBtn, QToolButton* snapshotBtn, QToolButton* expandBtn,
-                           QToolButton* storageBtn);
-    void RecordActionHandler(ipfreely::eCamId const camId, QToolButton* recordBtn);
+    void     SetDisplaySize();
+    void     ConnectButtons();
+    void     CheckStartupConnections();
+    void     SetupCameraInDb(ipfreely::eCamId const camId, QToolButton* connectBtn);
+    void     ConnectionHandler(ipfreely::IpCamera const& camera, QToolButton* connectBtn,
+                               QToolButton* motionRegionsBtn, QToolButton* removeRegionsBtn,
+                               QToolButton* recordBtn, QToolButton* snapshotBtn, QToolButton* expandBtn,
+                               QToolButton* storageBtn);
+    void     RecordActionHandler(ipfreely::eCamId const camId, QToolButton* recordBtn);
     QWidget* GetParentFrame(ipfreely::eCamId const camId) const;
-    void UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage const& videoFrame,
-                            QRect const& motionBoundingRect, bool const streamProcIsWriting);
-    void SaveImageSnapshot(ipfreely::eCamId const camId);
-    void SetFpsInTitle(ipfreely::eCamId const camId, double const fps);
-    void ShowExpandedVideoForm(ipfreely::eCamId const camId);
-    void ViewStorage(ipfreely::IpCamera const& camera);
-    void VideoFrameAreaSelection(int const cameraId, QRectF const& percentageSelection);
-    void EnableMotionRegionsSetup(ipfreely::eCamId const camId, bool const enable,
-                                  QToolButton* removeRegionsBtn);
-    void RemoveMotionRegions(ipfreely::eCamId const camId);
+    void     UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage const& videoFrame,
+                                QRect const& motionBoundingRect, bool const streamProcIsWriting);
+    void     SaveImageSnapshot(ipfreely::eCamId const camId);
+    void     SetFpsInTitle(ipfreely::eCamId const camId, double const fps);
+    void     ShowExpandedVideoForm(ipfreely::eCamId const camId);
+    void     ViewStorage(ipfreely::IpCamera const& camera);
+    void     VideoFrameAreaSelection(int const cameraId, QRectF const& percentageSelection);
+    void     EnableMotionRegionsSetup(ipfreely::eCamId const camId, bool const enable,
+                                      QToolButton* removeRegionsBtn);
+    void     RemoveMotionRegions(ipfreely::eCamId const camId);
 
 private:
-    Ui::IpFreelyMainWindow*          ui;
-    QString                          m_appVersion;
-    ipfreely::IpFreelyPreferences    m_prefs;
-    ipfreely::IpFreelyCameraDatabase m_camDb;
-    QTimer*                          m_updateFeedsTimer;
-    std::map<ipfreely::eCamId, IpFreelyVideoFrame*> m_camFeeds;
-    std::map<ipfreely::eCamId, stream_proc_t>       m_streamProcessors;
-    int                                m_numConnections;
-    std::shared_ptr<IpFreelyVideoForm> m_videoForm;
-    ipfreely::eCamId                   m_videoFormId;
+    Ui::IpFreelyMainWindow*                                   ui;
+    QString                                                   m_appVersion;
+    ipfreely::IpFreelyPreferences                             m_prefs;
+    ipfreely::IpFreelyCameraDatabase                          m_camDb;
+    std::shared_ptr<ipfreely::IpFreelyDiskSpaceManager>       m_diskSpaceMgr;
+    QTimer*                                                   m_updateFeedsTimer;
+    std::map<ipfreely::eCamId, IpFreelyVideoFrame*>           m_camFeeds;
+    std::map<ipfreely::eCamId, stream_proc_t>                 m_streamProcessors;
+    int                                                       m_numConnections;
+    std::shared_ptr<IpFreelyVideoForm>                        m_videoForm;
+    ipfreely::eCamId                                          m_videoFormId;
     std::map<ipfreely::eCamId, ipfreely::IpCamera::regions_t> m_camMotionRegions;
     std::map<ipfreely::eCamId, bool>                          m_motionAreaSetupEnabled;
 };

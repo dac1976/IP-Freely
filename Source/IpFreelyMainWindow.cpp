@@ -48,6 +48,7 @@
 #include "IpFreelyCameraSetupDialog.h"
 #include "IpFreelySdCardViewerDialog.h"
 #include "IpFreelyStreamProcessor.h"
+#include "IpFreelyDiskSpaceManager.h"
 #include "StringUtils/StringUtils.h"
 #include "DebugLog/DebugLogging.h"
 
@@ -94,6 +95,8 @@ IpFreelyMainWindow::IpFreelyMainWindow(QString const& appVersion, QWidget* paren
     : QMainWindow(parent)
     , ui(new Ui::IpFreelyMainWindow)
     , m_appVersion(appVersion)
+    , m_diskSpaceMgr(std::make_shared<ipfreely::IpFreelyDiskSpaceManager>(
+          m_prefs.SaveFolderPath(), m_prefs.MaxNumDaysData(), m_prefs.MaxUsedDiskSpacePercent()))
     , m_updateFeedsTimer(new QTimer(this))
     , m_numConnections(0)
     , m_videoForm(std::make_shared<IpFreelyVideoForm>())
@@ -186,6 +189,11 @@ void IpFreelyMainWindow::on_actionPreferences_triggered()
             break;
         }
     }
+
+    // Recreate disk space manager.
+    m_diskSpaceMgr.reset();
+    m_diskSpaceMgr = std::make_shared<ipfreely::IpFreelyDiskSpaceManager>(
+        m_prefs.SaveFolderPath(), m_prefs.MaxNumDaysData(), m_prefs.MaxUsedDiskSpacePercent());
 }
 
 void IpFreelyMainWindow::on_actionAbout_triggered()

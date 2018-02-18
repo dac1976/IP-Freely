@@ -102,7 +102,8 @@ SOURCES += \
     IpFreelySdCardViewerDialog.cpp \
     IpFreelyStreamProcessor.cpp \
     IpFreelyMotionDetector.cpp \
-    IpFreelyVideoFrame.cpp
+    IpFreelyVideoFrame.cpp \
+    IpFreelyDiskSpaceManager.cpp
 
 HEADERS += \
     IpFreelyMainWindow.h \
@@ -116,7 +117,8 @@ HEADERS += \
     IpFreelySdCardViewerDialog.h \
     IpFreelyStreamProcessor.h \
     IpFreelyMotionDetector.h \
-    IpFreelyVideoFrame.h
+    IpFreelyVideoFrame.h \
+    IpFreelyDiskSpaceManager.h
 
 FORMS += \
     IpFreelyMainWindow.ui \
