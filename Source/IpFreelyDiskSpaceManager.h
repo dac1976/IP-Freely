@@ -27,7 +27,6 @@
 
 #include <string>
 #include <list>
-#include <ctime>
 #include <memory>
 
 namespace core_lib
@@ -76,7 +75,6 @@ private:
     std::string                                     m_saveFolderPath{};
     int                                             m_maxNumDaysToStore{7};
     int                                             m_maxPercentUsedSpace{90};
-    time_t                                          m_currentTime{0};
     std::list<std::wstring>                         m_subDirs;
     std::shared_ptr<core_lib::threads::EventThread> m_eventThread;
 };
