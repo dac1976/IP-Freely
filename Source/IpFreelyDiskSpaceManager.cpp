@@ -73,9 +73,6 @@ void IpFreelyDiskSpaceManager::ThreadEventCallback() noexcept
 {
     try
     {
-        // Get current time stamp.
-        m_currentTime = time(0);
-
         // Get list of recording sub-directories.
         m_subDirs = core_lib::file_utils::ListSubDirectories(
             core_lib::string_utils::StringToWString(m_saveFolderPath));
