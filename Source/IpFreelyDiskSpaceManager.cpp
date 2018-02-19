@@ -133,8 +133,7 @@ bool IpFreelyDiskSpaceManager::DeleteOldestRecording()
 {
     if (m_subDirs.size() <= 1)
     {
-        DEBUG_MESSAGE_EX_WARNING("No data will be deleted only one the current day's recording "
-                                 "sub-directory was found.");
+        DEBUG_MESSAGE_EX_WARNING("No data will be deleted only the current day's sub-directory was found.");
         return false;
     }
 
