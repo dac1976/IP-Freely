@@ -26,7 +26,11 @@
 #include "ui_IpFreelyPreferencesDialog.h"
 #include <QFileDialog>
 #include <QScreen>
+#include <boost/filesystem.hpp>
 #include "IpFreelyPreferences.h"
+#include "DebugLog/DebugLogging.h"
+
+namespace bfs = boost::filesystem;
 
 IpFreelyPreferencesDialog::IpFreelyPreferencesDialog(ipfreely::IpFreelyPreferences& prefs,
                                                      QWidget*                       parent)
@@ -107,7 +111,19 @@ void IpFreelyPreferencesDialog::on_saveFolderPathToolButton_clicked()
         QString::fromStdString(m_prefs.SaveFolderPath()),
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
-    ui->saveFolderPathLineEdit->setText(dir);
+    bfs::path p(dir.toStdWString());
+    p /= L"data";
+    p = bfs::system_complete(p);
+
+    if (!bfs::exists(p))
+    {
+        if (!bfs::create_directories(p))
+        {
+            DEBUG_MESSAGE_EX_ERROR("Failed to create save folder: " << p.string());
+        }
+    }
+
+    ui->saveFolderPathLineEdit->setText(QString::fromStdWString(p.wstring()));
 }
 
 void IpFreelyPreferencesDialog::on_selectNonePushButton_clicked()

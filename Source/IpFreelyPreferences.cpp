@@ -38,8 +38,20 @@ namespace ipfreely
 
 IpFreelyPreferences::IpFreelyPreferences(bool const load)
 {
-    auto path        = bfs::initial_path();
-    m_saveFolderPath = path.string();
+    auto path = bfs::initial_path();
+
+    auto savePath = path;
+    savePath /= "data";
+    savePath         = bfs::system_complete(savePath);
+    m_saveFolderPath = savePath.string();
+
+    if (!bfs::exists(savePath))
+    {
+        if (!bfs::create_directories(savePath))
+        {
+            DEBUG_MESSAGE_EX_ERROR("Failed to create save folder: " << m_saveFolderPath);
+        }
+    }
 
     path /= "IpFreely.cfg";
     path = bfs::system_complete(path);
