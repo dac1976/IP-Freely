@@ -48,9 +48,7 @@ IpFreelyMotionDetector::IpFreelyMotionDetector(std::string const& name,
                                                double const       requiredFileDurationSecs,
                                                double const fps, int const originalWidth,
                                                int const originalHeight)
-    : m_msgQueueThread(std::bind(&IpFreelyMotionDetector::MessageDecoder, std::placeholders::_1),
-                       core_lib::threads::eOnDestroyOptions::processRemainingItems)
-    , m_name(core_lib::string_utils::RemoveIllegalChars(name))
+    : m_name(core_lib::string_utils::RemoveIllegalChars(name))
     , m_cameraDetails(cameraDetails)
     , m_saveFolderPath(saveFolderPath)
     , m_requiredFileDurationSecs(requiredFileDurationSecs)
@@ -59,6 +57,8 @@ IpFreelyMotionDetector::IpFreelyMotionDetector(std::string const& name,
     , m_originalHeight(originalHeight)
     , m_updatePeriodMillisecs(static_cast<unsigned int>(1000.0 / m_fps))
     , m_erosionKernel(cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2, 2)))
+    , m_msgQueueThread(std::bind(&IpFreelyMotionDetector::MessageDecoder, std::placeholders::_1),
+                       core_lib::threads::eOnDestroyOptions::processRemainingItems)
 {
     bfs::path p(m_saveFolderPath);
     p = bfs::system_complete(p);
@@ -75,7 +75,7 @@ IpFreelyMotionDetector::IpFreelyMotionDetector(std::string const& name,
 
     Initialise();
 
-    DEBUG_MESSAGE_EX_INFO("Started motion dectector for stream at: " << m_cameraDetails.streamUrl);
+    DEBUG_MESSAGE_EX_INFO("Started motion detector for stream at: " << m_cameraDetails.streamUrl);
 
     m_msgQueueThread.RegisterMessageHandler(
         MESSAGE_ID,

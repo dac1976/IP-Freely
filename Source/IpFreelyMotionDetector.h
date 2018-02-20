@@ -94,7 +94,6 @@ private:
 
 private:
     mutable std::mutex                                        m_motionMutex{};
-    core_lib::threads::MessageQueueThread<int, video_frame_t> m_msgQueueThread;
     std::string                                               m_name{"cam"};
     IpCamera                                                  m_cameraDetails{};
     std::string                                               m_saveFolderPath{};
@@ -117,6 +116,7 @@ private:
     double                                                    m_fileDurationSecs{0.0};
     cv::Ptr<cv::VideoWriter>                                  m_videoWriter{};
     bool                                                      m_motionIntersection{false};
+    core_lib::threads::MessageQueueThread<int, video_frame_t> m_msgQueueThread;
 };
 
 } // namespace ipfreely

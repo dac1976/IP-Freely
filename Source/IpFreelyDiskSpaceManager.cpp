@@ -58,7 +58,7 @@ IpFreelyDiskSpaceManager::IpFreelyDiskSpaceManager(std::string const& saveFolder
     }
 
     DEBUG_MESSAGE_EX_INFO(
-        "Started disk space manager for disk containgin save folder:" << m_saveFolderPath);
+        "Started disk space manager for disk containing save folder:" << m_saveFolderPath);
 
     m_eventThread = std::make_shared<core_lib::threads::EventThread>(
         std::bind(&IpFreelyDiskSpaceManager::ThreadEventCallback, this), UPDATE_PERIOD_MS);
@@ -133,7 +133,8 @@ bool IpFreelyDiskSpaceManager::DeleteOldestRecording()
 {
     if (m_subDirs.size() <= 1)
     {
-        DEBUG_MESSAGE_EX_WARNING("No data will be deleted only the current day's sub-directory was found.");
+        DEBUG_MESSAGE_EX_WARNING(
+            "No data will be deleted only the current day's sub-directory was found.");
         return false;
     }
 

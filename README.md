@@ -63,10 +63,10 @@ The project supplied for the application is for Qt Creator and will work in Linu
 You may use this code within other supported development and build environments but it is up to the user to create the required projects or makefiles for those environments. This should be fairly easy by referring to the Qt project (.pro) file.
 
 This library requires some third-party open source libraries for it to compile and function. These are as follows:
-* Boost (tested with 1.65.1+ but newest version recommended): http://www.boost.org/
+* Boost (tested with 1.65.1 and 1.66.0 but newest version recommended): http://www.boost.org/
 * Cereal (tested with 1.2.2 but newest version recommended): http://uscilab.github.io/cereal/
 * Loki: http://loki-lib.sourceforge.net/
-* CoreLibrary (tested with 1.4.4.0): https://github.com/dac1976/CoreLibrary
+* CoreLibrary (requires with 1.4.6.0+): https://github.com/dac1976/CoreLibrary
 * Qt Framework (tested with 5.10): http://www.qt.io
 * Single Application: https://github.com/itay-grudev/SingleApplication
 * OpenCV (tested with 3.4.0): https://opencv.org/releases.html

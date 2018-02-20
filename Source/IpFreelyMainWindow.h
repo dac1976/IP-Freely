@@ -140,15 +140,15 @@ private:
     QString                                                   m_appVersion;
     ipfreely::IpFreelyPreferences                             m_prefs;
     ipfreely::IpFreelyCameraDatabase                          m_camDb;
-    std::shared_ptr<ipfreely::IpFreelyDiskSpaceManager>       m_diskSpaceMgr;
     QTimer*                                                   m_updateFeedsTimer;
-    std::map<ipfreely::eCamId, IpFreelyVideoFrame*>           m_camFeeds;
-    std::map<ipfreely::eCamId, stream_proc_t>                 m_streamProcessors;
     int                                                       m_numConnections;
     std::shared_ptr<IpFreelyVideoForm>                        m_videoForm;
     ipfreely::eCamId                                          m_videoFormId;
+    std::map<ipfreely::eCamId, IpFreelyVideoFrame*>           m_camFeeds;
     std::map<ipfreely::eCamId, ipfreely::IpCamera::regions_t> m_camMotionRegions;
     std::map<ipfreely::eCamId, bool>                          m_motionAreaSetupEnabled;
+    std::map<ipfreely::eCamId, stream_proc_t>                 m_streamProcessors;
+    std::shared_ptr<ipfreely::IpFreelyDiskSpaceManager>       m_diskSpaceMgr;
 };
 
 #endif // IPFREELYMAINWINDOW_H
