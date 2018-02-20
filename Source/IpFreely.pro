@@ -68,7 +68,7 @@ else {
     QMAKE_CXXFLAGS += -std=c++14
 
     # Set version info for library.
-    VERSION = 1.0.2
+    VERSION = 1.1.0
 
     INCLUDEPATH += /usr/local/include \
         /home/duncan/projects/ThirdParty \

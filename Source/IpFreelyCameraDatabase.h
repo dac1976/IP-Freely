@@ -117,6 +117,9 @@ struct IpCamera final
     /*! \brief Camera's maximum FPS as defined in its settings. */
     double cameraMaxFps{25.0};
 
+    /*! \brief Enabled scheduled motion recording mode. */
+    bool enabledMotionRecording{false};
+
     /*! \brief IpCamera's default constructor. */
     IpCamera() = default;
 
@@ -231,6 +234,14 @@ struct IpCamera final
             // Added with version 5.
             ar(CEREAL_NVP(cameraMaxFps));
         }
+
+        if (version > 6)
+        {
+            // Added with version 7.
+            temp = enabledMotionRecording ? 1 : 0;
+            ar(CEREAL_NVP(temp));
+            enabledMotionRecording = temp == 1;
+        }
     }
 };
 
@@ -342,7 +353,7 @@ QRect CreateQRectFromVidoFrameDims(int const videoFrameWidth, int const videoFra
 
 } // namespace ipfreely
 
-CEREAL_CLASS_VERSION(ipfreely::IpCamera, 6);
+CEREAL_CLASS_VERSION(ipfreely::IpCamera, 7);
 CEREAL_CLASS_VERSION(ipfreely::IpFreelyCameraDatabase, 1);
 
 #endif // IPFREELYCAMERADATABASE_H

@@ -1,6 +1,6 @@
 # IP Freely (IP/Web camera stream viewer and recorder) #
 ## Introduction ##
-This project implements a hopefully useful cross-platform application to view and record from up to 4 IP camera live RTSP and HTTP(S) streams. You can also connect to local webcams. The application also allows you to view a camera's on-board storage (e.g. SD card) and download video content from the camera's on-board storage to your PC (or anywhere else your PC can browse to on your network, e.g. a NAS).
+This project implements a hopefully useful cross-platform application to view and record from up to 4 IP camera live RTSP and HTTP(S) streams. You can also connect to local web cams. The application also allows you to view a camera's on-board storage (e.g. SD card) and download video content from the camera's on-board storage to your PC (or anywhere else your PC can browse to on your network, e.g. a NAS).
 
 It is licensed under the GNU Lesser General Public License 3.0 and the relevant documentation for this can be found at the top of each source file and the LICENSE text file.
 
@@ -11,21 +11,24 @@ Copyright (C) 2018 Duncan Crutchley.
 ## Background ##
 I started this project shortly after buying and installing some RTSP compatible IP security cameras at my house. The software that came with the cameras was adequate but not great; relying on ActiveX and Internet Explorer. Instead this project provides a native application to view and record up to 4 cameras' streams. Currently, this application does not give you any control over the IP cameras' on-board settings.
 
-## Key Features ##
+## Key Features (Version 1.1.0.0) ##
 * Multi-threaded.
 * Cross-platform (Windows and Linux).
 * Supports up to 4 user configurable RTSP camera streams displayed in a 2x2 grid.
 * Clean and intuitive UI, hopefully!
 * If a suitable URL is provided then you can view a camera's on-board storage (e.g. SD card) and download the content to your PC.
+* The user can view a larger expanded view from any of the 4 streams.
 * Still snapshot images can be taken from the camera feeds at any time with the click of a button.
 * Local AVI (DivX) video recordings can be made from the camera streams at the click of button.
 * Scheduled recording can be setup and enabled on a per camera basis, with the schedule allowing selection of days and active hours in the day.
-* The user can view a larger expanded view from any of the 4 streams.
-* (Coming soon) Motion detection with user-configurable scheduling (similar to scheduled recordings), ability to trigger recordings and send email alerts. Per camera user definable motion detection regions, per camera motion detection algorithm sensitivity (off, low sensitivity, medium sensitivity, high sensitivity and manual settings)
-* (Being considered) Built-in webserver to display some basic features, such as periodically updated snapshots from the camera feeds.
+* Motion detection with user-configurable scheduling (similar to scheduled recordings). 
+* Per camera user definable motion detection regions.
+* Per camera motion detection algorithm sensitivity (off, low sensitivity, medium sensitivity, high sensitivity and manual settings).
+* (Planned) Motion triggered email send email alerts. 
+* (Planned) Built-in web server to display some basic features, such as periodically updated snapshots from the camera feeds.
 
-## Screenshots ##
-Taken from release 1.0.1.0.
+## Screen-shots ##
+Taken from release 1.0.1.0 (slightly out-of-date).
 
 ### Preferences ###
 
@@ -66,10 +69,10 @@ This library requires some third-party open source libraries for it to compile a
 * Boost (tested with 1.65.1 and 1.66.0 but newest version recommended): http://www.boost.org/
 * Cereal (tested with 1.2.2 but newest version recommended): http://uscilab.github.io/cereal/
 * Loki: http://loki-lib.sourceforge.net/
-* CoreLibrary (requires with 1.4.6.0+): https://github.com/dac1976/CoreLibrary
-* Qt Framework (tested with 5.10): http://www.qt.io
+* CoreLibrary (requires with 1.4.6.0 but newest version recommended): https://github.com/dac1976/CoreLibrary
+* Qt Framework (tested with 5.10 and 5.10.1 but should work with any 5.X version): http://www.qt.io
 * Single Application: https://github.com/itay-grudev/SingleApplication
-* OpenCV (tested with 3.4.0): https://opencv.org/releases.html
+* OpenCV (tested with 3.4.0 but other 3.X versions should work): https://opencv.org/releases.html
 
 Please note that some of these libraries themselves require other dependencies, so please refer to their documentation.
 

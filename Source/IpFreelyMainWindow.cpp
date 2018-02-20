@@ -1112,6 +1112,11 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
 
             auto motionSchedule = m_prefs.MotionTrackingSchedule();
 
+            if (!camera.enabledMotionRecording)
+            {
+                motionSchedule.clear();
+            }
+
             m_streamProcessors[camera.camId] =
                 std::make_shared<ipfreely::IpFreelyStreamProcessor>(camName,
                                                                     camera,
@@ -1256,9 +1261,9 @@ void IpFreelyMainWindow::UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage
         displayFrame = videoFrame;
     }
 
-    auto motionRegionSetupEnabled = m_motionAreaSetupEnabled[camId];
+    auto motionAreasEnabled = m_motionAreaSetupEnabled[camId];
 
-    if (!motionBoundingRect.isNull() || streamProcIsWriting || motionRegionSetupEnabled)
+    if (!motionBoundingRect.isNull() || streamProcIsWriting || motionAreasEnabled)
     {
         QPainter p(&displayFrame);
         QRect    rect                   = motionBoundingRect;
@@ -1274,11 +1279,10 @@ void IpFreelyMainWindow::UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage
                 static_cast<int>(static_cast<double>(motionBoundingRect.bottom()) * scalar));
         }
 
-        if (motionRegionSetupEnabled)
+        if (motionAreasEnabled)
         {
             auto motionRectAreas = m_camMotionRegions[camId];
-
-            auto pen = QPen(Qt::cyan);
+            auto pen             = QPen(Qt::cyan);
             pen.setWidth(2);
             p.setPen(pen);
             p.setBackground(QBrush(Qt::NoBrush));

@@ -101,6 +101,8 @@ void IpFreelyCameraSetupDialog::on_buttonBox_accepted()
     m_camera.minMotionAreaPercentFactor = ui->minMotionAreaPercentDoubleSpinBox->value() / 100.0;
     m_camera.motionAreaAveFactor        = ui->motionAreaAveFactorDoubleSpinBox->value();
     m_camera.shrinkVideoFrames          = ui->shrinkFramesCheckBox->checkState() == Qt::Checked;
+    m_camera.enabledMotionRecording =
+        ui->enableMotionRecordingCheckBox->checkState() == Qt::Checked;
 
     accept();
 }
@@ -248,4 +250,6 @@ void IpFreelyCameraSetupDialog::InitialiseCameraSettings(ipfreely::IpCamera cons
     ui->minMotionAreaPercentDoubleSpinBox->setValue(camera.minMotionAreaPercentFactor * 100.0);
     ui->motionAreaAveFactorDoubleSpinBox->setValue(camera.motionAreaAveFactor);
     ui->shrinkFramesCheckBox->setCheckState(camera.shrinkVideoFrames ? Qt::Checked : Qt::Unchecked);
+    ui->enableMotionRecordingCheckBox->setCheckState(camera.enabledMotionRecording ? Qt::Checked
+                                                                                   : Qt::Unchecked);
 }

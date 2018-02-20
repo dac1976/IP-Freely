@@ -24,6 +24,7 @@
  */
 #include "IpFreelyMotionDetector.h"
 #include <sstream>
+#include <cmath>
 #include <boost/throw_exception.hpp>
 #include <boost/filesystem.hpp>
 #include "StringUtils/StringUtils.h"
@@ -37,6 +38,7 @@ namespace ipfreely
 static constexpr int    MESSAGE_ID         = 1;
 static constexpr double DIFF_MAX_VALUE     = 255.0;
 static constexpr int    IDEAL_FRAME_HEIGHT = 600;
+static constexpr size_t HOLD_ON_OFF_SECS   = 10;
 
 #if defined(MOTION_DETECTOR_DEBUG)
 static constexpr int CONTOUR_LINE_THICKNESS = 2;
@@ -57,6 +59,7 @@ IpFreelyMotionDetector::IpFreelyMotionDetector(std::string const& name,
     , m_originalHeight(originalHeight)
     , m_updatePeriodMillisecs(static_cast<unsigned int>(1000.0 / m_fps))
     , m_erosionKernel(cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2, 2)))
+    , m_holdOffFrameCountLimit(static_cast<size_t>(std::ceil(m_fps)) * HOLD_ON_OFF_SECS)
     , m_msgQueueThread(std::bind(&IpFreelyMotionDetector::MessageDecoder, std::placeholders::_1),
                        core_lib::threads::eOnDestroyOptions::processRemainingItems)
 {
@@ -212,9 +215,6 @@ bool IpFreelyMotionDetector::DetectMotion()
     // This algorithm is based on an example given here:
     // https://github.com/cedricve/motion-detection
 
-    // Our return flag.
-    bool motionDetected = false;
-
     // Calculate differences between the images and do AND-operation
     // then threshold image, low differences are ignored (ex. contrast
     // change due to sunlight).
@@ -328,9 +328,6 @@ bool IpFreelyMotionDetector::DetectMotion()
     // we ignore small, most likely insignificnt motion.
     if (maxBoundingRect.area() > m_minImageChangeArea)
     {
-        // Flag that we have motion.
-        motionDetected = true;
-
         // Create a motin bounding rectangle sclaed to original
         // video frame's size.
         cv::Point tl1(static_cast<int>(static_cast<double>(min_x) / m_motionFrameScalar),
@@ -366,8 +363,6 @@ bool IpFreelyMotionDetector::DetectMotion()
         cv::Point br2(static_cast<int>(r), static_cast<int>(b));
 
         m_motionBoundingRect = cv::Rect(tl2, br2);
-
-        CheckForIntersections();
     }
     else
     {
@@ -385,18 +380,23 @@ bool IpFreelyMotionDetector::DetectMotion()
 
         m_motionBoundingRect = cv::Rect(
             static_cast<int>(l), static_cast<int>(t), static_cast<int>(w), static_cast<int>(h));
-
-        // If we still have a bounding rect keep motion detected flag set.
-        motionDetected = m_motionBoundingRect.area() > 0;
-
-        CheckForIntersections();
     }
 
-    return motionDetected;
+    return CheckForIntersections();
 }
 
-void IpFreelyMotionDetector::CheckForIntersections()
+bool IpFreelyMotionDetector::CheckForIntersections()
 {
+    if (m_motionBoundingRect.area() == 0)
+    {
+        return false;
+    }
+
+    if (m_cameraDetails.motionRegions.empty())
+    {
+        return true;
+    }
+
     QRect mr(m_motionBoundingRect.tl().x,
              m_motionBoundingRect.tl().y,
              m_motionBoundingRect.width,
@@ -415,7 +415,7 @@ void IpFreelyMotionDetector::CheckForIntersections()
         }
     }
 
-    m_motionIntersection = motionIntersection;
+    return motionIntersection;
 }
 
 void IpFreelyMotionDetector::RotateFrames()
@@ -433,21 +433,109 @@ bool IpFreelyMotionDetector::MessageHandler(video_frame_t& msg)
 {
     m_originalFrame = msg;
 
+    // Get current time stamp.
+    m_currentTime = time(0);
+
     InitialiseFrames();
     UpdateNextFrame();
 
+    bool recording      = m_videoWriter.get() != nullptr;
+    bool motionDetected = false;
+
     if (DetectMotion())
     {
-        if (m_motionIntersection)
+        motionDetected = true;
+
+        // Reset hold-off count if we've detected motion.
+        m_holdOffFrameCount = 0;
+    }
+    else
+    {
+        // If recording in progress increment hold-off count.
+        if (recording)
         {
-            // TODO: If not already active start recording
-            // make sure we stop recording as necessary.
+            ++m_holdOffFrameCount;
         }
     }
 
+    // If hold-off count reached then redet count and reset writer
+    // and finally set recording flag to false.
+    if (m_holdOffFrameCount == m_holdOffFrameCountLimit)
+    {
+        m_holdOffFrameCount = 0;
+        m_videoWriter.release();
+        recording = false;
+    }
+
+    if (motionDetected || recording)
+    {
+        CreateCaptureObjects();
+    }
+
+    WriteVideoFrame();
     RotateFrames();
 
     return true;
+}
+
+void IpFreelyMotionDetector::CreateCaptureObjects()
+{
+    if (m_videoWriter)
+    {
+        if (m_fileDurationSecs < m_requiredFileDurationSecs)
+        {
+            return;
+        }
+
+        m_videoWriter.release();
+    }
+
+    auto localTime = std::localtime(&m_currentTime);
+    char folderName[9];
+    std::strftime(folderName, sizeof(folderName), "%Y%m%d", localTime);
+
+    bfs::path p(m_saveFolderPath);
+    p /= folderName;
+    p = bfs::system_complete(p);
+
+    if (!bfs::exists(p))
+    {
+        if (!bfs::create_directories(p))
+        {
+            std::ostringstream oss;
+            oss << "Failed to create directories: " << p.string();
+            BOOST_THROW_EXCEPTION(std::runtime_error(oss.str()));
+        }
+    }
+
+    std::ostringstream oss;
+    oss << m_name << "_motion_" << m_currentTime << ".avi";
+
+    p /= oss.str();
+
+    DEBUG_MESSAGE_EX_INFO("Creating new output video file: " << p.string());
+
+    m_videoWriter = cv::makePtr<cv::VideoWriter>(p.string().c_str(),
+                                                 cv::VideoWriter::fourcc('D', 'I', 'V', 'X'),
+                                                 m_fps,
+                                                 cv::Size(m_originalWidth, m_originalHeight));
+
+    if (!m_videoWriter->isOpened())
+    {
+        m_videoWriter.release();
+        BOOST_THROW_EXCEPTION(std::runtime_error("Failed to open VideoWriter object"));
+    }
+
+    m_fileDurationSecs = 0.0;
+}
+
+void IpFreelyMotionDetector::WriteVideoFrame()
+{
+    if (m_videoWriter)
+    {
+        *m_videoWriter << *m_originalFrame;
+        m_fileDurationSecs += static_cast<double>(m_updatePeriodMillisecs) / 1000.0;
+    }
 }
 
 } // namespace ipfreely

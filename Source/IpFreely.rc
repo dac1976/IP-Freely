@@ -7,8 +7,8 @@
 IDI_ICON1	ICON	DISCARDABLE	"IpFreely.ico"
 
 VS_VERSION_INFO VERSIONINFO
-    FILEVERSION 1,0,2,0
-    PRODUCTVERSION 1,0,2,0
+    FILEVERSION 1,1,0,0
+    PRODUCTVERSION 1,1,0,0
     FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
     FILEFLAGS VS_FF_DEBUG
@@ -24,12 +24,12 @@ VS_VERSION_INFO VERSIONINFO
             BLOCK "040904b0"
             BEGIN
                 VALUE "CompanyName", "~\0"
-                VALUE "FileDescription", "IP Freely (RTSP Stream Viewer and Recorder)\0"
-                VALUE "FileVersion", "1.0.2.0\0"
+                VALUE "FileDescription", "IP Freely (IP/Web camera stream viewer and recorder)\0"
+                VALUE "FileVersion", "1.1.0.0\0"
                 VALUE "LegalCopyright", "Copyright 2018 Duncan Crutchley\0"
                 VALUE "OriginalFilename", "IpFreely\0"
                 VALUE "ProductName", "IpFreely\0"
-                VALUE "ProductVersion", "1.0.2.0\0"
+                VALUE "ProductVersion", "1.1.0.0\0"
             END
         END
         BLOCK "VarFileInfo"

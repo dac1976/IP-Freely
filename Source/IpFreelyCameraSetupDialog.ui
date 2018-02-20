@@ -478,6 +478,13 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="enableMotionRecordingCheckBox">
+     <property name="text">
+      <string>Enable scheduled  motion recording</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer_2">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

@@ -28,6 +28,7 @@
 #include <QRect>
 #include <string>
 #include <memory>
+#include <ctime>
 #include <opencv/cv.hpp>
 #include "Threads/MessageQueueThread.h"
 #include "IpFreelyCameraDatabase.h"
@@ -87,10 +88,12 @@ private:
     void       InitialiseFrames();
     void       UpdateNextFrame();
     bool       DetectMotion();
-    void       CheckForIntersections();
+    bool       CheckForIntersections();
     void       RotateFrames();
     static int MessageDecoder(video_frame_t const& msg);
     bool       MessageHandler(video_frame_t& msg);
+    void       CreateCaptureObjects();
+    void       WriteVideoFrame();
 
 private:
     mutable std::mutex                                        m_motionMutex{};
@@ -104,7 +107,9 @@ private:
     unsigned int                                              m_updatePeriodMillisecs{40};
     cv::Mat                                                   m_erosionKernel{};
     cv::Scalar                                                m_rectangleColor{0, 255, 0};
-    video_frame_t                                             m_originalFrame{};
+    video_frame_t                                             m_originalFrame;
+    size_t                                                    m_holdOffFrameCountLimit{0};
+    size_t                                                    m_holdOffFrameCount{0};
     double                                                    m_motionFrameScalar{1.0};
     int                                                       m_minImageChangeArea{0};
     size_t                                                    m_imageChangesThreshold{0};
@@ -114,8 +119,8 @@ private:
     cv::Mat                                                   m_nextGreyFrame{};
     cv::Rect                                                  m_motionBoundingRect{0, 0, 0, 0};
     double                                                    m_fileDurationSecs{0.0};
+    time_t                                                    m_currentTime{};
     cv::Ptr<cv::VideoWriter>                                  m_videoWriter{};
-    bool                                                      m_motionIntersection{false};
     core_lib::threads::MessageQueueThread<int, video_frame_t> m_msgQueueThread;
 };
 
