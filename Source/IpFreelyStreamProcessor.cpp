@@ -146,9 +146,10 @@ IpFreelyStreamProcessor::IpFreelyStreamProcessor(
 
     m_updatePeriodMillisecs = static_cast<unsigned int>(1000.0 / m_fps);
 
-    DEBUG_MESSAGE_EX_INFO("Stream at: "
-                          << m_cameraDetails.streamUrl << " running with FPS of: " << m_fps
-                          << ", thread update period (ms): " << m_updatePeriodMillisecs);
+    DEBUG_MESSAGE_EX_INFO("Stream at: " << m_cameraDetails.streamUrl << " running with FPS of: "
+                                        << m_fps
+                                        << ", thread update period (ms): "
+                                        << m_updatePeriodMillisecs);
 
     m_eventThread = std::make_shared<core_lib::threads::EventThread>(
         std::bind(&IpFreelyStreamProcessor::ThreadEventCallback, this), m_updatePeriodMillisecs);
@@ -385,10 +386,17 @@ void IpFreelyStreamProcessor::CreateCaptureObjects()
 
         DEBUG_MESSAGE_EX_INFO("Creating new output video file: " << p.string());
 
+#if BOOST_OS_WINDOWS
         m_videoWriter = cv::makePtr<cv::VideoWriter>(p.string().c_str(),
                                                      cv::VideoWriter::fourcc('D', 'I', 'V', 'X'),
                                                      m_fps,
                                                      cv::Size(m_videoWidth, m_videoHeight));
+#else
+        m_videoWriter = cv::makePtr<cv::VideoWriter>(p.string().c_str(),
+                                                     cv::VideoWriter::fourcc('X', 'V', 'I', 'D'),
+                                                     m_fps,
+                                                     cv::Size(m_videoWidth, m_videoHeight));
+#endif
 
         if (!m_videoWriter->isOpened())
         {

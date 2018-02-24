@@ -515,10 +515,17 @@ void IpFreelyMotionDetector::CreateCaptureObjects()
 
     DEBUG_MESSAGE_EX_INFO("Creating new output video file: " << p.string());
 
+#if BOOST_OS_WINDOWS
     m_videoWriter = cv::makePtr<cv::VideoWriter>(p.string().c_str(),
                                                  cv::VideoWriter::fourcc('D', 'I', 'V', 'X'),
                                                  m_fps,
                                                  cv::Size(m_originalWidth, m_originalHeight));
+#else
+    m_videoWriter = cv::makePtr<cv::VideoWriter>(p.string().c_str(),
+                                                 cv::VideoWriter::fourcc('X', 'V', 'I', 'D'),
+                                                 m_fps,
+                                                 cv::Size(m_originalWidth, m_originalHeight));
+#endif
 
     if (!m_videoWriter->isOpened())
     {
