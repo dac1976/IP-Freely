@@ -75,7 +75,7 @@ std::string GetAppVersion(const std::string& appFilePath)
     return appVersion;
 }
 #else
-#define IPFREELY_VERSION "1.1.0.0"
+#define IPFREELY_VERSION "1.1.1.0"
 #endif
 
 int main(int argc, char* argv[])

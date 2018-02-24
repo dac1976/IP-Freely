@@ -31,6 +31,8 @@
 #include <QRectF>
 #include <QSize>
 
+static constexpr int AREA_RECT_LINE_WIDTH = 2;
+
 IpFreelyVideoFrame::IpFreelyVideoFrame(int const                   cameraId,
                                        selection_callback_t const& selectionCallback,
                                        QWidget*                    parent)
@@ -102,10 +104,26 @@ void IpFreelyVideoFrame::mouseReleaseEvent(QMouseEvent* /*event*/)
     auto selection = m_rubberBand->geometry();
     m_rubberBand->hide();
 
+    auto const maxHeight    = m_videoHeight - selection.top() - AREA_RECT_LINE_WIDTH;
+    auto       actualHeight = selection.height();
+
+    if (actualHeight > maxHeight)
+    {
+        actualHeight = maxHeight;
+    }
+
+    auto const maxWidth    = m_videoWidth - selection.left() - AREA_RECT_LINE_WIDTH;
+    auto       actualWidth = selection.width();
+
+    if (actualWidth > maxWidth)
+    {
+        actualWidth = maxWidth;
+    }
+
     double t = static_cast<double>(selection.top()) / static_cast<double>(m_videoHeight);
     double l = static_cast<double>(selection.left()) / static_cast<double>(m_videoWidth);
-    double h = static_cast<double>(selection.height()) / static_cast<double>(m_videoHeight);
-    double w = static_cast<double>(selection.width()) / static_cast<double>(m_videoWidth);
+    double h = static_cast<double>(actualHeight) / static_cast<double>(m_videoHeight);
+    double w = static_cast<double>(actualWidth) / static_cast<double>(m_videoWidth);
 
     if ((t >= 1.0) || (l >= 1.0) || (h >= 1.0) || (w >= 1.0) || (t + h > 1.0) || (l + w) > 1.0)
     {
