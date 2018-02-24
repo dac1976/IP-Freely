@@ -248,8 +248,10 @@ void IpFreelyMainWindow::on_connect1ToolButton_clicked()
 
 void IpFreelyMainWindow::on_motionDetectorRegions1ToolButton_toggled(bool checked)
 {
-    EnableMotionRegionsSetup(
-        ipfreely::eCamId::cam1, checked, ui->cam1RemoveMotionRegionsToolButton);
+    EnableMotionRegionsSetup(ipfreely::eCamId::cam1,
+                             checked,
+                             ui->cam1RemoveMotionRegionsToolButton,
+                             ui->cam1RemoveMotionRegionsToolButton);
 }
 
 void IpFreelyMainWindow::on_removeMotionRegions1ToolButton_clicked()
@@ -329,8 +331,10 @@ void IpFreelyMainWindow::on_connect2ToolButton_clicked()
 
 void IpFreelyMainWindow::on_motionDetectorRegions2ToolButton_toggled(bool checked)
 {
-    EnableMotionRegionsSetup(
-        ipfreely::eCamId::cam2, checked, ui->cam2RemoveMotionRegionsToolButton);
+    EnableMotionRegionsSetup(ipfreely::eCamId::cam2,
+                             checked,
+                             ui->cam2RemoveMotionRegionsToolButton,
+                             ui->cam2RemoveMotionRegionsToolButton);
 }
 
 void IpFreelyMainWindow::on_removeMotionRegions2ToolButton_clicked()
@@ -410,8 +414,10 @@ void IpFreelyMainWindow::on_connect3ToolButton_clicked()
 
 void IpFreelyMainWindow::on_motionDetectorRegions3ToolButton_toggled(bool checked)
 {
-    EnableMotionRegionsSetup(
-        ipfreely::eCamId::cam3, checked, ui->cam3RemoveMotionRegionsToolButton);
+    EnableMotionRegionsSetup(ipfreely::eCamId::cam3,
+                             checked,
+                             ui->cam3RemoveMotionRegionsToolButton,
+                             ui->cam3RemoveMotionRegionsToolButton);
 }
 
 void IpFreelyMainWindow::on_removeMotionRegions3ToolButton_clicked()
@@ -491,8 +497,10 @@ void IpFreelyMainWindow::on_connect4ToolButton_clicked()
 
 void IpFreelyMainWindow::on_motionDetectorRegions4ToolButton_toggled(bool checked)
 {
-    EnableMotionRegionsSetup(
-        ipfreely::eCamId::cam4, checked, ui->cam4RemoveMotionRegionsToolButton);
+    EnableMotionRegionsSetup(ipfreely::eCamId::cam4,
+                             checked,
+                             ui->cam4RemoveMotionRegionsToolButton,
+                             ui->cam4RemoveMotionRegionsToolButton);
 }
 
 void IpFreelyMainWindow::on_removeMotionRegions4ToolButton_clicked()
@@ -1127,8 +1135,8 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
         }
         catch (std::exception& e)
         {
-            DEBUG_MESSAGE_EX_ERROR(
-                "Stream Error, camera: " << camName << ", error message: " << e.what());
+            DEBUG_MESSAGE_EX_ERROR("Stream Error, camera: " << camName
+                                                            << ", error message: " << e.what());
             QMessageBox::critical(this,
                                   "Stream Error",
                                   QString::fromLocal8Bit(e.what()),
@@ -1490,8 +1498,8 @@ void IpFreelyMainWindow::VideoFrameAreaSelection(int const     cameraId,
         return;
     }
 
-    ipfreely::IpCamera::point_t leftTop(percentageSelection.left(), percentageSelection.top());
-    ipfreely::IpCamera::point_t widthHeight(percentageSelection.width(),
+    ipfreely::IpCamera::point_t  leftTop(percentageSelection.left(), percentageSelection.top());
+    ipfreely::IpCamera::point_t  widthHeight(percentageSelection.width(),
                                             percentageSelection.height());
     ipfreely::IpCamera::region_t region(leftTop, widthHeight);
     m_camMotionRegions[camId].emplace_back(region);
@@ -1503,11 +1511,14 @@ void IpFreelyMainWindow::VideoFrameAreaSelection(int const     cameraId,
         camera.motionRegions = m_camMotionRegions[camId];
         m_camDb.UpdateCamera(camera);
         m_camDb.Save();
+
+        ReconnectCamera(camId);
     }
 }
 
 void IpFreelyMainWindow::EnableMotionRegionsSetup(ipfreely::eCamId const camId, bool const enable,
-                                                  QToolButton* removeRegionsBtn)
+                                                  QToolButton* removeRegionsBtn,
+                                                  QToolButton* setMotionRegionsBtn)
 {
     removeRegionsBtn->setVisible(enable);
 
@@ -1530,6 +1541,10 @@ void IpFreelyMainWindow::EnableMotionRegionsSetup(ipfreely::eCamId const camId, 
             m_camMotionRegions[camId]       = camera.motionRegions;
             m_motionAreaSetupEnabled[camId] = true;
         }
+
+        bool blockState = setMotionRegionsBtn->blockSignals(true);
+        setMotionRegionsBtn->setChecked(true);
+        setMotionRegionsBtn->blockSignals(blockState);
     }
     else
     {
@@ -1563,4 +1578,37 @@ void IpFreelyMainWindow::RemoveMotionRegions(ipfreely::eCamId const camId)
     camera.motionRegions = m_camMotionRegions[camId];
     m_camDb.UpdateCamera(camera);
     m_camDb.Save();
+
+    ReconnectCamera(camId);
+}
+
+void IpFreelyMainWindow::ReconnectCamera(ipfreely::eCamId const camId)
+{
+    switch (camId)
+    {
+    case ipfreely::eCamId::cam1:
+        on_connect1ToolButton_clicked();
+        on_connect1ToolButton_clicked();
+        EnableMotionRegionsSetup(
+            camId, true, ui->cam1RemoveMotionRegionsToolButton, ui->cam1MotionRegionsToolButton);
+        break;
+    case ipfreely::eCamId::cam2:
+        on_connect2ToolButton_clicked();
+        on_connect2ToolButton_clicked();
+        EnableMotionRegionsSetup(
+            camId, true, ui->cam2RemoveMotionRegionsToolButton, ui->cam2MotionRegionsToolButton);
+        break;
+    case ipfreely::eCamId::cam3:
+        on_connect3ToolButton_clicked();
+        on_connect3ToolButton_clicked();
+        EnableMotionRegionsSetup(
+            camId, true, ui->cam3RemoveMotionRegionsToolButton, ui->cam3MotionRegionsToolButton);
+        break;
+    case ipfreely::eCamId::cam4:
+        on_connect4ToolButton_clicked();
+        on_connect4ToolButton_clicked();
+        EnableMotionRegionsSetup(
+            camId, true, ui->cam4RemoveMotionRegionsToolButton, ui->cam4MotionRegionsToolButton);
+        break;
+    }
 }

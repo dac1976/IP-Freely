@@ -132,8 +132,9 @@ private:
     void     ViewStorage(ipfreely::IpCamera const& camera);
     void     VideoFrameAreaSelection(int const cameraId, QRectF const& percentageSelection);
     void     EnableMotionRegionsSetup(ipfreely::eCamId const camId, bool const enable,
-                                      QToolButton* removeRegionsBtn);
+                                      QToolButton* removeRegionsBtn, QToolButton* setMotionRegionsBtn);
     void     RemoveMotionRegions(ipfreely::eCamId const camId);
+    void     ReconnectCamera(ipfreely::eCamId const camId);
 
 private:
     Ui::IpFreelyMainWindow*                                   ui;
