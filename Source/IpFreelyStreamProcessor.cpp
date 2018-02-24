@@ -186,8 +186,19 @@ void IpFreelyStreamProcessor::StopVideoWriting() noexcept
 
 bool IpFreelyStreamProcessor::GetEnableVideoWriting() const noexcept
 {
-    std::lock_guard<std::mutex> lock(m_writingMutex);
-    return m_enableVideoWriting;
+    bool isWriting = false;
+
+    {
+        std::lock_guard<std::mutex> lock(m_writingMutex);
+        isWriting = m_enableVideoWriting;
+    }
+
+    if (!isWriting && m_motionDetector)
+    {
+        isWriting = m_motionDetector->WritingStream();
+    }
+
+    return isWriting;
 }
 
 bool IpFreelyStreamProcessor::VideoFrameUpdated() const noexcept

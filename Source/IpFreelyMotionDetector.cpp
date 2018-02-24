@@ -104,6 +104,12 @@ QRect IpFreelyMotionDetector::CurrentMotionRect() const noexcept
                  m_motionBoundingRect.height);
 }
 
+bool IpFreelyMotionDetector::WritingStream() const noexcept
+{
+    std::lock_guard<std::mutex> lock(m_writingMutex);
+    return m_writingStream;
+}
+
 void IpFreelyMotionDetector::Initialise()
 {
 #if defined(MOTION_DETECTOR_DEBUG)
@@ -465,6 +471,7 @@ bool IpFreelyMotionDetector::MessageHandler(video_frame_t& msg)
         m_holdOffFrameCount = 0;
         m_videoWriter.release();
         recording = false;
+        SetWritingStream(false);
     }
 
     if (motionDetected || recording)
@@ -488,6 +495,7 @@ void IpFreelyMotionDetector::CreateCaptureObjects()
         }
 
         m_videoWriter.release();
+        SetWritingStream(false);
     }
 
     auto localTime = std::localtime(&m_currentTime);
@@ -534,6 +542,7 @@ void IpFreelyMotionDetector::CreateCaptureObjects()
     }
 
     m_fileDurationSecs = 0.0;
+    SetWritingStream(true);
 }
 
 void IpFreelyMotionDetector::WriteVideoFrame()
@@ -543,6 +552,12 @@ void IpFreelyMotionDetector::WriteVideoFrame()
         *m_videoWriter << *m_originalFrame;
         m_fileDurationSecs += static_cast<double>(m_updatePeriodMillisecs) / 1000.0;
     }
+}
+
+void IpFreelyMotionDetector::SetWritingStream(bool const writing) noexcept
+{
+    std::lock_guard<std::mutex> lock(m_writingMutex);
+    m_writingStream = writing;
 }
 
 } // namespace ipfreely
