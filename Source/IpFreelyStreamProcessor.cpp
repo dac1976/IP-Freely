@@ -146,10 +146,9 @@ IpFreelyStreamProcessor::IpFreelyStreamProcessor(
 
     m_updatePeriodMillisecs = static_cast<unsigned int>(1000.0 / m_fps);
 
-    DEBUG_MESSAGE_EX_INFO("Stream at: " << m_cameraDetails.streamUrl << " running with FPS of: "
-                                        << m_fps
-                                        << ", thread update period (ms): "
-                                        << m_updatePeriodMillisecs);
+    DEBUG_MESSAGE_EX_INFO("Stream at: "
+                          << m_cameraDetails.streamUrl << " running with FPS of: " << m_fps
+                          << ", thread update period (ms): " << m_updatePeriodMillisecs);
 
     m_eventThread = std::make_shared<core_lib::threads::EventThread>(
         std::bind(&IpFreelyStreamProcessor::ThreadEventCallback, this), m_updatePeriodMillisecs);
@@ -184,14 +183,9 @@ void IpFreelyStreamProcessor::StopVideoWriting() noexcept
     SetEnableVideoWriting(false);
 }
 
-bool IpFreelyStreamProcessor::GetEnableVideoWriting() const noexcept
+bool IpFreelyStreamProcessor::EnableVideoWriting() const noexcept
 {
-    bool isWriting = false;
-
-    {
-        std::lock_guard<std::mutex> lock(m_writingMutex);
-        isWriting = m_enableVideoWriting;
-    }
+    bool isWriting = GetEnableVideoWriting();
 
     if (!isWriting && m_motionDetector)
     {
@@ -326,6 +320,12 @@ void IpFreelyStreamProcessor::SetEnableVideoWriting(bool enable) noexcept
 {
     std::lock_guard<std::mutex> lock(m_writingMutex);
     m_enableVideoWriting = enable;
+}
+
+bool IpFreelyStreamProcessor::GetEnableVideoWriting() const noexcept
+{
+    std::lock_guard<std::mutex> lock(m_writingMutex);
+    return m_enableVideoWriting;
 }
 
 void IpFreelyStreamProcessor::CheckRecordingSchedule()

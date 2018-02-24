@@ -547,7 +547,7 @@ void IpFreelyMainWindow::on_updateFeedsTimer()
             auto currentVideoFrame = streamProcessor.second->CurrentVideoFrame(&motionBoundingRect);
 
             auto fps         = streamProcessor.second->CurrentFps();
-            auto isRecording = streamProcessor.second->GetEnableVideoWriting();
+            auto isRecording = streamProcessor.second->EnableVideoWriting();
 
             UpdateCamFeedFrame(
                 streamProcessor.first, currentVideoFrame, motionBoundingRect, isRecording);
@@ -1207,7 +1207,7 @@ void IpFreelyMainWindow::RecordActionHandler(ipfreely::eCamId const camId, QTool
         return;
     }
 
-    if (streamProcIter->second->GetEnableVideoWriting())
+    if (streamProcIter->second->EnableVideoWriting())
     {
         streamProcIter->second->StopVideoWriting();
 

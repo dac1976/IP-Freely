@@ -89,10 +89,10 @@ public:
     void StopVideoWriting() noexcept;
 
     /*!
-     * \brief GetEnableVideoWriting reports if stream is being written to disk.
+     * \brief EnableVideoWriting reports if stream is being written to disk.
      * \return True if writing, false otherwise.
      */
-    bool GetEnableVideoWriting() const noexcept;
+    bool EnableVideoWriting() const noexcept;
 
     /*!c
      * \brief VideoFrameUpdated monitors stream activity.
@@ -127,6 +127,7 @@ private:
                                std::vector<std::vector<bool>> const& schedule);
     void        ThreadEventCallback() noexcept;
     void        SetEnableVideoWriting(bool enable) noexcept;
+    bool        GetEnableVideoWriting() const noexcept;
     void        CheckRecordingSchedule();
     void        CreateCaptureObjects();
     void        GrabVideoFrame();
