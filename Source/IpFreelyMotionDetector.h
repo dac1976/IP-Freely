@@ -106,6 +106,7 @@ private:
 private:
     mutable std::mutex       m_motionMutex{};
     mutable std::mutex       m_writingMutex{};
+    mutable std::mutex       m_fpsMutex{};
     std::string              m_name{"cam"};
     IpCamera                 m_cameraDetails{};
     std::string              m_saveFolderPath{};

@@ -24,6 +24,7 @@
  */
 #include "IpFreelyStreamProcessor.h"
 #include <sstream>
+#include <cmath>
 #include <boost/throw_exception.hpp>
 #include <boost/filesystem.hpp>
 #include "IpFreelyMotionDetector.h"
@@ -137,21 +138,8 @@ IpFreelyStreamProcessor::IpFreelyStreamProcessor(
 
     m_videoWidth  = static_cast<int>(m_videoCapture->get(CV_CAP_PROP_FRAME_WIDTH));
     m_videoHeight = static_cast<int>(m_videoCapture->get(CV_CAP_PROP_FRAME_HEIGHT));
-    m_fps         = m_videoCapture->get(CV_CAP_PROP_FPS);
 
-    if ((m_fps < MIN_FPS) || (m_fps > MAX_FPS))
-    {
-        m_fps = cameraDetails.cameraMaxFps;
-    }
-
-    m_updatePeriodMillisecs = static_cast<unsigned int>(1000.0 / m_fps);
-
-    DEBUG_MESSAGE_EX_INFO("Stream at: "
-                          << m_cameraDetails.streamUrl << " running with FPS of: " << m_fps
-                          << ", thread update period (ms): " << m_updatePeriodMillisecs);
-
-    m_eventThread = std::make_shared<core_lib::threads::EventThread>(
-        std::bind(&IpFreelyStreamProcessor::ThreadEventCallback, this), m_updatePeriodMillisecs);
+    CheckFps();
 }
 
 IpFreelyStreamProcessor::~IpFreelyStreamProcessor()
@@ -308,6 +296,7 @@ void IpFreelyStreamProcessor::ThreadEventCallback() noexcept
         CheckMotionDetector();
         CreateCaptureObjects();
         WriteVideoFrame();
+        CheckFps();
     }
     catch (...)
     {
@@ -486,6 +475,60 @@ void IpFreelyStreamProcessor::CheckMotionDetector()
 
     std::lock_guard<std::mutex> lockF(m_frameMutex);
     m_motionDetector->AddNextFrame(m_videoFrame);
+}
+
+void IpFreelyStreamProcessor::CheckFps()
+{
+    auto fps = m_videoCapture->get(CV_CAP_PROP_FPS);
+
+    if ((fps < MIN_FPS) || (fps > MAX_FPS))
+    {
+        fps = m_cameraDetails.cameraMaxFps;
+
+        DEBUG_MESSAGE_EX_WARNING(
+            "Invalid FPS obtained from stream defaulting to user preference FPS, stream URL: "
+            << m_cameraDetails.streamUrl);
+    }
+
+    if (std::abs(fps - m_fps) > 0.1)
+    {
+        m_fps                   = fps;
+        m_updatePeriodMillisecs = static_cast<unsigned int>(1000.0 / m_fps);
+
+        DEBUG_MESSAGE_EX_INFO("Stream at: " << m_cameraDetails.streamUrl << " running with FPS of: "
+                                            << m_fps
+                                            << ", thread update period (ms): "
+                                            << m_updatePeriodMillisecs);
+
+        if (m_videoWriter)
+        {
+            DEBUG_MESSAGE_EX_INFO("Releasing video writer due to FPS change, stream URL: "
+                                  << m_cameraDetails.streamUrl);
+            m_videoWriter.release();
+        }
+
+        if (m_motionDetector)
+        {
+            DEBUG_MESSAGE_EX_INFO("Recreating motion detector with new FPS, stream URL: "
+                                  << m_cameraDetails.streamUrl);
+            m_motionDetector.reset();
+            m_motionDetector = std::make_shared<IpFreelyMotionDetector>(m_name,
+                                                                        m_cameraDetails,
+                                                                        m_saveFolderPath,
+                                                                        m_requiredFileDurationSecs,
+                                                                        m_fps,
+                                                                        m_videoWidth,
+                                                                        m_videoHeight);
+        }
+
+        DEBUG_MESSAGE_EX_INFO(
+            "Recreating event thread for stream URL: " << m_cameraDetails.streamUrl);
+
+        m_eventThread.reset();
+        m_eventThread = std::make_shared<core_lib::threads::EventThread>(
+            std::bind(&IpFreelyStreamProcessor::ThreadEventCallback, this),
+            m_updatePeriodMillisecs);
+    }
 }
 
 } // namespace ipfreely

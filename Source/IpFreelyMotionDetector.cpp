@@ -417,6 +417,10 @@ bool IpFreelyMotionDetector::CheckForIntersections()
         if (mr.intersects(r))
         {
             motionIntersection = true;
+
+            DEBUG_MESSAGE_EX_INFO("Motion detector intersection found, camera stream URL: "
+                                  << m_cameraDetails.streamUrl);
+
             break;
         }
     }
@@ -468,6 +472,9 @@ bool IpFreelyMotionDetector::MessageHandler(video_frame_t& msg)
     // and finally set recording flag to false.
     if (m_holdOffFrameCount == m_holdOffFrameCountLimit)
     {
+        DEBUG_MESSAGE_EX_INFO("Motion detector hold-off period finished, camera stream URL: "
+                              << m_cameraDetails.streamUrl);
+
         m_holdOffFrameCount = 0;
         m_videoWriter.release();
         recording = false;
@@ -491,6 +498,9 @@ void IpFreelyMotionDetector::CreateCaptureObjects()
     {
         if (m_fileDurationSecs < m_requiredFileDurationSecs)
         {
+            DEBUG_MESSAGE_EX_DEBUG(
+                "Motion detector file duration reached for current video file, camera stream URL: "
+                << m_cameraDetails.streamUrl);
             return;
         }
 
