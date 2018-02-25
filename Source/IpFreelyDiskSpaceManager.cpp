@@ -94,13 +94,15 @@ void IpFreelyDiskSpaceManager::CheckUsedDiskSpace()
     {
         QStorageInfo info(QString::fromStdString(m_saveFolderPath));
 
-        auto percentUsed = static_cast<int>((static_cast<double>(info.bytesAvailable()) * 100.0) /
-                                            static_cast<double>(info.bytesTotal()));
+        auto percentUsed =
+            static_cast<int>(100.0 * (1.0 - (static_cast<double>(info.bytesAvailable()) /
+                                             static_cast<double>(info.bytesTotal()))));
 
         if (percentUsed > m_maxPercentUsedSpace)
         {
             DEBUG_MESSAGE_EX_INFO("Percentage disk space used is too great ("
-                                  << percentUsed << "%), will attempt to delete oldest data.");
+                                  << percentUsed
+                                  << "%), will attempt to delete oldest data.");
 
             if (!DeleteOldestRecording())
             {
@@ -119,7 +121,9 @@ void IpFreelyDiskSpaceManager::CheckNumDaysDataStored()
     while (m_subDirs.size() > static_cast<size_t>(m_maxNumDaysToStore))
     {
         DEBUG_MESSAGE_EX_INFO("Too many days data found on disk. Expected: "
-                              << m_maxNumDaysToStore << " but found: " << m_subDirs.size()
+                              << m_maxNumDaysToStore
+                              << " but found: "
+                              << m_subDirs.size()
                               << ". Will attempt to delete oldest data.");
 
         if (!DeleteOldestRecording())
