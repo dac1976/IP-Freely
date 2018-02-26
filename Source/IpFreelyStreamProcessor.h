@@ -125,17 +125,18 @@ private:
     static bool IsScheduleEnabled(std::vector<std::vector<bool>> const& schedule);
     static bool VerifySchedule(std::string const&                    scheduleId,
                                std::vector<std::vector<bool>> const& schedule);
-    void ThreadEventCallback() noexcept;
-    void SetEnableVideoWriting(bool enable) noexcept;
-    bool GetEnableVideoWriting() const noexcept;
-    void CheckRecordingSchedule();
-    void CreateCaptureObjects();
-    void GrabVideoFrame();
-    void WriteVideoFrame();
-    bool CheckMotionSchedule() const;
-    void InitialiseMotionDetector();
-    void CheckMotionDetector();
-    void CheckFps();
+    void        ThreadEventCallback() noexcept;
+    void        SetEnableVideoWriting(bool enable) noexcept;
+    bool        GetEnableVideoWriting() const noexcept;
+    void        CheckRecordingSchedule();
+    void        CreateCaptureObjects();
+    void        GrabVideoFrame();
+    void        WriteVideoFrame();
+    bool        CheckMotionSchedule() const;
+    void        InitialiseMotionDetector();
+    void        CheckMotionDetector();
+    void        CreateVideoCapture();
+    void        CheckFps();
 
 private:
     mutable std::mutex                              m_writingMutex{};

@@ -119,27 +119,30 @@ IpFreelyStreamProcessor::IpFreelyStreamProcessor(
         }
     }
 
-    bool isId;
-    auto comleteStreamUrl = cameraDetails.CompleteStreamUrl(isId);
+    CreateVideoCapture();
 
-    if (isId)
-    {
-        m_videoCapture = cv::makePtr<cv::VideoCapture>(std::stoi(comleteStreamUrl));
-    }
-    else
-    {
-        m_videoCapture = cv::makePtr<cv::VideoCapture>(comleteStreamUrl.c_str());
-    }
+    auto fps = m_videoCapture->get(CV_CAP_PROP_FPS);
 
-    if (!m_videoCapture->isOpened())
+    if ((fps < MIN_FPS) || (fps > MAX_FPS))
     {
-        BOOST_THROW_EXCEPTION(std::runtime_error("Failed to open VideoCapture object."));
+        fps = m_cameraDetails.cameraMaxFps;
+
+        DEBUG_MESSAGE_EX_WARNING(
+            "Invalid FPS obtained from stream defaulting to user preference FPS, stream URL: "
+            << m_cameraDetails.streamUrl);
     }
 
-    m_videoWidth  = static_cast<int>(m_videoCapture->get(CV_CAP_PROP_FRAME_WIDTH));
-    m_videoHeight = static_cast<int>(m_videoCapture->get(CV_CAP_PROP_FRAME_HEIGHT));
+    m_fps                   = fps;
+    m_updatePeriodMillisecs = static_cast<unsigned int>(1000.0 / m_fps);
 
-    CheckFps();
+    DEBUG_MESSAGE_EX_INFO("Stream at: "
+                          << m_cameraDetails.streamUrl << " running with FPS of: " << m_fps
+                          << ", thread update period (ms): " << m_updatePeriodMillisecs);
+
+    DEBUG_MESSAGE_EX_INFO("Creating event thread for stream URL: " << m_cameraDetails.streamUrl);
+
+    m_eventThread = std::make_shared<core_lib::threads::EventThread>(
+        std::bind(&IpFreelyStreamProcessor::ThreadEventCallback, this), m_updatePeriodMillisecs);
 }
 
 IpFreelyStreamProcessor::~IpFreelyStreamProcessor()
@@ -477,6 +480,34 @@ void IpFreelyStreamProcessor::CheckMotionDetector()
     m_motionDetector->AddNextFrame(m_videoFrame);
 }
 
+void IpFreelyStreamProcessor::CreateVideoCapture()
+{
+    if (m_videoCapture)
+    {
+        m_videoCapture.release();
+    }
+
+    bool isId;
+    auto comleteStreamUrl = m_cameraDetails.CompleteStreamUrl(isId);
+
+    if (isId)
+    {
+        m_videoCapture = cv::makePtr<cv::VideoCapture>(std::stoi(comleteStreamUrl));
+    }
+    else
+    {
+        m_videoCapture = cv::makePtr<cv::VideoCapture>(comleteStreamUrl.c_str());
+    }
+
+    if (!m_videoCapture->isOpened())
+    {
+        BOOST_THROW_EXCEPTION(std::runtime_error("Failed to open VideoCapture object."));
+    }
+
+    m_videoWidth  = static_cast<int>(m_videoCapture->get(CV_CAP_PROP_FRAME_WIDTH));
+    m_videoHeight = static_cast<int>(m_videoCapture->get(CV_CAP_PROP_FRAME_HEIGHT));
+}
+
 void IpFreelyStreamProcessor::CheckFps()
 {
     auto fps = m_videoCapture->get(CV_CAP_PROP_FPS);
@@ -492,13 +523,15 @@ void IpFreelyStreamProcessor::CheckFps()
 
     if (std::abs(fps - m_fps) > 0.1)
     {
+        // If the FPS has changed then recreate the video capture object.
+        CreateVideoCapture();
+
         m_fps                   = fps;
         m_updatePeriodMillisecs = static_cast<unsigned int>(1000.0 / m_fps);
 
-        DEBUG_MESSAGE_EX_INFO("Stream at: " << m_cameraDetails.streamUrl << " running with FPS of: "
-                                            << m_fps
-                                            << ", thread update period (ms): "
-                                            << m_updatePeriodMillisecs);
+        DEBUG_MESSAGE_EX_INFO("Stream at: "
+                              << m_cameraDetails.streamUrl << " running with FPS of: " << m_fps
+                              << ", thread update period (ms): " << m_updatePeriodMillisecs);
 
         if (m_videoWriter)
         {

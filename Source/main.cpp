@@ -48,10 +48,10 @@ std::string GetAppVersion(const std::string& appFilePath)
     std::wstring appFilePathW(appFilePath.begin(), appFilePath.end());
     const DWORD  blockSize = GetFileVersionInfoSize(appFilePathW.c_str(), NULL);
 
-    std::string appVersion;
-    auto deleter = [](BYTE const* p) { delete[] p; };
+    std::string                              appVersion;
+    auto                                     deleter = [](BYTE const* p) { delete[] p; };
     std::unique_ptr<BYTE, decltype(deleter)> block(new BYTE[blockSize], deleter);
-    LPVOID pBlock = reinterpret_cast<LPVOID>(block.get());
+    LPVOID                                   pBlock = reinterpret_cast<LPVOID>(block.get());
 
     if (GetFileVersionInfo(appFilePathW.c_str(), NULL, blockSize, pBlock))
     {
@@ -75,7 +75,7 @@ std::string GetAppVersion(const std::string& appFilePath)
     return appVersion;
 }
 #else
-#define IPFREELY_VERSION "1.1.3.0"
+#define IPFREELY_VERSION "1.1.4.0"
 #endif
 
 int main(int argc, char* argv[])
