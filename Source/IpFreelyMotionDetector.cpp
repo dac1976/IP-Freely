@@ -433,13 +433,13 @@ bool IpFreelyMotionDetector::CheckForIntersections()
             DEBUG_MESSAGE_EX_INFO("Motion detector intersection found for camera stream URL: "
                                   << m_cameraDetails.streamUrl
                                   << ", region details: L = "
-                                  << r.left()
+                                  << region.first.first
                                   << ", T = "
-                                  << r.top()
+                                  << region.first.second
                                   << ", W = "
-                                  << r.width()
+                                  << region.second.first
                                   << ", H = "
-                                  << r.height());
+                                  << region.second.second);
 
             break;
         }
