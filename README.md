@@ -63,7 +63,7 @@ Taken from release 1.1.5.0.
 [pic06]: https://github.com/dac1976/IP-Freely/blob/master/Images/pic06.png "Camera storage browser."
 [pic07]: https://github.com/dac1976/IP-Freely/blob/master/Images/pic07.png "Camera stream recording."
 [pic08]: https://github.com/dac1976/IP-Freely/blob/master/Images/pic08.png "Motion detection schedule."
-[pic09]: https://github.com/dac1976/IP-Freely/blob/master/Images/pic08.png "Motion region setup."
+[pic09]: https://github.com/dac1976/IP-Freely/blob/master/Images/pic09.png "Motion region setup."
 
 ## Build Requirements ##
 This application has been developed in Qt Creator and tested for use in Windows 10 and Linux (Ubuntu 17.10). In Windows it is recommended to use the MSVC2015 64bit tool chain from within Qt Creator to build and test the code. In Linux the code has been tested with GCC 7.2.0 but other C++11 compilers should be fine, such as Clang.
