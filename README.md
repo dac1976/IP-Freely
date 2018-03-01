@@ -1,6 +1,6 @@
 # IP Freely (IP/Web camera stream viewer and recorder) #
 ## Introduction ##
-This project implements a hopefully useful cross-platform application to view and record from up to 4 IP camera live RTSP and HTTP(S) streams. You can also connect to local web cams. The application also allows you to view a camera's on-board storage (e.g. SD card) and download video content from the camera's on-board storage to your PC (or anywhere else your PC can browse to on your network, e.g. a NAS).
+This project implements a hopefully useful cross-platform application to view and record from up to 4 IP cameras' live RTSP and HTTP(S) streams. You can also connect to local web cameras. The application also allows you to view a camera's on-board storage (e.g. SD card) and download video content from the camera's on-board storage to your PC (or anywhere else your PC can browse to on your network, e.g. a NAS).
 
 It is licensed under the GNU Lesser General Public License 3.0 and the relevant documentation for this can be found at the top of each source file and the LICENSE text file.
 
@@ -11,30 +11,33 @@ Copyright (C) 2018 Duncan Crutchley.
 ## Background ##
 I started this project shortly after buying and installing some RTSP compatible IP security cameras at my house. The software that came with the cameras was adequate but not great; relying on ActiveX and Internet Explorer. Instead this project provides a native application to view and record up to 4 cameras' streams. Currently, this application does not give you any control over the IP cameras' on-board settings.
 
-## Key Features (Version 1.1.0.0) ##
+## Key Features (Current Version 1.1.5.0) ##
+* Clean and intuitive UI, hopefully!
 * Multi-threaded.
 * Cross-platform (Windows and Linux).
-* Supports up to 4 user configurable RTSP camera streams displayed in a 2x2 grid.
-* Clean and intuitive UI, hopefully!
+* Supports up to 4 user configurable IP or web camera streams displayed in a 2x2 grid.
 * If a suitable URL is provided then you can view a camera's on-board storage (e.g. SD card) and download the content to your PC.
 * The user can view a larger expanded view from any of the 4 streams.
 * Still snapshot images can be taken from the camera feeds at any time with the click of a button.
-* Local AVI (DivX) video recordings can be made from the camera streams at the click of button.
+* Local AVI (DivX on Windows, XDiv on Linux) video recordings can be made from the camera streams at the click of button.
 * Scheduled recording can be setup and enabled on a per camera basis, with the schedule allowing selection of days and active hours in the day.
-* Motion detection with user-configurable scheduling (similar to scheduled recordings). 
+* Motion detection can be setup with user-configurable scheduling (similar to scheduled recordings). 
 * Per camera user definable motion detection regions.
 * Per camera motion detection algorithm sensitivity (off, low sensitivity, medium sensitivity, high sensitivity and manual settings).
+* Built-in disk space manager. User can configure how many days recordings to keep and a maximum percentage of used disk space. The disk manager periodically i nthe background will remove oldest data first and ensures used space always falls within defined limits.
 * (Planned) Motion triggered email send email alerts. 
 * (Planned) Built-in web server to display some basic features, such as periodically updated snapshots from the camera feeds.
 
 ## Screen-shots ##
-Taken from release 1.0.1.0 (slightly out-of-date).
+Taken from release 1.1.5.0.
 
 ### Preferences ###
 
 ![alt text][pic04]
 
 ![alt text][pic05]
+
+![alt text][pic08]
 
 ### Camera Setup ###
 
@@ -43,6 +46,8 @@ Taken from release 1.0.1.0 (slightly out-of-date).
 ### Main Screen ###
 
 ![alt text][pic01]
+
+![alt text][pic09]
 
 ![alt text][pic02]
 
@@ -57,6 +62,8 @@ Taken from release 1.0.1.0 (slightly out-of-date).
 [pic05]: https://github.com/dac1976/IP-Freely/blob/master/Images/pic05.png "Recording schedule preferences."
 [pic06]: https://github.com/dac1976/IP-Freely/blob/master/Images/pic06.png "Camera storage browser."
 [pic07]: https://github.com/dac1976/IP-Freely/blob/master/Images/pic07.png "Camera stream recording."
+[pic08]: https://github.com/dac1976/IP-Freely/blob/master/Images/pic08.png "Motion detection schedule."
+[pic09]: https://github.com/dac1976/IP-Freely/blob/master/Images/pic08.png "Motion region setup."
 
 ## Build Requirements ##
 This application has been developed in Qt Creator and tested for use in Windows 10 and Linux (Ubuntu 17.10). In Windows it is recommended to use the MSVC2015 64bit tool chain from within Qt Creator to build and test the code. In Linux the code has been tested with GCC 7.2.0 but other C++11 compilers should be fine, such as Clang.
