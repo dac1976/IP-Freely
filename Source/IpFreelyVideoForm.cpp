@@ -121,7 +121,7 @@ void IpFreelyVideoForm::SetVideoFrame(QImage const& videoFrame, double const fps
 
         for (auto const& motionRegion : motionRegions)
         {
-            auto r = ipfreely::CreateQRectFromVidoFrameDims(
+            auto r = ipfreely::CreateQRectFromVideoFrameDims(
                 resizedImage.width(), resizedImage.height(), motionRegion);
 
             if (rect.intersects(r))

@@ -25,6 +25,7 @@
 #include "IpFreelyMotionDetector.h"
 #include <sstream>
 #include <cmath>
+#include <cstdint>
 #include <boost/throw_exception.hpp>
 #include <boost/filesystem.hpp>
 #include "StringUtils/StringUtils.h"
@@ -35,10 +36,11 @@ namespace bfs = boost::filesystem;
 namespace ipfreely
 {
 
-static constexpr int    MESSAGE_ID         = 1;
-static constexpr double DIFF_MAX_VALUE     = 255.0;
-static constexpr int    IDEAL_FRAME_HEIGHT = 600;
-static constexpr size_t HOLD_ON_OFF_SECS   = 10;
+static constexpr int    MESSAGE_ID           = 1;
+static constexpr double DIFF_MAX_VALUE       = 255.0;
+static constexpr int    IDEAL_FRAME_HEIGHT   = 600;
+static constexpr size_t HOLD_ON_OFF_SECS     = 10;
+static constexpr int    BOUNDING_RECT_MARGIN = 1;
 
 #if defined(MOTION_DETECTOR_DEBUG)
 static constexpr int CONTOUR_LINE_THICKNESS = 2;
@@ -78,7 +80,10 @@ IpFreelyMotionDetector::IpFreelyMotionDetector(std::string const& name,
 
     Initialise();
 
-    DEBUG_MESSAGE_EX_INFO("Started motion detector for stream at: " << m_cameraDetails.streamUrl);
+    DEBUG_MESSAGE_EX_INFO("Started motion detector for stream at: "
+                          << m_cameraDetails.streamUrl
+                          << ", required file duration (in seconds) set to: "
+                          << m_requiredFileDurationSecs);
 
     m_msgQueueThread.RegisterMessageHandler(
         MESSAGE_ID,
@@ -218,8 +223,15 @@ void IpFreelyMotionDetector::UpdateNextFrame()
 
 bool IpFreelyMotionDetector::DetectMotion()
 {
-    // This algorithm is based on an example given here:
+    // This algorithm is inspired by an example given here:
     // https://github.com/cedricve/motion-detection
+    // However I have taken this basic idea and added
+    // some extra layers to the algorithm to smooth out
+    // out the motion region now gets a smoothing rolling
+    // average applied to it between frames to make it
+    // less janky. I've also added a check to filter
+    // out motion regions less than a configurable percentage
+    // of the frame's total area.
 
     // Calculate differences between the images and do AND-operation
     // then threshold image, low differences are ignored (ex. contrast
@@ -248,9 +260,9 @@ bool IpFreelyMotionDetector::DetectMotion()
     {
         size_t numChanges = 0;
 
-        // Loop over image and detect changes. This is much better
-        // for CPU performance compared to using OpenCV's contour
-        // fitting algorithms.
+        // Loop over image and detect changes. This is better
+        // for CPU performance compared to using OpenCV's
+        // fcontour itting algorithms.
         for (int j = 0; j < motion.rows; j += 2)
         {
             for (int i = 0; i < motion.cols; i += 2)
@@ -258,7 +270,7 @@ bool IpFreelyMotionDetector::DetectMotion()
                 // check if at pixel (j,i) intensity is equal to 255
                 // this means that the pixel is different in the sequence
                 // of images (prev_frame, current_frame, next_frame)
-                if (static_cast<int>(motion.at<uchar>(j, i)) == 255)
+                if (static_cast<int>(motion.at<uint8_t>(j, i)) == 255)
                 {
                     ++numChanges;
 
@@ -290,24 +302,24 @@ bool IpFreelyMotionDetector::DetectMotion()
         // that encompasses all the motion detected.
         if (numChanges > 0)
         {
-            if (min_x - 10 > 0)
+            if (min_x - BOUNDING_RECT_MARGIN > 0)
             {
-                min_x -= 10;
+                min_x -= BOUNDING_RECT_MARGIN;
             }
 
-            if (min_y - 10 > 0)
+            if (min_y - BOUNDING_RECT_MARGIN > 0)
             {
-                min_y -= 10;
+                min_y -= BOUNDING_RECT_MARGIN;
             }
 
-            if (max_x + 10 < motion.cols - 1)
+            if (max_x + BOUNDING_RECT_MARGIN < (motion.cols - 1))
             {
-                max_x += 10;
+                max_x += BOUNDING_RECT_MARGIN;
             }
 
-            if (max_y + 10 < motion.rows - 1)
+            if (max_y + BOUNDING_RECT_MARGIN < (motion.rows - 1))
             {
-                max_y += 10;
+                max_y += BOUNDING_RECT_MARGIN;
             }
 
             cv::Point x(min_x, min_y);
@@ -334,7 +346,7 @@ bool IpFreelyMotionDetector::DetectMotion()
     // we ignore small, most likely insignificnt motion.
     if (maxBoundingRect.area() > m_minImageChangeArea)
     {
-        // Create a motin bounding rectangle sclaed to original
+        // Create a motion bounding rectangle scaled to original
         // video frame's size.
         cv::Point tl1(static_cast<int>(static_cast<double>(min_x) / m_motionFrameScalar),
                       static_cast<int>(static_cast<double>(min_y) / m_motionFrameScalar));
@@ -343,9 +355,9 @@ bool IpFreelyMotionDetector::DetectMotion()
 
         auto minBoundingRect = cv::Rect(tl1, br1);
 
-        // To make the bounding rectangle appear less jerky we'll
-        // combine it with the previous bounding rectangle used a
-        // smoothed rolling average controlled by the smoothing factor.
+        // To make the bounding rectangle appear less janky we'll
+        // combine it with the previous bounding rectangle using a
+        // smoothing rolling average controlled by the smoothing factor.
         std::lock_guard<std::mutex> lock(m_motionMutex);
 
         double l = (static_cast<double>(m_motionBoundingRect.tl().x) *
@@ -373,7 +385,7 @@ bool IpFreelyMotionDetector::DetectMotion()
     else
     {
         // We have no current motion but rather than instantly removing the bounding
-        // rectangle instead shrink it down to zero area using the bounding rectangle.
+        // rectangle instead shrink it down to zero area gradually ov er a few iterations.
         std::lock_guard<std::mutex> lock(m_motionMutex);
 
         double l = m_motionBoundingRect.tl().x +
@@ -412,14 +424,22 @@ bool IpFreelyMotionDetector::CheckForIntersections()
 
     for (auto const& region : m_cameraDetails.motionRegions)
     {
-        auto r = ipfreely::CreateQRectFromVidoFrameDims(m_originalWidth, m_originalHeight, region);
+        auto r = ipfreely::CreateQRectFromVideoFrameDims(m_originalWidth, m_originalHeight, region);
 
         if (mr.intersects(r))
         {
             motionIntersection = true;
 
-            DEBUG_MESSAGE_EX_INFO("Motion detector intersection found, camera stream URL: "
-                                  << m_cameraDetails.streamUrl);
+            DEBUG_MESSAGE_EX_INFO("Motion detector intersection found for camera stream URL: "
+                                  << m_cameraDetails.streamUrl
+                                  << ", region details: L = "
+                                  << r.left()
+                                  << ", T = "
+                                  << r.top()
+                                  << ", W = "
+                                  << r.width()
+                                  << ", H = "
+                                  << r.height());
 
             break;
         }
@@ -468,7 +488,7 @@ bool IpFreelyMotionDetector::MessageHandler(video_frame_t& msg)
         }
     }
 
-    // If hold-off count reached then redet count and reset writer
+    // If hold-off count reached then reset count and reset writer
     // and finally set recording flag to false.
     if (m_holdOffFrameCount == m_holdOffFrameCountLimit)
     {
@@ -498,11 +518,13 @@ void IpFreelyMotionDetector::CreateCaptureObjects()
     {
         if (m_fileDurationSecs < m_requiredFileDurationSecs)
         {
-            DEBUG_MESSAGE_EX_DEBUG(
-                "Motion detector file duration reached for current video file, camera stream URL: "
-                << m_cameraDetails.streamUrl);
             return;
         }
+
+        DEBUG_MESSAGE_EX_INFO(
+            "Motion detector file duration reached for current video file, camera stream URL: "
+            << m_cameraDetails.streamUrl
+            << ", file writer being closed.");
 
         m_videoWriter.release();
         SetWritingStream(false);
@@ -531,7 +553,9 @@ void IpFreelyMotionDetector::CreateCaptureObjects()
 
     p /= oss.str();
 
-    DEBUG_MESSAGE_EX_INFO("Creating new output video file: " << p.string());
+    DEBUG_MESSAGE_EX_INFO("Creating new output video file: " << p.string() << ", FPS: " << m_fps);
+
+    m_fileDurationSecs = 0.0;
 
 #if BOOST_OS_WINDOWS
     m_videoWriter = cv::makePtr<cv::VideoWriter>(p.string().c_str(),
@@ -548,10 +572,10 @@ void IpFreelyMotionDetector::CreateCaptureObjects()
     if (!m_videoWriter->isOpened())
     {
         m_videoWriter.release();
-        BOOST_THROW_EXCEPTION(std::runtime_error("Failed to open VideoWriter object"));
+        DEBUG_MESSAGE_EX_ERROR("Failed to open VideoWriter object: " << p.string());
+        return;
     }
 
-    m_fileDurationSecs = 0.0;
     SetWritingStream(true);
 }
 

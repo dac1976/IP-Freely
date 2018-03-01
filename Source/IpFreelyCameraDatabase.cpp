@@ -272,8 +272,8 @@ void IpFreelyCameraDatabase::Load()
     *this = std::move(camDb);
 }
 
-QRect CreateQRectFromVidoFrameDims(int const videoFrameWidth, int const videoFrameHeight,
-                                   IpCamera::region_t const& motionRegion)
+QRect CreateQRectFromVideoFrameDims(int const videoFrameWidth, int const videoFrameHeight,
+                                    IpCamera::region_t const& motionRegion)
 {
     QRect r;
     r.setTop(static_cast<int>(static_cast<double>(videoFrameHeight) * motionRegion.first.second));

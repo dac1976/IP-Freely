@@ -1299,7 +1299,7 @@ void IpFreelyMainWindow::UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage
 
             for (auto const& motionRegion : motionRectAreas)
             {
-                auto r = ipfreely::CreateQRectFromVidoFrameDims(
+                auto r = ipfreely::CreateQRectFromVideoFrameDims(
                     displayFrame.width(), displayFrame.height(), motionRegion);
 
                 if (rect.intersects(r))

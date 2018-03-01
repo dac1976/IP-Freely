@@ -135,9 +135,10 @@ IpFreelyStreamProcessor::IpFreelyStreamProcessor(
     m_fps                   = fps;
     m_updatePeriodMillisecs = static_cast<unsigned int>(1000.0 / m_fps);
 
-    DEBUG_MESSAGE_EX_INFO("Stream at: "
-                          << m_cameraDetails.streamUrl << " running with FPS of: " << m_fps
-                          << ", thread update period (ms): " << m_updatePeriodMillisecs);
+    DEBUG_MESSAGE_EX_INFO("Stream at: " << m_cameraDetails.streamUrl << " running with FPS of: "
+                                        << m_fps
+                                        << ", thread update period (ms): "
+                                        << m_updatePeriodMillisecs);
 
     DEBUG_MESSAGE_EX_INFO("Creating event thread for stream URL: " << m_cameraDetails.streamUrl);
 
@@ -155,7 +156,8 @@ void IpFreelyStreamProcessor::StartVideoWriting() noexcept
     if (m_useRecordingSchedule)
     {
         DEBUG_MESSAGE_EX_WARNING(
-            "Manual recording disabled because a schedule is defined. Camera: " << m_name);
+            "Manual recording disabled because a recording schedule is defined. Camera: "
+            << m_name);
         return;
     }
 
@@ -167,7 +169,8 @@ void IpFreelyStreamProcessor::StopVideoWriting() noexcept
     if (m_useRecordingSchedule)
     {
         DEBUG_MESSAGE_EX_WARNING(
-            "Manual recording disabled because a schedule is defined. Camera: " << m_name);
+            "Manual recording disabled because a recording schedule is defined. Camera: "
+            << m_name);
         return;
     }
 
@@ -281,7 +284,8 @@ bool IpFreelyStreamProcessor::VerifySchedule(std::string const&                 
     else
     {
         DEBUG_MESSAGE_EX_WARNING(
-            scheduleId << " is disabled. No days/hours are set as active in the schedule.");
+            scheduleId
+            << " is disabled. Either no days/hours are set or scheduled recording is disabled.");
     }
 
     return scheduleOk;
@@ -364,6 +368,8 @@ void IpFreelyStreamProcessor::CreateCaptureObjects()
             m_videoWriter.release();
         }
 
+        m_fileDurationSecs = 0.0;
+
         auto localTime = std::localtime(&m_currentTime);
         char folderName[9];
         std::strftime(folderName, sizeof(folderName), "%Y%m%d", localTime);
@@ -376,9 +382,8 @@ void IpFreelyStreamProcessor::CreateCaptureObjects()
         {
             if (!bfs::create_directories(p))
             {
-                std::ostringstream oss;
-                oss << "Failed to create directories: " << p.string();
-                BOOST_THROW_EXCEPTION(std::runtime_error(oss.str()));
+                DEBUG_MESSAGE_EX_ERROR("Failed to create directories: " << p.string());
+                return;
             }
         }
 
@@ -387,7 +392,8 @@ void IpFreelyStreamProcessor::CreateCaptureObjects()
 
         p /= oss.str();
 
-        DEBUG_MESSAGE_EX_INFO("Creating new output video file: " << p.string());
+        DEBUG_MESSAGE_EX_INFO(
+            "Creating new output video file: " << p.string() << ", FPS: " << m_fps);
 
 #if BOOST_OS_WINDOWS
         m_videoWriter = cv::makePtr<cv::VideoWriter>(p.string().c_str(),
@@ -404,13 +410,13 @@ void IpFreelyStreamProcessor::CreateCaptureObjects()
         if (!m_videoWriter->isOpened())
         {
             m_videoWriter.release();
-            BOOST_THROW_EXCEPTION(std::runtime_error("Failed to open VideoWriter object"));
+            DEBUG_MESSAGE_EX_ERROR("Failed to open VideoWriter object for: " << p.string());
+            return;
         }
-
-        m_fileDurationSecs = 0.0;
     }
     else
     {
+        DEBUG_MESSAGE_EX_INFO("Video writing disabled, releasing video writer, camera: " << m_name);
         m_videoWriter.release();
     }
 }
@@ -501,7 +507,9 @@ void IpFreelyStreamProcessor::CreateVideoCapture()
 
     if (!m_videoCapture->isOpened())
     {
-        BOOST_THROW_EXCEPTION(std::runtime_error("Failed to open VideoCapture object."));
+        std::ostringstream oss;
+        oss << "Failed to open VideoCapture object, url: " << m_cameraDetails.streamUrl;
+        BOOST_THROW_EXCEPTION(std::runtime_error(oss.str()));
     }
 
     m_videoWidth  = static_cast<int>(m_videoCapture->get(CV_CAP_PROP_FRAME_WIDTH));
@@ -523,15 +531,19 @@ void IpFreelyStreamProcessor::CheckFps()
 
     if (std::abs(fps - m_fps) > 0.1)
     {
+        DEBUG_MESSAGE_EX_WARNING(
+            "Detected change in FPS for stream: " << m_cameraDetails.streamUrl);
+
         // If the FPS has changed then recreate the video capture object.
         CreateVideoCapture();
 
         m_fps                   = fps;
         m_updatePeriodMillisecs = static_cast<unsigned int>(1000.0 / m_fps);
 
-        DEBUG_MESSAGE_EX_INFO("Stream at: "
-                              << m_cameraDetails.streamUrl << " running with FPS of: " << m_fps
-                              << ", thread update period (ms): " << m_updatePeriodMillisecs);
+        DEBUG_MESSAGE_EX_INFO("Stream at: " << m_cameraDetails.streamUrl << " running with FPS of: "
+                                            << m_fps
+                                            << ", thread update period (ms): "
+                                            << m_updatePeriodMillisecs);
 
         if (m_videoWriter)
         {
