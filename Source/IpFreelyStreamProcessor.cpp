@@ -416,8 +416,12 @@ void IpFreelyStreamProcessor::CreateCaptureObjects()
     }
     else
     {
-        DEBUG_MESSAGE_EX_INFO("Video writing disabled, releasing video writer, camera: " << m_name);
-        m_videoWriter.release();
+        if (m_videoWriter)
+        {
+            DEBUG_MESSAGE_EX_INFO(
+                "Video writing disabled, releasing video writer, camera: " << m_name);
+            m_videoWriter.release();
+        }
     }
 }
 
