@@ -121,7 +121,8 @@ IpFreelyStreamProcessor::IpFreelyStreamProcessor(
 
     CreateVideoCapture();
 
-    auto fps = m_videoCapture->get(CV_CAP_PROP_FPS);
+    auto fps      = m_videoCapture->get(CV_CAP_PROP_FPS);
+    m_originalFps = fps;
 
     if ((fps < MIN_FPS) || (fps > MAX_FPS))
     {
@@ -524,19 +525,20 @@ void IpFreelyStreamProcessor::CheckFps()
 {
     auto fps = m_videoCapture->get(CV_CAP_PROP_FPS);
 
-    if ((fps < MIN_FPS) || (fps > MAX_FPS))
+    if (std::abs(fps - m_originalFps) > 0.1)
     {
-        fps = m_cameraDetails.cameraMaxFps;
-
-        DEBUG_MESSAGE_EX_WARNING(
-            "Invalid FPS obtained from stream defaulting to user preference FPS, stream URL: "
-            << m_cameraDetails.streamUrl);
-    }
-
-    if (std::abs(fps - m_fps) > 0.1)
-    {
+        m_originalFps = fps;
         DEBUG_MESSAGE_EX_WARNING(
             "Detected change in FPS for stream: " << m_cameraDetails.streamUrl);
+
+        if ((fps < MIN_FPS) || (fps > MAX_FPS))
+        {
+            fps = m_cameraDetails.cameraMaxFps;
+
+            DEBUG_MESSAGE_EX_WARNING(
+                "Invalid FPS obtained from stream defaulting to user preference FPS, stream URL: "
+                << m_cameraDetails.streamUrl);
+        }
 
         // If the FPS has changed then recreate the video capture object.
         CreateVideoCapture();

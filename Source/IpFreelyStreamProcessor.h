@@ -125,18 +125,18 @@ private:
     static bool IsScheduleEnabled(std::vector<std::vector<bool>> const& schedule);
     static bool VerifySchedule(std::string const&                    scheduleId,
                                std::vector<std::vector<bool>> const& schedule);
-    void        ThreadEventCallback() noexcept;
-    void        SetEnableVideoWriting(bool enable) noexcept;
-    bool        GetEnableVideoWriting() const noexcept;
-    void        CheckRecordingSchedule();
-    void        CreateCaptureObjects();
-    void        GrabVideoFrame();
-    void        WriteVideoFrame();
-    bool        CheckMotionSchedule() const;
-    void        InitialiseMotionDetector();
-    void        CheckMotionDetector();
-    void        CreateVideoCapture();
-    void        CheckFps();
+    void ThreadEventCallback() noexcept;
+    void SetEnableVideoWriting(bool enable) noexcept;
+    bool GetEnableVideoWriting() const noexcept;
+    void CheckRecordingSchedule();
+    void CreateCaptureObjects();
+    void GrabVideoFrame();
+    void WriteVideoFrame();
+    bool CheckMotionSchedule() const;
+    void InitialiseMotionDetector();
+    void CheckMotionDetector();
+    void CreateVideoCapture();
+    void CheckFps();
 
 private:
     mutable std::mutex                              m_writingMutex{};
@@ -149,6 +149,7 @@ private:
     std::vector<std::vector<bool>>                  m_recordingSchedule{};
     std::vector<std::vector<bool>>                  m_motionSchedule{};
     unsigned int                                    m_updatePeriodMillisecs{0};
+    double                                          m_originalFps{0.0};
     double                                          m_fps{0.0};
     bool                                            m_useRecordingSchedule{false};
     bool                                            m_useMotionSchedule{false};
