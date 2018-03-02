@@ -124,6 +124,9 @@ IpFreelyStreamProcessor::IpFreelyStreamProcessor(
     auto fps      = m_videoCapture->get(CV_CAP_PROP_FPS);
     m_originalFps = fps;
 
+    DEBUG_MESSAGE_EX_INFO(
+        "Stream at: " << m_cameraDetails.streamUrl << ", stream FPS: " << m_originalFps);
+
     if ((fps < MIN_FPS) || (fps > MAX_FPS))
     {
         fps = m_cameraDetails.cameraMaxFps;
@@ -527,9 +530,13 @@ void IpFreelyStreamProcessor::CheckFps()
 
     if (std::abs(fps - m_originalFps) > 0.1)
     {
+        DEBUG_MESSAGE_EX_WARNING("Detected change in FPS for stream: " << m_cameraDetails.streamUrl
+                                                                       << ", changed from: "
+                                                                       << m_originalFps
+                                                                       << " to: "
+                                                                       << fps);
+
         m_originalFps = fps;
-        DEBUG_MESSAGE_EX_WARNING(
-            "Detected change in FPS for stream: " << m_cameraDetails.streamUrl);
 
         if ((fps < MIN_FPS) || (fps > MAX_FPS))
         {
