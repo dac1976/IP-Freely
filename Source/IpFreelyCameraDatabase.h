@@ -60,6 +60,12 @@ enum class eMotionDetectorMode
     manual
 };
 
+/*! \brief Minimum allowed recording FPS. */
+static constexpr double MIN_FPS = 1.0;
+
+/*! \brief Maximum allowed recording FPS. */
+static constexpr double MAX_FPS = 60.0;
+
 /*! \brief Camera's details structure. */
 struct IpCamera final
 {
@@ -114,7 +120,7 @@ struct IpCamera final
     /*! \brief Vector of motion detection regions. */
     regions_t motionRegions{};
 
-    /*! \brief Camera's maximum FPS as defined in its settings. */
+    /*! \brief Camera's maximum prefered recording FPS as defined in its settings. */
     double cameraMaxFps{25.0};
 
     /*! \brief Enabled scheduled motion recording mode. */
@@ -336,7 +342,7 @@ private:
     }
 
 private:
-    std::string m_dbPath{};
+    std::string                m_dbPath{};
     std::map<eCamId, IpCamera> m_cameras{};
 };
 

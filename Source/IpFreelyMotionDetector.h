@@ -63,7 +63,7 @@ public:
                            double const fps, int const originalWidth, int const originalHeight);
 
     /*! \brief IpFreelyMotionDetector destructor. */
-    ~IpFreelyMotionDetector();
+    ~IpFreelyMotionDetector() = default;
 
     /*! \brief IpFreelyMotionDetector deleted copy constructor. */
     IpFreelyMotionDetector(IpFreelyMotionDetector const&) = delete;

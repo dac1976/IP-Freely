@@ -74,7 +74,7 @@ public:
                             std::vector<std::vector<bool>> const& motionSchedule    = {});
 
     /*! \brief IpFreelyStreamProcessor destructor. */
-    virtual ~IpFreelyStreamProcessor();
+    ~IpFreelyStreamProcessor() = default;
 
     /*! \brief IpFreelyStreamProcessor deleted copy constructor. */
     IpFreelyStreamProcessor(IpFreelyStreamProcessor const&) = delete;
@@ -116,8 +116,14 @@ public:
     QImage CurrentVideoFrame(QRect* motionRectangle = nullptr) const;
 
     /*!
-     * \brief CurrentFps gives acces to current stream FPS.
-     * \return The streams FPS.
+     * \brief OriginalFps gives acces to camera stream's reported FPS.
+     * \return The stream's reported FPS.
+     */
+    double OriginalFps() const noexcept;
+
+    /*!
+     * \brief CurrentFps gives acces to current stream's recording FPS.
+     * \return The stream's recording FPS.
      */
     double CurrentFps() const noexcept;
 
@@ -136,6 +142,7 @@ private:
     void        InitialiseMotionDetector();
     void        CheckMotionDetector();
     void        CreateVideoCapture();
+    bool        ComputeFps();
     void        CheckFps();
 
 private:

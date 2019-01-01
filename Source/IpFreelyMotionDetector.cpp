@@ -90,11 +90,6 @@ IpFreelyMotionDetector::IpFreelyMotionDetector(std::string const& name,
         std::bind(&IpFreelyMotionDetector::MessageHandler, this, std::placeholders::_1));
 }
 
-IpFreelyMotionDetector::~IpFreelyMotionDetector()
-{
-    // Do nothing.
-}
-
 void IpFreelyMotionDetector::AddNextFrame(cv::Mat const& videoFrame)
 {
     m_msgQueueThread.Push(std::make_shared<cv::Mat>(videoFrame));
@@ -227,7 +222,7 @@ bool IpFreelyMotionDetector::DetectMotion()
     // https://github.com/cedricve/motion-detection
     // However I have taken this basic idea and added
     // some extra layers to the algorithm to smooth out
-    // out the motion region now gets a smoothing rolling
+    // detection. The motion region now gets a smoothing rolling
     // average applied to it between frames to make it
     // less janky. I've also added a check to filter
     // out motion regions less than a configurable percentage
@@ -263,7 +258,7 @@ bool IpFreelyMotionDetector::DetectMotion()
 
         // Loop over image and detect changes. This is better
         // for CPU performance compared to using OpenCV's
-        // fcontour itting algorithms.
+        // contour fitting algorithms.
         for (int j = 0; j < motion.rows; j += 2)
         {
             for (int i = 0; i < motion.cols; i += 2)
@@ -386,7 +381,7 @@ bool IpFreelyMotionDetector::DetectMotion()
     else
     {
         // We have no current motion but rather than instantly removing the bounding
-        // rectangle instead shrink it down to zero area gradually ov er a few iterations.
+        // rectangle instead shrink it down to zero area gradually over a few iterations.
         std::lock_guard<std::mutex> lock(m_motionMutex);
 
         double l = m_motionBoundingRect.tl().x +
@@ -460,7 +455,7 @@ bool IpFreelyMotionDetector::MessageHandler(video_frame_t& msg)
     m_originalFrame = msg;
 
     // Get current time stamp.
-    m_currentTime = time(0);
+    m_currentTime = time(nullptr);
 
     InitialiseFrames();
     UpdateNextFrame();

@@ -54,11 +54,12 @@ IpFreelyVideoForm::~IpFreelyVideoForm()
     delete ui;
 }
 
-void IpFreelyVideoForm::SetVideoFrame(QImage const& videoFrame, double const fps,
-                                      QRect const& motionBoundingRect,
-                                      bool const streamBeingWritten, regions_t const& motionRegions)
+void IpFreelyVideoForm::SetVideoFrame(QImage const& videoFrame, double fps, double originalFps,
+                                      QRect const& motionBoundingRect, bool streamBeingWritten,
+                                      regions_t const& motionRegions)
 {
-    auto title = m_title + ": " + QString::number(fps) + tr(" FPS");
+    auto title = m_title + ": " + QString::number(fps) + tr(" Recording FPS, ") +
+                 QString::number(originalFps) + tr(" Stream FPS");
     setWindowTitle(title);
 
     double frameAspectRatio =

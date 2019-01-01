@@ -68,7 +68,7 @@ else {
     QMAKE_CXXFLAGS += -std=c++14
 
     # Set version info for library.
-    VERSION = 1.1.6
+    VERSION = 1.2.0
 
     INCLUDEPATH += /usr/include/opencv4 \
         /mnt/Data/projects/ThirdParty \

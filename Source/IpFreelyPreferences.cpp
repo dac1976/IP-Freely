@@ -45,14 +45,6 @@ IpFreelyPreferences::IpFreelyPreferences(bool const load)
     savePath         = bfs::system_complete(savePath);
     m_saveFolderPath = savePath.string();
 
-    if (!bfs::exists(savePath))
-    {
-        if (!bfs::create_directories(savePath))
-        {
-            DEBUG_MESSAGE_EX_ERROR("Failed to create save folder: " << m_saveFolderPath);
-        }
-    }
-
     path /= "IpFreely.cfg";
     path = bfs::system_complete(path);
 
@@ -63,6 +55,14 @@ IpFreelyPreferences::IpFreelyPreferences(bool const load)
         try
         {
             Load();
+
+            if (!bfs::exists(m_saveFolderPath))
+            {
+                if (!bfs::create_directories(m_saveFolderPath))
+                {
+                    DEBUG_MESSAGE_EX_ERROR("Failed to create save folder: " << m_saveFolderPath);
+                }
+            }
         }
         catch (...)
         {

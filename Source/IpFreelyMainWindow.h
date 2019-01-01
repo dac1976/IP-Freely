@@ -127,7 +127,7 @@ private:
     void     UpdateCamFeedFrame(ipfreely::eCamId const camId, QImage const& videoFrame,
                                 QRect const& motionBoundingRect, bool const streamProcIsWriting);
     void     SaveImageSnapshot(ipfreely::eCamId const camId);
-    void     SetFpsInTitle(ipfreely::eCamId const camId, double const fps);
+    void     SetFpsInTitle(ipfreely::eCamId const camId, double fps, double originalFps);
     void     ShowExpandedVideoForm(ipfreely::eCamId const camId);
     void     ViewStorage(ipfreely::IpCamera const& camera);
     void     VideoFrameAreaSelection(int const cameraId, QRectF const& percentageSelection);

@@ -66,13 +66,15 @@ public:
     /*!
      * \brief SetVideoFrame sets the current frame of video in the display.
      * \param[in] videoFrame - The frame of video to display.
-     * \param[in] fps - The video stream's actual FPS.
+     * \param[in] fps - The video stream's recording FPS.
+     * \param[in] originalFps - The video stream's actual FPS.
      * \param[in] motionBoundingRect - The video stream's detected motion bounding rectangle.
      * \param[in] streamBeingWritten - The video stream is currently having data recorded.
      * \param[in] motionRegions - (Optional) The motion rectangles being monitored.
      */
-    void SetVideoFrame(QImage const& videoFrame, double const fps, QRect const& motionBoundingRect,
-                       bool const streamBeingWritten, regions_t const& motionRegions = {});
+    void SetVideoFrame(QImage const& videoFrame, double fps, double originalFps,
+                       QRect const& motionBoundingRect, bool streamBeingWritten,
+                       regions_t const& motionRegions = {});
 
     /*!
      * \brief SetTitle sets title text of the form.

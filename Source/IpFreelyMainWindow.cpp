@@ -89,7 +89,7 @@ void ClearLayout(QLayout* layout, bool deleteWidgets)
     }
 }
 
-} // unnamed namesapce
+} // namespace
 
 IpFreelyMainWindow::IpFreelyMainWindow(QString const& appVersion, QWidget* parent)
     : QMainWindow(parent)
@@ -546,13 +546,14 @@ void IpFreelyMainWindow::on_updateFeedsTimer()
             QRect motionBoundingRect;
             auto currentVideoFrame = streamProcessor.second->CurrentVideoFrame(&motionBoundingRect);
 
+            auto originalFps = streamProcessor.second->OriginalFps();
             auto fps         = streamProcessor.second->CurrentFps();
             auto isRecording = streamProcessor.second->EnableVideoWriting();
 
             UpdateCamFeedFrame(
                 streamProcessor.first, currentVideoFrame, motionBoundingRect, isRecording);
 
-            SetFpsInTitle(streamProcessor.first, fps);
+            SetFpsInTitle(streamProcessor.first, fps, originalFps);
 
             if (m_videoForm->isVisible() && (m_videoFormId == streamProcessor.first))
             {
@@ -563,8 +564,12 @@ void IpFreelyMainWindow::on_updateFeedsTimer()
                     motionRegions = m_camMotionRegions[streamProcessor.first];
                 }
 
-                m_videoForm->SetVideoFrame(
-                    currentVideoFrame, fps, motionBoundingRect, isRecording, motionRegions);
+                m_videoForm->SetVideoFrame(currentVideoFrame,
+                                           fps,
+                                           originalFps,
+                                           motionBoundingRect,
+                                           isRecording,
+                                           motionRegions);
             }
         }
     }
@@ -1135,8 +1140,8 @@ void IpFreelyMainWindow::ConnectionHandler(ipfreely::IpCamera const& camera,
         }
         catch (std::exception& e)
         {
-            DEBUG_MESSAGE_EX_ERROR(
-                "Stream Error, camera: " << camName << ", error message: " << e.what());
+            DEBUG_MESSAGE_EX_ERROR("Stream Error, camera: " << camName
+                                                            << ", error message: " << e.what());
             QMessageBox::critical(this,
                                   "Stream Error",
                                   QString::fromLocal8Bit(e.what()),
@@ -1415,21 +1420,29 @@ void IpFreelyMainWindow::SaveImageSnapshot(ipfreely::eCamId const camId)
     }
 }
 
-void IpFreelyMainWindow::SetFpsInTitle(ipfreely::eCamId const camId, double const fps)
+void IpFreelyMainWindow::SetFpsInTitle(ipfreely::eCamId const camId, double fps, double originalFps)
 {
     switch (camId)
     {
     case ipfreely::eCamId::cam1:
-        ui->camFeed1GroupBox->setTitle(tr("Camera 1: ") + QString::number(fps) + tr(" FPS"));
+        ui->camFeed1GroupBox->setTitle(tr("Camera 1: ") + QString::number(fps) +
+                                       tr(" Recording FPS, ") + QString::number(originalFps) +
+                                       tr(" Stream FPS"));
         break;
     case ipfreely::eCamId::cam2:
-        ui->camFeed2GroupBox->setTitle(tr("Camera 2: ") + QString::number(fps) + tr(" FPS"));
+        ui->camFeed2GroupBox->setTitle(tr("Camera 2: ") + QString::number(fps) +
+                                       tr(" Recording FPS, ") + QString::number(originalFps) +
+                                       tr(" Stream FPS"));
         break;
     case ipfreely::eCamId::cam3:
-        ui->camFeed3GroupBox->setTitle(tr("Camera 3: ") + QString::number(fps) + tr(" FPS"));
+        ui->camFeed3GroupBox->setTitle(tr("Camera 3: ") + QString::number(fps) +
+                                       tr(" Recording FPS, ") + QString::number(originalFps) +
+                                       tr(" Stream FPS"));
         break;
     case ipfreely::eCamId::cam4:
-        ui->camFeed4GroupBox->setTitle(tr("Camera 4: ") + QString::number(fps) + tr(" FPS"));
+        ui->camFeed4GroupBox->setTitle(tr("Camera 4: ") + QString::number(fps) +
+                                       tr(" Recording FPS, ") + QString::number(originalFps) +
+                                       tr(" Stream FPS"));
         break;
     case ipfreely::eCamId::noCam:
         // Do nothing.
@@ -1498,8 +1511,8 @@ void IpFreelyMainWindow::VideoFrameAreaSelection(int const     cameraId,
         return;
     }
 
-    ipfreely::IpCamera::point_t leftTop(percentageSelection.left(), percentageSelection.top());
-    ipfreely::IpCamera::point_t widthHeight(percentageSelection.width(),
+    ipfreely::IpCamera::point_t  leftTop(percentageSelection.left(), percentageSelection.top());
+    ipfreely::IpCamera::point_t  widthHeight(percentageSelection.width(),
                                             percentageSelection.height());
     ipfreely::IpCamera::region_t region(leftTop, widthHeight);
     m_camMotionRegions[camId].emplace_back(region);

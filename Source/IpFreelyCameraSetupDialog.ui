@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>640</width>
-    <height>555</height>
+    <height>614</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -128,7 +128,7 @@
      <item row="5" column="0">
       <widget class="QLabel" name="maxCamFpsLabel">
        <property name="text">
-        <string>Camera's Maximum FPS</string>
+        <string>Preferred Recording FPS</string>
        </property>
       </widget>
      </item>
@@ -143,7 +143,7 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Specify the camera's FPS as defined in its settings.</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify the FPS to be used when recording the camera's stream.&lt;/p&gt;&lt;p&gt;Note that if the camera stream's detected FPS is less than this value the camera's detected value will be used instead.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="decimals">
           <number>1</number>
@@ -152,7 +152,7 @@
           <double>1.000000000000000</double>
          </property>
          <property name="maximum">
-          <double>30.000000000000000</double>
+          <double>60.000000000000000</double>
          </property>
          <property name="value">
           <double>25.000000000000000</double>

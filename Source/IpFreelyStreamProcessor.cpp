@@ -89,9 +89,6 @@ inline QImage CvMatToQImage(cv::Mat const& inMat)
 
 } // namespace utils
 
-static constexpr double MIN_FPS = 1.0;
-static constexpr double MAX_FPS = 30.0;
-
 IpFreelyStreamProcessor::IpFreelyStreamProcessor(
     std::string const& name, IpCamera const& cameraDetails, std::string const& saveFolderPath,
     double const requiredFileDurationSecs, std::vector<std::vector<bool>> const& recordingSchedule,
@@ -102,6 +99,7 @@ IpFreelyStreamProcessor::IpFreelyStreamProcessor(
     , m_requiredFileDurationSecs(requiredFileDurationSecs)
     , m_recordingSchedule(recordingSchedule)
     , m_motionSchedule(motionSchedule)
+    , m_fps(m_cameraDetails.cameraMaxFps)
 {
     m_useRecordingSchedule = VerifySchedule("Recording", m_recordingSchedule);
     m_useMotionSchedule    = VerifySchedule("Motion", m_motionSchedule);
@@ -121,37 +119,24 @@ IpFreelyStreamProcessor::IpFreelyStreamProcessor(
 
     CreateVideoCapture();
 
-    auto fps      = m_videoCapture->get(cv::CAP_PROP_FPS);
-    m_originalFps = fps;
+    m_originalFps = m_videoCapture->get(cv::CAP_PROP_FPS);
 
     DEBUG_MESSAGE_EX_INFO("Stream at: " << m_cameraDetails.streamUrl
-                                        << ", stream FPS: " << m_originalFps);
+                                        << " has detected stream FPS: " << m_originalFps);
 
-    if ((fps < MIN_FPS) || (fps > MAX_FPS))
-    {
-        fps = m_cameraDetails.cameraMaxFps;
+    // Work out a safe recording FPS.
+    ComputeFps();
 
-        DEBUG_MESSAGE_EX_WARNING(
-            "Invalid FPS obtained from stream defaulting to user preference FPS, stream URL: "
-            << m_cameraDetails.streamUrl);
-    }
-
-    m_fps                   = fps;
     m_updatePeriodMillisecs = static_cast<unsigned int>(1000.0 / m_fps);
 
     DEBUG_MESSAGE_EX_INFO("Stream at: "
-                          << m_cameraDetails.streamUrl << " running with FPS of: " << m_fps
+                          << m_cameraDetails.streamUrl << ", recording with FPS of: " << m_fps
                           << ", thread update period (ms): " << m_updatePeriodMillisecs);
 
     DEBUG_MESSAGE_EX_INFO("Creating event thread for stream URL: " << m_cameraDetails.streamUrl);
 
     m_eventThread = std::make_shared<core_lib::threads::EventThread>(
         std::bind(&IpFreelyStreamProcessor::ThreadEventCallback, this), m_updatePeriodMillisecs);
-}
-
-IpFreelyStreamProcessor::~IpFreelyStreamProcessor()
-{
-    // Do nothing.
 }
 
 void IpFreelyStreamProcessor::StartVideoWriting() noexcept
@@ -227,6 +212,11 @@ QImage IpFreelyStreamProcessor::CurrentVideoFrame(QRect* motionRectangle) const
     return utils::CvMatToQImage(result);
 }
 
+double IpFreelyStreamProcessor::OriginalFps() const noexcept
+{
+    return m_originalFps;
+}
+
 double IpFreelyStreamProcessor::CurrentFps() const noexcept
 {
     return m_fps;
@@ -297,7 +287,7 @@ bool IpFreelyStreamProcessor::VerifySchedule(std::string const&                 
 void IpFreelyStreamProcessor::ThreadEventCallback() noexcept
 {
     // Get current time stamp.
-    m_currentTime = time(0);
+    m_currentTime = time(nullptr);
 
     try
     {
@@ -501,15 +491,15 @@ void IpFreelyStreamProcessor::CreateVideoCapture()
     }
 
     bool isId;
-    auto comleteStreamUrl = m_cameraDetails.CompleteStreamUrl(isId);
+    auto completeStreamUrl = m_cameraDetails.CompleteStreamUrl(isId);
 
     if (isId)
     {
-        m_videoCapture = cv::makePtr<cv::VideoCapture>(std::stoi(comleteStreamUrl));
+        m_videoCapture = cv::makePtr<cv::VideoCapture>(std::stoi(completeStreamUrl));
     }
     else
     {
-        m_videoCapture = cv::makePtr<cv::VideoCapture>(comleteStreamUrl.c_str());
+        m_videoCapture = cv::makePtr<cv::VideoCapture>(completeStreamUrl.c_str());
     }
 
     if (!m_videoCapture->isOpened())
@@ -521,6 +511,40 @@ void IpFreelyStreamProcessor::CreateVideoCapture()
 
     m_videoWidth  = static_cast<int>(m_videoCapture->get(cv::CAP_PROP_FRAME_WIDTH));
     m_videoHeight = static_cast<int>(m_videoCapture->get(cv::CAP_PROP_FRAME_HEIGHT));
+}
+
+bool IpFreelyStreamProcessor::ComputeFps()
+{
+    // Remember current recording FPS.
+    auto fps = m_fps;
+
+    if (m_fps > m_originalFps)
+    {
+        DEBUG_MESSAGE_EX_WARNING("Preferred recording FPS is greater than camera's detected FPS. "
+                                 "Will use camera's detected FPS instead for stream URL: "
+                                 << m_cameraDetails.streamUrl);
+        m_fps = m_originalFps;
+    }
+
+    if (m_fps < MIN_FPS)
+    {
+        m_fps = MIN_FPS;
+
+        DEBUG_MESSAGE_EX_WARNING("Recording FPS is less than overall allowed minimum FPS. Will use "
+                                 "minimum allowed FPS instead for stream URL: "
+                                 << m_cameraDetails.streamUrl);
+    }
+
+    if (m_fps > MAX_FPS)
+    {
+        m_fps = MAX_FPS;
+
+        DEBUG_MESSAGE_EX_WARNING("Recording FPS is less than overall allowed maximum FPS. Will use "
+                                 "maximum allowed FPS instead, stream URL: "
+                                 << m_cameraDetails.streamUrl);
+    }
+
+    return std::abs(fps - m_fps) > 0.1;
 }
 
 void IpFreelyStreamProcessor::CheckFps()
@@ -535,53 +559,56 @@ void IpFreelyStreamProcessor::CheckFps()
 
         m_originalFps = fps;
 
-        if ((fps < MIN_FPS) || (fps > MAX_FPS))
+        // Work out a safe recording FPS.
+        if (ComputeFps())
         {
-            fps = m_cameraDetails.cameraMaxFps;
+            m_updatePeriodMillisecs = static_cast<unsigned int>(1000.0 / m_fps);
 
-            DEBUG_MESSAGE_EX_WARNING(
-                "Invalid FPS obtained from stream defaulting to user preference FPS, stream URL: "
-                << m_cameraDetails.streamUrl);
-        }
-
-        // If the FPS has changed then recreate the video capture object.
-        CreateVideoCapture();
-
-        m_fps                   = fps;
-        m_updatePeriodMillisecs = static_cast<unsigned int>(1000.0 / m_fps);
-
-        DEBUG_MESSAGE_EX_INFO("Stream at: "
-                              << m_cameraDetails.streamUrl << " running with FPS of: " << m_fps
+            DEBUG_MESSAGE_EX_INFO(
+                "Stream at: " << m_cameraDetails.streamUrl << ", recording with FPS of: " << m_fps
                               << ", thread update period (ms): " << m_updatePeriodMillisecs);
 
-        if (m_videoWriter)
-        {
-            DEBUG_MESSAGE_EX_INFO("Releasing video writer due to FPS change, stream URL: "
-                                  << m_cameraDetails.streamUrl);
-            m_videoWriter.release();
+            // If the FPS has changed then recreate the video capture object.
+            CreateVideoCapture();
+
+            // And release video writer.
+            if (m_videoWriter)
+            {
+                DEBUG_MESSAGE_EX_INFO("Releasing video writer due to FPS change, stream URL: "
+                                      << m_cameraDetails.streamUrl);
+                m_videoWriter.release();
+            }
+
+            // And recreate the motion detector.
+            if (m_motionDetector)
+            {
+                DEBUG_MESSAGE_EX_INFO("Recreating motion detector with new FPS, stream URL: "
+                                      << m_cameraDetails.streamUrl);
+                m_motionDetector.reset();
+                m_motionDetector =
+                    std::make_shared<IpFreelyMotionDetector>(m_name,
+                                                             m_cameraDetails,
+                                                             m_saveFolderPath,
+                                                             m_requiredFileDurationSecs,
+                                                             m_fps,
+                                                             m_videoWidth,
+                                                             m_videoHeight);
+            }
+
+            // Finally recreate the event thread.
+            DEBUG_MESSAGE_EX_INFO(
+                "Recreating event thread for stream URL: " << m_cameraDetails.streamUrl);
+
+            m_eventThread.reset();
+            m_eventThread = std::make_shared<core_lib::threads::EventThread>(
+                std::bind(&IpFreelyStreamProcessor::ThreadEventCallback, this),
+                m_updatePeriodMillisecs);
         }
-
-        if (m_motionDetector)
+        else
         {
-            DEBUG_MESSAGE_EX_INFO("Recreating motion detector with new FPS, stream URL: "
-                                  << m_cameraDetails.streamUrl);
-            m_motionDetector.reset();
-            m_motionDetector = std::make_shared<IpFreelyMotionDetector>(m_name,
-                                                                        m_cameraDetails,
-                                                                        m_saveFolderPath,
-                                                                        m_requiredFileDurationSecs,
-                                                                        m_fps,
-                                                                        m_videoWidth,
-                                                                        m_videoHeight);
+            DEBUG_MESSAGE_EX_INFO(
+                "Current recording FPS is still OK even though detected stream FPS has changed.");
         }
-
-        DEBUG_MESSAGE_EX_INFO(
-            "Recreating event thread for stream URL: " << m_cameraDetails.streamUrl);
-
-        m_eventThread.reset();
-        m_eventThread = std::make_shared<core_lib::threads::EventThread>(
-            std::bind(&IpFreelyStreamProcessor::ThreadEventCallback, this),
-            m_updatePeriodMillisecs);
     }
 }
 
