@@ -183,7 +183,7 @@ void IpFreelyMotionDetector::InitialiseFrames()
         m_prevGreyFrame = *m_originalFrame;
     }
 
-    cv::cvtColor(m_prevGreyFrame, m_prevGreyFrame, CV_BGR2GRAY);
+    cv::cvtColor(m_prevGreyFrame, m_prevGreyFrame, cv::COLOR_BGR2GRAY);
 
     if (m_cameraDetails.shrinkVideoFrames)
     {
@@ -199,7 +199,7 @@ void IpFreelyMotionDetector::InitialiseFrames()
         m_currentGreyFrame = *m_originalFrame;
     }
 
-    cv::cvtColor(m_currentGreyFrame, m_currentGreyFrame, CV_BGR2GRAY);
+    cv::cvtColor(m_currentGreyFrame, m_currentGreyFrame, cv::COLOR_BGR2GRAY);
 }
 
 void IpFreelyMotionDetector::UpdateNextFrame()
@@ -218,7 +218,7 @@ void IpFreelyMotionDetector::UpdateNextFrame()
         m_nextGreyFrame = *m_originalFrame;
     }
 
-    cv::cvtColor(m_nextGreyFrame, m_nextGreyFrame, CV_BGR2GRAY);
+    cv::cvtColor(m_nextGreyFrame, m_nextGreyFrame, cv::COLOR_BGR2GRAY);
 }
 
 bool IpFreelyMotionDetector::DetectMotion()
@@ -240,7 +240,8 @@ bool IpFreelyMotionDetector::DetectMotion()
     cv::absdiff(m_prevGreyFrame, m_nextGreyFrame, diff1);
     cv::absdiff(m_nextGreyFrame, m_currentGreyFrame, diff2);
     cv::bitwise_and(diff1, diff2, motion);
-    cv::threshold(motion, motion, m_cameraDetails.pixelThreshold, DIFF_MAX_VALUE, CV_THRESH_BINARY);
+    cv::threshold(
+        motion, motion, m_cameraDetails.pixelThreshold, DIFF_MAX_VALUE, cv::THRESH_BINARY);
     cv::erode(motion, motion, m_erosionKernel);
 
     // Now work out the std dev of the motion frame.
@@ -431,15 +432,10 @@ bool IpFreelyMotionDetector::CheckForIntersections()
             motionIntersection = true;
 
             DEBUG_MESSAGE_EX_INFO("Motion detector intersection found for camera stream URL: "
-                                  << m_cameraDetails.streamUrl
-                                  << ", region details: L = "
-                                  << region.first.first
-                                  << ", T = "
-                                  << region.first.second
-                                  << ", W = "
-                                  << region.second.first
-                                  << ", H = "
-                                  << region.second.second);
+                                  << m_cameraDetails.streamUrl << ", region details: L = "
+                                  << region.first.first << ", T = " << region.first.second
+                                  << ", W = " << region.second.first
+                                  << ", H = " << region.second.second);
 
             break;
         }
@@ -523,8 +519,7 @@ void IpFreelyMotionDetector::CreateCaptureObjects()
 
         DEBUG_MESSAGE_EX_INFO(
             "Motion detector file duration reached for current video file, camera stream URL: "
-            << m_cameraDetails.streamUrl
-            << ", file writer being closed.");
+            << m_cameraDetails.streamUrl << ", file writer being closed.");
 
         m_videoWriter.release();
         SetWritingStream(false);

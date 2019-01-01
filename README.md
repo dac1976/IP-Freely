@@ -11,7 +11,7 @@ Copyright (C) 2018 Duncan Crutchley.
 ## Background ##
 I started this project shortly after buying and installing some RTSP compatible IP security cameras at my house. The software that came with the cameras was adequate but not great; relying on ActiveX and Internet Explorer. Instead this project provides a native application to view and record up to 4 cameras' streams. Currently, this application does not give you any control over the IP cameras' on-board settings.
 
-## Key Features (Current Version 1.1.5.0) ##
+## Key Features (Current Version 1.1.6.0) ##
 * Clean and intuitive UI, hopefully!
 * Multi-threaded.
 * Cross-platform (Windows and Linux).
@@ -66,20 +66,20 @@ Taken from release 1.1.5.0.
 [pic09]: https://github.com/dac1976/IP-Freely/blob/master/Images/pic09.png "Motion region setup."
 
 ## Build Requirements ##
-This application has been developed in Qt Creator and tested for use in Windows 10 and Linux (Ubuntu 17.10). In Windows it is recommended to use the MSVC2015 64bit tool chain from within Qt Creator to build and test the code. In Linux the code has been tested with GCC 7.2.0 but other C++11 compilers should be fine, such as Clang.
+This application has been developed in Qt Creator and tested for use in Windows 10 and Linux (Ubuntu 17.10+ or Manjaro 17+). In Windows it is recommended to use the MSVC2015 or MSVC 2017 64bit tool chain from within Qt Creator to build and test the code. In Linux the code has been tested with GCC 7.2.0+ but other C++1y compilers should be fine, such as Clang.
 
-The project supplied for the application is for Qt Creator and will work in Linux and Windows. This project can be customized to suit the user's own environment and paths.
+The project supplied for the application is for Qt Creator and will work in Linux and Windows. This project can be customized to suit the user's own environment and paths. I will mainly maintain the Linux version.
 
 You may use this code within other supported development and build environments but it is up to the user to create the required projects or makefiles for those environments. This should be fairly easy by referring to the Qt project (.pro) file.
 
 This library requires some third-party open source libraries for it to compile and function. These are as follows:
-* Boost (tested with 1.65.1 and 1.66.0 but newest version recommended): http://www.boost.org/
+* Boost (tested with 1.65.1 to 1.68.0 but newest version recommended): http://www.boost.org/
 * Cereal (tested with 1.2.2 but newest version recommended): http://uscilab.github.io/cereal/
 * Loki: http://loki-lib.sourceforge.net/
-* CoreLibrary (requires with 1.4.6.0 but newest version recommended): https://github.com/dac1976/CoreLibrary
-* Qt Framework (tested with 5.10 and 5.10.1 but should work with any 5.X version): http://www.qt.io
+* CoreLibrary (requires with 1.4.6.0 and greater): https://github.com/dac1976/CoreLibrary
+* Qt Framework (tested with 5.10 to 5.12 but should work with any 5.X version): http://www.qt.io
 * Single Application: https://github.com/itay-grudev/SingleApplication
-* OpenCV (tested with 3.4.0 but other 3.X versions should work): https://opencv.org/releases.html
+* OpenCV (now requires 4.0.1): https://opencv.org/releases.html
 
 Please note that some of these libraries themselves require other dependencies, so please refer to their documentation.
 

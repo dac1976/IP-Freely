@@ -25,7 +25,7 @@
 #include "IpFreelyStreamProcessor.h"
 #include <sstream>
 #include <cmath>
-#include <boost/throw_exception.hpp>
+#include <boost/exception/all.hpp>
 #include <boost/filesystem.hpp>
 #include "IpFreelyMotionDetector.h"
 #include "Threads/EventThread.h"
@@ -121,11 +121,11 @@ IpFreelyStreamProcessor::IpFreelyStreamProcessor(
 
     CreateVideoCapture();
 
-    auto fps      = m_videoCapture->get(CV_CAP_PROP_FPS);
+    auto fps      = m_videoCapture->get(cv::CAP_PROP_FPS);
     m_originalFps = fps;
 
-    DEBUG_MESSAGE_EX_INFO(
-        "Stream at: " << m_cameraDetails.streamUrl << ", stream FPS: " << m_originalFps);
+    DEBUG_MESSAGE_EX_INFO("Stream at: " << m_cameraDetails.streamUrl
+                                        << ", stream FPS: " << m_originalFps);
 
     if ((fps < MIN_FPS) || (fps > MAX_FPS))
     {
@@ -139,10 +139,9 @@ IpFreelyStreamProcessor::IpFreelyStreamProcessor(
     m_fps                   = fps;
     m_updatePeriodMillisecs = static_cast<unsigned int>(1000.0 / m_fps);
 
-    DEBUG_MESSAGE_EX_INFO("Stream at: " << m_cameraDetails.streamUrl << " running with FPS of: "
-                                        << m_fps
-                                        << ", thread update period (ms): "
-                                        << m_updatePeriodMillisecs);
+    DEBUG_MESSAGE_EX_INFO("Stream at: "
+                          << m_cameraDetails.streamUrl << " running with FPS of: " << m_fps
+                          << ", thread update period (ms): " << m_updatePeriodMillisecs);
 
     DEBUG_MESSAGE_EX_INFO("Creating event thread for stream URL: " << m_cameraDetails.streamUrl);
 
@@ -396,8 +395,8 @@ void IpFreelyStreamProcessor::CreateCaptureObjects()
 
         p /= oss.str();
 
-        DEBUG_MESSAGE_EX_INFO(
-            "Creating new output video file: " << p.string() << ", FPS: " << m_fps);
+        DEBUG_MESSAGE_EX_INFO("Creating new output video file: " << p.string()
+                                                                 << ", FPS: " << m_fps);
 
 #if BOOST_OS_WINDOWS
         m_videoWriter = cv::makePtr<cv::VideoWriter>(p.string().c_str(),
@@ -520,21 +519,19 @@ void IpFreelyStreamProcessor::CreateVideoCapture()
         BOOST_THROW_EXCEPTION(std::runtime_error(oss.str()));
     }
 
-    m_videoWidth  = static_cast<int>(m_videoCapture->get(CV_CAP_PROP_FRAME_WIDTH));
-    m_videoHeight = static_cast<int>(m_videoCapture->get(CV_CAP_PROP_FRAME_HEIGHT));
+    m_videoWidth  = static_cast<int>(m_videoCapture->get(cv::CAP_PROP_FRAME_WIDTH));
+    m_videoHeight = static_cast<int>(m_videoCapture->get(cv::CAP_PROP_FRAME_HEIGHT));
 }
 
 void IpFreelyStreamProcessor::CheckFps()
 {
-    auto fps = m_videoCapture->get(CV_CAP_PROP_FPS);
+    auto fps = m_videoCapture->get(cv::CAP_PROP_FPS);
 
     if (std::abs(fps - m_originalFps) > 0.1)
     {
-        DEBUG_MESSAGE_EX_WARNING("Detected change in FPS for stream: " << m_cameraDetails.streamUrl
-                                                                       << ", changed from: "
-                                                                       << m_originalFps
-                                                                       << " to: "
-                                                                       << fps);
+        DEBUG_MESSAGE_EX_WARNING("Detected change in FPS for stream: "
+                                 << m_cameraDetails.streamUrl << ", changed from: " << m_originalFps
+                                 << " to: " << fps);
 
         m_originalFps = fps;
 
@@ -553,10 +550,9 @@ void IpFreelyStreamProcessor::CheckFps()
         m_fps                   = fps;
         m_updatePeriodMillisecs = static_cast<unsigned int>(1000.0 / m_fps);
 
-        DEBUG_MESSAGE_EX_INFO("Stream at: " << m_cameraDetails.streamUrl << " running with FPS of: "
-                                            << m_fps
-                                            << ", thread update period (ms): "
-                                            << m_updatePeriodMillisecs);
+        DEBUG_MESSAGE_EX_INFO("Stream at: "
+                              << m_cameraDetails.streamUrl << " running with FPS of: " << m_fps
+                              << ", thread update period (ms): " << m_updatePeriodMillisecs);
 
         if (m_videoWriter)
         {

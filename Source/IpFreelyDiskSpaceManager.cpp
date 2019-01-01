@@ -26,7 +26,7 @@
 #include <QStorageInfo>
 #include <sstream>
 #include <algorithm>
-#include <boost/throw_exception.hpp>
+#include <boost/exception/all.hpp>
 #include <boost/filesystem.hpp>
 #include "Threads/EventThread.h"
 #include "DebugLog/DebugLogging.h"
@@ -101,8 +101,7 @@ void IpFreelyDiskSpaceManager::CheckUsedDiskSpace()
         if (percentUsed > m_maxPercentUsedSpace)
         {
             DEBUG_MESSAGE_EX_INFO("Percentage disk space used is too great ("
-                                  << percentUsed
-                                  << "%), will attempt to delete oldest data.");
+                                  << percentUsed << "%), will attempt to delete oldest data.");
 
             if (!DeleteOldestRecording())
             {
@@ -121,9 +120,7 @@ void IpFreelyDiskSpaceManager::CheckNumDaysDataStored()
     while (m_subDirs.size() > static_cast<size_t>(m_maxNumDaysToStore))
     {
         DEBUG_MESSAGE_EX_INFO("Too many days data found on disk. Expected: "
-                              << m_maxNumDaysToStore
-                              << " but found: "
-                              << m_subDirs.size()
+                              << m_maxNumDaysToStore << " but found: " << m_subDirs.size()
                               << ". Will attempt to delete oldest data.");
 
         if (!DeleteOldestRecording())

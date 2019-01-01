@@ -26,7 +26,7 @@
 #include <sstream>
 #include <fstream>
 #include <utility>
-#include <boost/throw_exception.hpp>
+#include <boost/exception/all.hpp>
 #include <boost/filesystem.hpp>
 #include "Serialization/SerializeToVector.h"
 #include "DebugLog/DebugLogging.h"

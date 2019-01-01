@@ -17,7 +17,7 @@ TEMPLATE = app
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 
-CONFIG += core_lib_dll
+CONFIG += core_lib c++14
 
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -68,13 +68,13 @@ else {
     QMAKE_CXXFLAGS += -std=c++14
 
     # Set version info for library.
-    VERSION = 1.1.5
+    VERSION = 1.1.6
 
-    INCLUDEPATH += /usr/local/include \
-        /home/duncan/projects/ThirdParty \
-        /home/duncan/projects/ThirdParty/singleapplication
+    INCLUDEPATH += /usr/include/opencv4 \
+        /mnt/Data/projects/ThirdParty \
+        /mnt/Data/projects/ThirdParty/singleapplication
 
-    LIBS += -L/usr/local/lib   \
+    LIBS += -L/usr/lib   \
             -lopencv_core      \
             -lopencv_imgcodecs \
             -lopencv_imgproc   \
@@ -83,10 +83,10 @@ else {
             #-lopencv_highgui
 
     SOURCES += \
-        /home/duncan/projects/ThirdParty/singleapplication/singleapplication.cpp
+        /mnt/Data/projects/ThirdParty/singleapplication/singleapplication.cpp
 
     HEADERS += \
-        /home/duncan/projects/ThirdParty/singleapplication/singleapplication.h
+        /mnt/Data/projects/ThirdParty/singleapplication/singleapplication.h
 }
 
 SOURCES += \

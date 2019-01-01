@@ -29,7 +29,7 @@
 #include <string>
 #include <memory>
 #include <ctime>
-#include <opencv/cv.hpp>
+#include <opencv2/opencv.hpp>
 #include "Threads/MessageQueueThread.h"
 #include "IpFreelyCameraDatabase.h"
 
@@ -98,40 +98,40 @@ private:
     bool       CheckForIntersections();
     void       RotateFrames();
     static int MessageDecoder(video_frame_t const& msg);
-    bool MessageHandler(video_frame_t& msg);
-    void CreateCaptureObjects();
-    void WriteVideoFrame();
-    void SetWritingStream(bool const writing) noexcept;
+    bool       MessageHandler(video_frame_t& msg);
+    void       CreateCaptureObjects();
+    void       WriteVideoFrame();
+    void       SetWritingStream(bool const writing) noexcept;
 
 private:
-    mutable std::mutex       m_motionMutex{};
-    mutable std::mutex       m_writingMutex{};
-    mutable std::mutex       m_fpsMutex{};
-    std::string              m_name{"cam"};
-    IpCamera                 m_cameraDetails{};
-    std::string              m_saveFolderPath{};
-    double                   m_requiredFileDurationSecs{0.0};
-    double                   m_fps{25.0};
-    int                      m_originalWidth{0};
-    int                      m_originalHeight{0};
-    unsigned int             m_updatePeriodMillisecs{40};
-    cv::Mat                  m_erosionKernel{};
-    cv::Scalar               m_rectangleColor{0, 255, 0};
-    video_frame_t            m_originalFrame;
-    size_t                   m_holdOffFrameCountLimit{0};
-    size_t                   m_holdOffFrameCount{0};
-    double                   m_motionFrameScalar{1.0};
-    int                      m_minImageChangeArea{0};
-    size_t                   m_imageChangesThreshold{0};
-    bool                     m_initialiseFrames{true};
-    cv::Mat                  m_prevGreyFrame{};
-    cv::Mat                  m_currentGreyFrame{};
-    cv::Mat                  m_nextGreyFrame{};
-    cv::Rect                 m_motionBoundingRect{0, 0, 0, 0};
-    double                   m_fileDurationSecs{0.0};
-    time_t                   m_currentTime{};
-    cv::Ptr<cv::VideoWriter> m_videoWriter{};
-    bool                     m_writingStream{false};
+    mutable std::mutex                                        m_motionMutex{};
+    mutable std::mutex                                        m_writingMutex{};
+    mutable std::mutex                                        m_fpsMutex{};
+    std::string                                               m_name{"cam"};
+    IpCamera                                                  m_cameraDetails{};
+    std::string                                               m_saveFolderPath{};
+    double                                                    m_requiredFileDurationSecs{0.0};
+    double                                                    m_fps{25.0};
+    int                                                       m_originalWidth{0};
+    int                                                       m_originalHeight{0};
+    unsigned int                                              m_updatePeriodMillisecs{40};
+    cv::Mat                                                   m_erosionKernel{};
+    cv::Scalar                                                m_rectangleColor{0, 255, 0};
+    video_frame_t                                             m_originalFrame;
+    size_t                                                    m_holdOffFrameCountLimit{0};
+    size_t                                                    m_holdOffFrameCount{0};
+    double                                                    m_motionFrameScalar{1.0};
+    int                                                       m_minImageChangeArea{0};
+    size_t                                                    m_imageChangesThreshold{0};
+    bool                                                      m_initialiseFrames{true};
+    cv::Mat                                                   m_prevGreyFrame{};
+    cv::Mat                                                   m_currentGreyFrame{};
+    cv::Mat                                                   m_nextGreyFrame{};
+    cv::Rect                                                  m_motionBoundingRect{0, 0, 0, 0};
+    double                                                    m_fileDurationSecs{0.0};
+    time_t                                                    m_currentTime{};
+    cv::Ptr<cv::VideoWriter>                                  m_videoWriter{};
+    bool                                                      m_writingStream{false};
     core_lib::threads::MessageQueueThread<int, video_frame_t> m_msgQueueThread;
 };
 
