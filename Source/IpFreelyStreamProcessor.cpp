@@ -40,51 +40,47 @@ namespace ipfreely
 namespace utils
 {
 
-inline QImage CvMatToQImage(cv::Mat const& inMat)
+inline bool CvMatToQImage(cv::Mat const& inMat, QImage& image)
 {
     switch (inMat.type())
     {
     // 8-bit, 4 channel
     case CV_8UC4:
     {
-        QImage image(inMat.data,
-                     inMat.cols,
-                     inMat.rows,
-                     static_cast<int>(inMat.step),
-                     QImage::Format_ARGB32);
-
-        return image;
+        image = QImage(inMat.data,
+                       inMat.cols,
+                       inMat.rows,
+                       static_cast<int>(inMat.step),
+                       QImage::Format_ARGB32);
+        return true;
     }
 
     // 8-bit, 3 channel
     case CV_8UC3:
     {
-        QImage image(inMat.data,
-                     inMat.cols,
-                     inMat.rows,
-                     static_cast<int>(inMat.step),
-                     QImage::Format_RGB888);
-
-        return image.rgbSwapped();
+        image = QImage(inMat.data,
+                       inMat.cols,
+                       inMat.rows,
+                       static_cast<int>(inMat.step),
+                       QImage::Format_RGB888)
+                    .rgbSwapped();
+        return true;
     }
     // 8-bit, 1 channel
     case CV_8UC1:
     {
-        QImage image(inMat.data,
-                     inMat.cols,
-                     inMat.rows,
-                     static_cast<int>(inMat.step),
-                     QImage::Format_Grayscale8);
-
-        return image;
+        image = QImage(inMat.data,
+                       inMat.cols,
+                       inMat.rows,
+                       static_cast<int>(inMat.step),
+                       QImage::Format_Grayscale8);
+        return true;
     }
 
     default:
         DEBUG_MESSAGE_EX_ERROR("unsupported cv::Mat format");
-        break;
+        return false;
     }
-
-    return QImage();
 }
 
 } // namespace utils
@@ -165,7 +161,7 @@ void IpFreelyStreamProcessor::StopVideoWriting() noexcept
     SetEnableVideoWriting(false);
 }
 
-bool IpFreelyStreamProcessor::EnableVideoWriting() const noexcept
+bool IpFreelyStreamProcessor::VideoWritingEnabled() const noexcept
 {
     bool isWriting = GetEnableVideoWriting();
 
@@ -192,24 +188,14 @@ double IpFreelyStreamProcessor::GetAspectRatioAndSize(int& width, int& height) c
 
 QImage IpFreelyStreamProcessor::CurrentVideoFrame(QRect* motionRectangle) const
 {
-    cv::Mat result;
-
-    {
-        std::lock_guard<std::mutex> lock(m_frameMutex);
-        result = m_videoFrame;
-    }
-
     if (motionRectangle)
     {
-        std::lock_guard<std::mutex> lock(m_motionMutex);
-
-        if (m_motionDetector)
-        {
-            *motionRectangle = m_motionDetector->CurrentMotionRect();
-        }
+        std::lock_guard<std::mutex> lockM(m_motionMutex);
+        *motionRectangle = m_motionRectangle;
     }
 
-    return utils::CvMatToQImage(result);
+    std::lock_guard<std::mutex> lockF(m_frameMutex);
+    return m_currentFrame;
 }
 
 double IpFreelyStreamProcessor::OriginalFps() const noexcept
@@ -420,8 +406,10 @@ void IpFreelyStreamProcessor::CreateCaptureObjects()
 
 void IpFreelyStreamProcessor::GrabVideoFrame()
 {
-    std::lock_guard<std::mutex> lock(m_frameMutex);
     *m_videoCapture >> m_videoFrame;
+
+    std::lock_guard<std::mutex> lock(m_frameMutex);
+    utils::CvMatToQImage(m_videoFrame, m_currentFrame);
     m_videoFrameUpdated = true;
 }
 
@@ -430,7 +418,6 @@ void IpFreelyStreamProcessor::WriteVideoFrame()
     if (m_videoWriter)
     {
         {
-            std::lock_guard<std::mutex> lock(m_frameMutex);
             *m_videoWriter << m_videoFrame;
         }
 
@@ -455,13 +442,14 @@ void IpFreelyStreamProcessor::InitialiseMotionDetector()
 {
     if (!m_motionDetector)
     {
-        m_motionDetector = std::make_shared<IpFreelyMotionDetector>(m_name,
+        m_motionDetector  = std::make_shared<IpFreelyMotionDetector>(m_name,
                                                                     m_cameraDetails,
                                                                     m_saveFolderPath,
                                                                     m_requiredFileDurationSecs,
                                                                     m_fps,
                                                                     m_videoWidth,
                                                                     m_videoHeight);
+        m_motionRectangle = QRect();
     }
 }
 
@@ -469,18 +457,19 @@ void IpFreelyStreamProcessor::CheckMotionDetector()
 {
     bool enableMotionDetector = CheckMotionSchedule();
 
-    std::lock_guard<std::mutex> lockM(m_motionMutex);
-
     if (!enableMotionDetector)
     {
         m_motionDetector.reset();
+        m_motionRectangle = QRect();
         return;
     }
 
     InitialiseMotionDetector();
 
-    std::lock_guard<std::mutex> lockF(m_frameMutex);
     m_motionDetector->AddNextFrame(m_videoFrame);
+
+    std::lock_guard<std::mutex> lockM(m_motionMutex);
+    m_motionRectangle = m_motionDetector->CurrentMotionRect();
 }
 
 void IpFreelyStreamProcessor::CreateVideoCapture()
@@ -522,7 +511,7 @@ bool IpFreelyStreamProcessor::ComputeFps()
     {
         DEBUG_MESSAGE_EX_WARNING("Preferred recording FPS is greater than camera's detected FPS. "
                                  "Will use camera's detected FPS instead for stream URL: "
-                                 << m_cameraDetails.streamUrl);
+                                 << m_cameraDetails.streamUrl << ", FPS: " << m_fps);
         m_fps = m_originalFps;
     }
 
@@ -532,7 +521,7 @@ bool IpFreelyStreamProcessor::ComputeFps()
 
         DEBUG_MESSAGE_EX_WARNING("Recording FPS is less than overall allowed minimum FPS. Will use "
                                  "minimum allowed FPS instead for stream URL: "
-                                 << m_cameraDetails.streamUrl);
+                                 << m_cameraDetails.streamUrl << ", FPS: " << m_fps);
     }
 
     if (m_fps > MAX_FPS)
@@ -541,7 +530,7 @@ bool IpFreelyStreamProcessor::ComputeFps()
 
         DEBUG_MESSAGE_EX_WARNING("Recording FPS is less than overall allowed maximum FPS. Will use "
                                  "maximum allowed FPS instead, stream URL: "
-                                 << m_cameraDetails.streamUrl);
+                                 << m_cameraDetails.streamUrl << ", FPS: " << m_fps);
     }
 
     return std::abs(fps - m_fps) > 0.1;
@@ -585,6 +574,7 @@ void IpFreelyStreamProcessor::CheckFps()
                 DEBUG_MESSAGE_EX_INFO("Recreating motion detector with new FPS, stream URL: "
                                       << m_cameraDetails.streamUrl);
                 m_motionDetector.reset();
+                m_motionRectangle = QRect();
                 m_motionDetector =
                     std::make_shared<IpFreelyMotionDetector>(m_name,
                                                              m_cameraDetails,

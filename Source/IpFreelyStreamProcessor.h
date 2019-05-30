@@ -89,10 +89,10 @@ public:
     void StopVideoWriting() noexcept;
 
     /*!
-     * \brief EnableVideoWriting reports if stream is being written to disk.
+     * \brief VideoWritingEnabled reports if stream is being written to disk.
      * \return True if writing, false otherwise.
      */
-    bool EnableVideoWriting() const noexcept;
+    bool VideoWritingEnabled() const noexcept;
 
     /*!c
      * \brief VideoFrameUpdated monitors stream activity.
@@ -165,6 +165,8 @@ private:
     int                                             m_videoHeight{0};
     cv::Ptr<cv::VideoCapture>                       m_videoCapture{};
     cv::Mat                                         m_videoFrame{};
+    QImage                                          m_currentFrame{};
+    QRect                                           m_motionRectangle{};
     cv::Ptr<cv::VideoWriter>                        m_videoWriter{};
     double                                          m_fileDurationSecs{0.0};
     bool                                            m_videoFrameUpdated{false};

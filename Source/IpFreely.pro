@@ -70,7 +70,7 @@ else {
     QMAKE_CXXFLAGS += -std=c++14
 
     # Set version info for library.
-    VERSION = 1.2.0
+    VERSION = 1.2.1
 
     INCLUDEPATH += /usr/include/opencv4 \
         /mnt/Data/projects/ThirdParty \
@@ -81,8 +81,8 @@ else {
             -lopencv_imgcodecs \
             -lopencv_imgproc   \
             -lopencv_video     \
-            -lopencv_videoio #\
-            #-lopencv_highgui
+            -lopencv_videoio \
+            -lopencv_highgui
 
     SOURCES += \
         /mnt/Data/projects/ThirdParty/singleapplication/singleapplication.cpp

@@ -57,7 +57,7 @@ namespace bfs = boost::filesystem;
 namespace
 {
 
-static constexpr int DEFAULT_UPDATE_PERIOD_MS = 25;
+static constexpr int DEFAULT_UPDATE_PERIOD_MS = 100;
 
 void ClearLayout(QLayout* layout, bool deleteWidgets)
 {
@@ -548,7 +548,7 @@ void IpFreelyMainWindow::on_updateFeedsTimer()
 
             auto originalFps = streamProcessor.second->OriginalFps();
             auto fps         = streamProcessor.second->CurrentFps();
-            auto isRecording = streamProcessor.second->EnableVideoWriting();
+            auto isRecording = streamProcessor.second->VideoWritingEnabled();
 
             UpdateCamFeedFrame(
                 streamProcessor.first, currentVideoFrame, motionBoundingRect, isRecording);
@@ -1212,7 +1212,7 @@ void IpFreelyMainWindow::RecordActionHandler(ipfreely::eCamId const camId, QTool
         return;
     }
 
-    if (streamProcIter->second->EnableVideoWriting())
+    if (streamProcIter->second->VideoWritingEnabled())
     {
         streamProcIter->second->StopVideoWriting();
 
